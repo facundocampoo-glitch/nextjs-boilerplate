@@ -2,10 +2,13 @@ export async function GET() {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Falta OPENAI_API_KEY" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Falta OPENAI_API_KEY" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 
   const r = await fetch("https://api.openai.com/v1/responses", {
@@ -21,14 +24,25 @@ export async function GET() {
   });
 
   if (!r.ok) {
-    return new Response(JSON.stringify({ error: await r.text() }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: await r.text() }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 
   const data = await r.json();
-  return new Response(JSON.stringify({ text: data.output_text }), {
-    headers: { "Content-Type": "application/json" },
-  });
+
+  const text =
+    data?.output?.[0]?.content?.[0]?.text ??
+    "No vino texto, pero la API respondió.";
+
+  return new Response(
+    JSON.stringify({ text }),
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 }
