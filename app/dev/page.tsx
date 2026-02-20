@@ -9,6 +9,8 @@ export default function DevPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [audioUrl, setAudioUrl] = useState<string>("");
+  const [audioLoading, setAudioLoading] = useState(false);
 
   async function run() {
     setLoading(true);
