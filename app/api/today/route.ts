@@ -1,25 +1,19 @@
 export const runtime = "nodejs";
 
+import { CONTENT_TYPES } from "@/lib/content-types";
+
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
 function dayOfWeek(): number {
-  // 0 = domingo, 1 = lunes ...
-  return new Date().getDay();
+  return new Date().getDay(); // 0 = domingo
 }
 
-// content_types que consumen cupo mensual (v1)
 function isQuotaControlled(content_type: string) {
-  const ct = String(content_type || "").trim().toLowerCase();
-
-  // Ajustá/extendé esta lista cuando sumemos módulos reales
   return (
-    ct === "suenos" ||
-    ct === "mirada_suenos" ||
-    ct === "interpretacion_suenos" ||
-    ct === "psicomagia" ||
-    ct === "mirada_psicomagia"
+    content_type === CONTENT_TYPES.SUENOS ||
+    content_type === CONTENT_TYPES.PSICOMAGIA
   );
 }
 
@@ -29,28 +23,32 @@ export async function POST(req: Request) {
     const user_profile = body?.user_profile;
 
     if (!user_profile?.name) {
-      return Response.json({ ok: false, error: "Falta user_profile.name" }, { status: 400 });
+      return Response.json(
+        { ok: false, error: "Falta user_profile.name" },
+        { status: 400 }
+      );
     }
 
     const today = todayISO();
     const dow = dayOfWeek();
 
-    // v1: mismo criterio que calendar
-    // Domingo → tarot_semanal (aún no implementado)
-    // Resto → horoscopo_diario
-    let content_type = "horoscopo_diario";
-    if (dow === 0) content_type = "tarot_semanal";
+    let content_type = CONTENT_TYPES.HOROSCOPO_DIARIO;
 
-    // Permitimos override DEV opcional (para probar cupos sin esperar UI):
-    // Si mandás body.requested_content_type, se usa ese.
+    if (dow === 0) {
+      content_type = CONTENT_TYPES.TAROT_SEMANAL;
+    }
+
     if (body?.requested_content_type) {
-      content_type = String(body.requested_content_type);
+      content_type = body.requested_content_type;
     }
 
     const event_key = `${content_type}:${today}`;
 
-    // Si todavía no implementamos ese contenido, lo declaramos sin romper
-    if (content_type !== "horoscopo_diario" && content_type !== "suenos" && content_type !== "psicomagia") {
+    if (
+      content_type !== CONTENT_TYPES.HOROSCOPO_DIARIO &&
+      content_type !== CONTENT_TYPES.SUENOS &&
+      content_type !== CONTENT_TYPES.PSICOMAGIA
+    ) {
       return Response.json(
         {
           ok: true,
@@ -65,18 +63,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // --- 1) CUPOS (solo si aplica) ---
-    // Horóscopo diario NO consume cupos.
-    if (isQuotaControlled(content_type)) {
-      const origin = new URL(req.url).origin;
+    const origin = new URL(req.url).origin;
 
-      // 1.1 Check cupo
+    // --- CUPOS ---
+    if (isQuotaControlled(content_type)) {
       const rCheck = await fetch(`${origin}/api/quota`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "check",
-          content_type,
+          module: content_type,
           user_profile,
         }),
       });
@@ -85,12 +81,11 @@ export async function POST(req: Request) {
 
       if (!rCheck.ok || check.ok === false) {
         return Response.json(
-          { ok: false, error: check.error || `Error cuota check ${rCheck.status}` },
+          { ok: false, error: check.error },
           { status: 500 }
         );
       }
 
-      // Esperamos que /api/quota devuelva allowed true/false
       if (check.allowed === false) {
         return Response.json(
           {
@@ -107,13 +102,12 @@ export async function POST(req: Request) {
         );
       }
 
-      // 1.2 Consumir cupo (solo si pasó check)
       const rConsume = await fetch(`${origin}/api/quota`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "consume",
-          content_type,
+          module: content_type,
           user_profile,
         }),
       });
@@ -122,12 +116,11 @@ export async function POST(req: Request) {
 
       if (!rConsume.ok || consumed.ok === false) {
         return Response.json(
-          { ok: false, error: consumed.error || `Error cuota consume ${rConsume.status}` },
+          { ok: false, error: consumed.error },
           { status: 500 }
         );
       }
 
-      // Seguimos a generar (y devolvemos quota info)
       const rGen = await fetch(`${origin}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -141,7 +134,7 @@ export async function POST(req: Request) {
 
       if (!rGen.ok || gen.ok === false) {
         return Response.json(
-          { ok: false, error: gen.error || `Error generate ${rGen.status}` },
+          { ok: false, error: gen.error },
           { status: 500 }
         );
       }
@@ -163,31 +156,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // --- 2) SIN CUPOS: horoscopo_diario (lo actual) ---
-    if (content_type !== "horoscopo_diario") {
-      // Si llegamos acá, es porque era algo “implementado” pero no está en cupos.
-      // Hoy no usamos esto, pero queda claro.
-      return Response.json(
-        {
-          ok: true,
-          today,
-          content_type,
-          event_key,
-          available: false,
-          allowed: false,
-          reason: "not_available",
-        },
-        { status: 200 }
-      );
-    }
-
-    const origin = new URL(req.url).origin;
-
+    // --- SIN CUPOS (horoscopo_diario) ---
     const r = await fetch(`${origin}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        content_type: "horoscopo_diario",
+        content_type,
         user_profile,
       }),
     });
@@ -196,7 +170,7 @@ export async function POST(req: Request) {
 
     if (!r.ok || data.ok === false) {
       return Response.json(
-        { ok: false, error: data.error || `Error ${r.status}` },
+        { ok: false, error: data.error },
         { status: 500 }
       );
     }
@@ -205,7 +179,7 @@ export async function POST(req: Request) {
       {
         ok: true,
         today,
-        content_type: "horoscopo_diario",
+        content_type,
         event_key,
         available: true,
         allowed: true,
