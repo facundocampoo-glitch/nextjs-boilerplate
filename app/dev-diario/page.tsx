@@ -20,15 +20,19 @@ export default function DevDiario() {
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
   const [error, setError] = useState("");
+  const [alreadyGenerated, setAlreadyGenerated] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       setText(saved);
+      setAlreadyGenerated(true);
     }
   }, []);
 
   async function run() {
+    if (alreadyGenerated) return;
+
     setLoading(true);
     setError("");
     setText("");
@@ -48,9 +52,8 @@ export default function DevDiario() {
       }
 
       setText(data.text);
-
-      // 🔒 Guardar resultado del día
       localStorage.setItem(storageKey, data.text);
+      setAlreadyGenerated(true);
 
     } catch (e: any) {
       setError(e?.message || "Error desconocido");
@@ -81,15 +84,20 @@ export default function DevDiario() {
       <div style={{ marginTop: 12 }}>
         <button
           onClick={run}
-          disabled={loading}
+          disabled={loading || alreadyGenerated}
           style={{
             padding: "10px 16px",
             borderRadius: 12,
             border: "1px solid #ccc",
-            cursor: "pointer"
+            cursor: alreadyGenerated ? "not-allowed" : "pointer",
+            opacity: alreadyGenerated ? 0.6 : 1
           }}
         >
-          {loading ? "Generando..." : "Probar horóscopo diario"}
+          {loading
+            ? "Generando..."
+            : alreadyGenerated
+            ? "Ya generado hoy"
+            : "Probar horóscopo diario"}
         </button>
       </div>
 
