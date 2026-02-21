@@ -2,8 +2,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const { prompt } = await req.json();
-
+    const { prompt, content_type, user_profile } = await req.json();
     if (!prompt) {
       return Response.json(
         { ok: false, error: "Falta prompt" },
