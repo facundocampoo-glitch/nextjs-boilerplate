@@ -1,20 +1,8 @@
-export const runtime = "nodejs";
-
+import { NextResponse } from "next/server";
 import { CONTENT_TYPES } from "@/lib/content-types";
 
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function dayOfWeek(): number {
-  return new Date().getDay(); // 0 = domingo
-}
-
 function isQuotaControlled(content_type: string) {
-  return (
-    content_type === CONTENT_TYPES.SUENOS ||
-    content_type === CONTENT_TYPES.PSICOMAGIA
-  );
+  return content_type === CONTENT_TYPES.SUENOS || content_type === CONTENT_TYPES.PSICOMAGIA;
 }
 
 export async function POST(req: Request) {
@@ -23,49 +11,48 @@ export async function POST(req: Request) {
     const user_profile = body?.user_profile;
 
     if (!user_profile?.name) {
-      return Response.json(
-        { ok: false, error: "Falta user_profile.name" },
-        { status: 400 }
+      return NextResponse.json({ ok: false, error: "Falta user_profile.name" }, { status: 400 });
+    }
+
+    const origin = new URL(req.url).origin;
+
+    // 1) Calendar decide qué toca hoy
+    const rCal = await fetch(`${origin}/api/calendar`, { method: "GET" });
+    const cal = await rCal.json();
+
+    if (!rCal.ok || cal.ok === false) {
+      return NextResponse.json(
+        { ok: false, error: cal?.error || "Error calendar" },
+        { status: 500 }
       );
     }
 
-    const today = todayISO();
-    const dow = dayOfWeek();
+    // 2) Override DEV opcional
+    const content_type = body?.requested_content_type
+      ? String(body.requested_content_type)
+      : String(cal.content_type);
 
-    let content_type = CONTENT_TYPES.HOROSCOPO_DIARIO;
-
-    if (dow === 0) {
-      content_type = CONTENT_TYPES.TAROT_SEMANAL;
-    }
-
-    if (body?.requested_content_type) {
-      content_type = body.requested_content_type;
-    }
-
+    const today = String(cal.today);
     const event_key = `${content_type}:${today}`;
 
-    if (
-      content_type !== CONTENT_TYPES.HOROSCOPO_DIARIO &&
-      content_type !== CONTENT_TYPES.SUENOS &&
-      content_type !== CONTENT_TYPES.PSICOMAGIA
-    ) {
-      return Response.json(
+    // 3) Si requiere input_text, exigirlo
+    const input_text = body?.input_text ? String(body.input_text) : "";
+    if (isQuotaControlled(content_type) && !input_text.trim()) {
+      return NextResponse.json(
         {
           ok: true,
           today,
           content_type,
           event_key,
-          available: false,
+          available: true,
           allowed: false,
-          reason: "not_implemented_yet",
+          reason: "missing_input_text",
         },
         { status: 200 }
       );
     }
 
-    const origin = new URL(req.url).origin;
-
-    // --- CUPOS ---
+    // 4) Cupos (solo si aplica)
     if (isQuotaControlled(content_type)) {
       const rCheck = await fetch(`${origin}/api/quota`, {
         method: "POST",
@@ -80,14 +67,14 @@ export async function POST(req: Request) {
       const check = await rCheck.json();
 
       if (!rCheck.ok || check.ok === false) {
-        return Response.json(
-          { ok: false, error: check.error },
+        return NextResponse.json(
+          { ok: false, error: check?.error || "Error quota check" },
           { status: 500 }
         );
       }
 
       if (check.allowed === false) {
-        return Response.json(
+        return NextResponse.json(
           {
             ok: true,
             today,
@@ -115,31 +102,33 @@ export async function POST(req: Request) {
       const consumed = await rConsume.json();
 
       if (!rConsume.ok || consumed.ok === false) {
-        return Response.json(
-          { ok: false, error: consumed.error },
+        return NextResponse.json(
+          { ok: false, error: consumed?.error || "Error quota consume" },
           { status: 500 }
         );
       }
 
+      // Generar contenido cupo
       const rGen = await fetch(`${origin}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content_type,
           user_profile,
+          input_text,
         }),
       });
 
       const gen = await rGen.json();
 
       if (!rGen.ok || gen.ok === false) {
-        return Response.json(
-          { ok: false, error: gen.error },
+        return NextResponse.json(
+          { ok: false, error: gen?.error || "Error generate" },
           { status: 500 }
         );
       }
 
-      return Response.json(
+      return NextResponse.json(
         {
           ok: true,
           today,
@@ -156,26 +145,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // --- SIN CUPOS (horoscopo_diario) ---
+    // 5) Sin cupos: horóscopo / tarot / etc.
+    const question = body?.question ? String(body.question) : "";
+
     const r = await fetch(`${origin}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         content_type,
         user_profile,
+        question,
       }),
     });
 
     const data = await r.json();
 
     if (!r.ok || data.ok === false) {
-      return Response.json(
-        { ok: false, error: data.error },
+      return NextResponse.json(
+        { ok: false, error: data?.error || "Error generate" },
         { status: 500 }
       );
     }
 
-    return Response.json(
+    return NextResponse.json(
       {
         ok: true,
         today,
@@ -190,7 +182,7 @@ export async function POST(req: Request) {
       { status: 200 }
     );
   } catch (e: any) {
-    return Response.json(
+    return NextResponse.json(
       { ok: false, error: e?.message || "Error desconocido" },
       { status: 500 }
     );
