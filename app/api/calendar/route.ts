@@ -1,45 +1,19 @@
-export const runtime = "nodejs";
-
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function dayOfWeek(): number {
-  // 0 = domingo, 1 = lunes ...
-  return new Date().getDay();
-}
+import { NextResponse } from "next/server";
+import { CONTENT_TYPES } from "@/lib/content-types";
 
 export async function GET() {
-  try {
-    const today = todayISO();
-    const dow = dayOfWeek();
+  const today = new Date();
+  const dow = today.getDay(); // 0 = domingo
 
-    // v2: regla simple
-    // Domingo → tarot_semanal
-    // Resto → horoscopo_diario
-    let content_type = "horoscopo_diario";
+  let content_type = CONTENT_TYPES.HOROSCOPO_DIARIO;
 
-    if (dow === 0) {
-      content_type = "tarot_semanal";
-    }
-
-    // v2: event_key para persistencia/caché
-    // (por ahora: usamos fecha; luego haremos semana ISO real)
-    const event_key = `${content_type}:${today}`;
-
-    return Response.json(
-      {
-        ok: true,
-        today,
-        content_type,
-        event_key,
-      },
-      { status: 200 }
-    );
-  } catch (e: any) {
-    return Response.json(
-      { ok: false, error: e?.message || "Error desconocido" },
-      { status: 500 }
-    );
+  if (dow === 0) {
+    content_type = CONTENT_TYPES.TAROT_SEMANAL;
   }
+
+  return NextResponse.json({
+    ok: true,
+    today: today.toISOString().slice(0, 10),
+    content_type,
+  });
 }
