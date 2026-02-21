@@ -31,12 +31,12 @@ Hacé el horóscopo diario para HOY. 100% personalizado. Integrá lo chino y lo 
 Entregar SOLO el texto final.
   `.trim();
 }
-    if (!prompt) {
-      return Response.json(
-        { ok: false, error: "Falta prompt" },
-        { status: 400 }
-      );
-    }
+    if (!prompt && content_type !== "horoscopo_diario") {
+  return Response.json(
+    { ok: false, error: "Falta prompt" },
+    { status: 400 }
+  );
+}
 
     const apiKey = process.env.OPENAI_API_KEY;
 
