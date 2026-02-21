@@ -31,7 +31,6 @@ function zodiacSign(birth_date: string) {
   return "Piscis";
 }
 
-// (v1) Animal chino simplificado
 function chineseZodiac(year: number) {
   const animals = [
     "Rata", "Buey", "Tigre", "Conejo", "Dragón", "Serpiente",
@@ -41,7 +40,6 @@ function chineseZodiac(year: number) {
   return animals[(idx + 12) % 12];
 }
 
-// --------- Prompt base ---------
 function buildDailyHoroscopePrompt(user_profile: any) {
   const sign = zodiacSign(user_profile.birth_date);
   const year = parseInt(String(user_profile.birth_date).slice(0, 4), 10);
@@ -76,7 +74,7 @@ No expliques astrología. No uses lenguaje místico. Operá.
 `.trim();
 }
 
-// --------- Supabase REST (sin instalar librerías) ---------
+// --------- Supabase REST ---------
 function getSupabaseConfig() {
   const url =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -99,16 +97,9 @@ async function sbSelectOne(table: string, query: string) {
   const endpoint = `${url}/rest/v1/${table}?${query}`;
   const r = await fetch(endpoint, {
     method: "GET",
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-    },
+    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
   });
-
-  if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`Supabase select error: ${t}`);
-  }
+  if (!r.ok) throw new Error(`Supabase select error: ${await r.text()}`);
   const arr = await r.json();
   return Array.isArray(arr) && arr.length > 0 ? arr[0] : null;
 }
@@ -118,16 +109,9 @@ async function sbSelectMany(table: string, query: string) {
   const endpoint = `${url}/rest/v1/${table}?${query}`;
   const r = await fetch(endpoint, {
     method: "GET",
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-    },
+    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
   });
-
-  if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`Supabase select error: ${t}`);
-  }
+  if (!r.ok) throw new Error(`Supabase select error: ${await r.text()}`);
   const arr = await r.json();
   return Array.isArray(arr) ? arr : [];
 }
@@ -145,41 +129,29 @@ async function sbUpsert(table: string, rows: any[]) {
     },
     body: JSON.stringify(rows),
   });
-
-  if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`Supabase upsert error: ${t}`);
-  }
+  if (!r.ok) throw new Error(`Supabase upsert error: ${await r.text()}`);
 }
 
-async function sbInsert(table: string, row: any) {
+async function sbUpsertEvent(row: any) {
   const { url, serviceKey } = getSupabaseConfig();
-  const endpoint = `${url}/rest/v1/${table}`;
+  // upsert usando el UNIQUE(user_id,event_key)
+  const endpoint = `${url}/rest/v1/generated_events?on_conflict=user_id,event_key`;
   const r = await fetch(endpoint, {
     method: "POST",
     headers: {
       apikey: serviceKey,
       Authorization: `Bearer ${serviceKey}`,
       "Content-Type": "application/json",
-      Prefer: "return=minimal",
+      Prefer: "resolution=merge-duplicates",
     },
-    body: JSON.stringify(row),
+    body: JSON.stringify([row]),
   });
-
-  // Si choca el UNIQUE, Supabase suele devolver 409
-  if (r.status === 409) return { ok: true, duplicate: true };
-
-  if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`Supabase insert error: ${t}`);
-  }
-  return { ok: true, duplicate: false };
+  if (!r.ok) throw new Error(`Supabase upsert generated_events error: ${await r.text()}`);
 }
 
-// --------- Memoria: formatear para prompt ---------
+// --------- Memoria -> texto de prompt ---------
 function formatMemoryForPrompt(items: Array<{ kind?: string; content?: string }>) {
   if (!items || items.length === 0) return "";
-
   const lines = items
     .slice(0, 8)
     .map((it) => {
@@ -206,13 +178,12 @@ export async function POST(req: Request) {
     const prompt = body?.prompt;
     const content_type = body?.content_type;
     const user_profile = body?.user_profile;
+    const force_regenerate = Boolean(body?.force_regenerate);
 
-    // 1) Si NO es horóscopo diario, exigimos prompt
     if (content_type !== "horoscopo_diario" && !prompt) {
       return Response.json({ ok: false, error: "Falta prompt" }, { status: 400 });
     }
 
-    // 2) Si ES horóscopo diario, exigimos user_profile completo
     if (content_type === "horoscopo_diario") {
       if (!user_profile) {
         return Response.json({ ok: false, error: "Falta user_profile" }, { status: 400 });
@@ -229,51 +200,52 @@ export async function POST(req: Request) {
 
       for (const k of required) {
         if (!user_profile?.[k]) {
-          return Response.json(
-            { ok: false, error: `Falta user_profile.${k}` },
-            { status: 400 }
-          );
+          return Response.json({ ok: false, error: `Falta user_profile.${k}` }, { status: 400 });
         }
       }
     }
 
-    // 3) Cache server-side SOLO para horoscopo_diario
+    let memory_used = false;
     let memoryBlock = "";
+
+    // Cache + memoria solo para horoscopo_diario
     if (content_type === "horoscopo_diario") {
       const date_key = todayISO();
       const user_id = normalizeUserIdFromProfile(user_profile);
       const event_key = `horoscopo_diario:${date_key}`;
 
-      // 3.1) Guardar/actualizar perfil
+      // Perfil
       await sbUpsert("user_profiles", [
-        {
-          user_id,
-          profile_json: user_profile,
-          updated_at: new Date().toISOString(),
-        },
+        { user_id, profile_json: user_profile, updated_at: new Date().toISOString() },
       ]);
 
-      // 3.2) Leer memoria activa (para prompt)
+      // Memoria
       const memItems = await sbSelectMany(
         "memory_items",
         `select=kind,content,score&user_id=eq.${encodeURIComponent(user_id)}&is_active=eq.true&order=score.desc,updated_at.desc&limit=8`
       );
       memoryBlock = formatMemoryForPrompt(memItems);
+      memory_used = Boolean(memoryBlock);
 
-      // 3.3) Buscar si ya existe el texto de hoy (cache)
-      const cached = await sbSelectOne(
-        "generated_events",
-        `select=output_text&user_id=eq.${encodeURIComponent(user_id)}&event_key=eq.${encodeURIComponent(
-          event_key
-        )}&limit=1`
-      );
+      // Cache: si NO forzás, devolvemos lo guardado
+      if (!force_regenerate) {
+        const cached = await sbSelectOne(
+          "generated_events",
+          `select=output_text&user_id=eq.${encodeURIComponent(user_id)}&event_key=eq.${encodeURIComponent(
+            event_key
+          )}&limit=1`
+        );
 
-      if (cached?.output_text) {
-        return Response.json({ ok: true, text: cached.output_text, cached: true }, { status: 200 });
+        if (cached?.output_text) {
+          return Response.json(
+            { ok: true, text: cached.output_text, cached: true, memory_used },
+            { status: 200 }
+          );
+        }
       }
     }
 
-    // 4) Construimos prompt final
+    // Prompt final
     let finalPrompt = prompt;
 
     if (content_type === "horoscopo_diario") {
@@ -281,18 +253,12 @@ export async function POST(req: Request) {
       finalPrompt = memoryBlock ? `${base}\n\n${memoryBlock}` : base;
     }
 
-    // 5) Llamada a OpenAI
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return Response.json({ ok: false, error: "Falta OPENAI_API_KEY" }, { status: 500 });
-    }
+    if (!apiKey) return Response.json({ ok: false, error: "Falta OPENAI_API_KEY" }, { status: 500 });
 
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [{ role: "user", content: finalPrompt }],
@@ -300,21 +266,18 @@ export async function POST(req: Request) {
       }),
     });
 
-    if (!r.ok) {
-      const raw = await r.text();
-      return Response.json({ ok: false, error: raw }, { status: 500 });
-    }
+    if (!r.ok) return Response.json({ ok: false, error: await r.text() }, { status: 500 });
 
     const data = await r.json();
     const text = data?.choices?.[0]?.message?.content?.trim() || "";
 
-    // 6) Guardar en cache si era horoscopo_diario
+    // Guardar/actualizar cache si era horoscopo_diario
     if (content_type === "horoscopo_diario") {
       const date_key = todayISO();
       const user_id = normalizeUserIdFromProfile(user_profile);
       const event_key = `horoscopo_diario:${date_key}`;
 
-      await sbInsert("generated_events", {
+      await sbUpsertEvent({
         user_id,
         content_type: "horoscopo_diario",
         event_key,
@@ -323,7 +286,7 @@ export async function POST(req: Request) {
       });
     }
 
-    return Response.json({ ok: true, text, cached: false }, { status: 200 });
+    return Response.json({ ok: true, text, cached: false, memory_used }, { status: 200 });
   } catch (e: any) {
     return Response.json({ ok: false, error: e?.message || "Error desconocido" }, { status: 500 });
   }
