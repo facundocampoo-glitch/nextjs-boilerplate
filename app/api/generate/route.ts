@@ -1,6 +1,9 @@
 export const runtime = "nodejs";
+
+import { CONTENT_TYPES } from "@/lib/content-types";
 import { getPromptTemplate } from "@/prompts/registry";
-// --------- Helpers de fecha / usuario ---------
+
+// --------- Helpers base ---------
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -10,7 +13,15 @@ function normalizeUserIdFromProfile(user_profile: any): string {
   return n.replace(/\s+/g, "_");
 }
 
-// --------- Helpers astro mínimos ---------
+function applyTemplate(template: string, vars: Record<string, string>) {
+  let out = template;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.split(`{{${k}}}`).join(v);
+  }
+  return out;
+}
+
+// --------- Astro mínimos ---------
 function zodiacSign(birth_date: string) {
   const parts = String(birth_date || "").split("-");
   if (parts.length !== 3) return "Desconocido";
@@ -38,46 +49,6 @@ function chineseZodiac(year: number) {
   ];
   const idx = (year - 4) % 12;
   return animals[(idx + 12) % 12];
-}
-function applyTemplate(template: string, vars: Record<string, string>) {
-  let out = template;
-  for (const [k, v] of Object.entries(vars)) {
-    out = out.split(`{{${k}}}`).join(v);
-  }
-  return out;
-}
-function buildDailyHoroscopePrompt(user_profile: any) {
-  const template = getPromptTemplate("horoscopo_diario");
-
-  // fallback seguro: si por algún motivo no existe el template
-  if (!template) {
-    return `
-Actuás como Mia: filo urbano, sin incienso, con humor contenido. Aire visual: bloques cortos.
-Idioma: ${user_profile.language || "es"}.
-
-Datos:
-- Nombre: ${user_profile.name}
-- Lugar nacimiento: ${user_profile.birth_place}
-
-Tarea:
-Generá HORÓSCOPO DIARIO para hoy.
-`.trim();
-  }
-
-  const sign = zodiacSign(user_profile.birth_date);
-  const year = parseInt(String(user_profile.birth_date).slice(0, 4), 10);
-  const animal = chineseZodiac(year);
-
-  const filled = applyTemplate(template, {
-    language: String(user_profile.language || "es"),
-    name: String(user_profile.name || ""),
-    sign: String(sign),
-    chinese_animal: String(animal),
-    birth_place: String(user_profile.birth_place || ""),
-    SIGN_UPPER: String(sign).toUpperCase(),
-  });
-
-  return filled;
 }
 
 // --------- Supabase REST ---------
@@ -140,7 +111,6 @@ async function sbUpsert(table: string, rows: any[]) {
 
 async function sbUpsertEvent(row: any) {
   const { url, serviceKey } = getSupabaseConfig();
-  // upsert usando el UNIQUE(user_id,event_key)
   const endpoint = `${url}/rest/v1/generated_events?on_conflict=user_id,event_key`;
   const r = await fetch(endpoint, {
     method: "POST",
@@ -155,9 +125,10 @@ async function sbUpsertEvent(row: any) {
   if (!r.ok) throw new Error(`Supabase upsert generated_events error: ${await r.text()}`);
 }
 
-// --------- Memoria -> texto de prompt ---------
+// --------- Memoria ---------
 function formatMemoryForPrompt(items: Array<{ kind?: string; content?: string }>) {
   if (!items || items.length === 0) return "";
+
   const lines = items
     .slice(0, 8)
     .map((it) => {
@@ -166,7 +137,7 @@ function formatMemoryForPrompt(items: Array<{ kind?: string; content?: string }>
       if (!c) return null;
       return `- (${k}) ${c}`;
     })
-    .filter(Boolean);
+    .filter(Boolean) as string[];
 
   if (lines.length === 0) return "";
 
@@ -176,89 +147,108 @@ ${lines.join("\n")}
 `.trim();
 }
 
+// --------- Construir prompt desde registry ---------
+function buildPromptFromRegistry(args: {
+  content_type: string;
+  user_profile: any;
+  input_text?: string;
+  question?: string;
+}) {
+  const template = getPromptTemplate(args.content_type);
+  if (!template) return null;
+
+  const up = args.user_profile;
+  const sign = zodiacSign(up.birth_date);
+  const year = parseInt(String(up.birth_date).slice(0, 4), 10);
+  const animal = chineseZodiac(year);
+
+  const now = new Date();
+  const month_label = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  return applyTemplate(template, {
+    language: String(up.language || "es"),
+    name: String(up.name || ""),
+    birth_date: String(up.birth_date || ""),
+    birth_time: String(up.birth_time || ""),
+    birth_place: String(up.birth_place || ""),
+    sign: String(sign),
+    SIGN_UPPER: String(sign).toUpperCase(),
+    chinese_animal: String(animal),
+    input_text: String(args.input_text || ""),
+    question_or_blank: String(args.question || "").trim() ? String(args.question) : "(sin pregunta)",
+    month_label: month_label,
+  });
+}
+
 // --------- API ---------
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const prompt = body?.prompt;
-    const content_type = body?.content_type;
+    const content_type = String(body?.content_type || "").trim();
     const user_profile = body?.user_profile;
     const force_regenerate = Boolean(body?.force_regenerate);
+    const input_text = body?.input_text ? String(body.input_text) : "";
+    const question = body?.question ? String(body.question) : "";
 
-    if (content_type !== "horoscopo_diario" && !prompt) {
-      return Response.json({ ok: false, error: "Falta prompt" }, { status: 400 });
+    if (!content_type) {
+      return Response.json({ ok: false, error: "Falta content_type" }, { status: 400 });
     }
 
-    if (content_type === "horoscopo_diario") {
-      if (!user_profile) {
-        return Response.json({ ok: false, error: "Falta user_profile" }, { status: 400 });
-      }
+    if (!user_profile) {
+      return Response.json({ ok: false, error: "Falta user_profile" }, { status: 400 });
+    }
 
-      const required = [
-        "name",
-        "birth_date",
-        "birth_time",
-        "birth_place",
-        "language",
-        "delivery_time_pref",
-      ];
-
-      for (const k of required) {
-        if (!user_profile?.[k]) {
-          return Response.json({ ok: false, error: `Falta user_profile.${k}` }, { status: 400 });
-        }
+    const required = ["name", "birth_date", "birth_time", "birth_place", "language", "delivery_time_pref"];
+    for (const k of required) {
+      if (!user_profile?.[k]) {
+        return Response.json({ ok: false, error: `Falta user_profile.${k}` }, { status: 400 });
       }
     }
 
-    let memory_used = false;
-    let memoryBlock = "";
+    // Regla: módulos que requieren input_text
+    if ((content_type === CONTENT_TYPES.SUENOS || content_type === CONTENT_TYPES.PSICOMAGIA) && !input_text.trim()) {
+      return Response.json({ ok: false, error: "Falta input_text" }, { status: 400 });
+    }
 
-    // Cache + memoria solo para horoscopo_diario
-    if (content_type === "horoscopo_diario") {
-      const date_key = todayISO();
-      const user_id = normalizeUserIdFromProfile(user_profile);
-      const event_key = `horoscopo_diario:${date_key}`;
+    const date_key = todayISO();
+    const user_id = normalizeUserIdFromProfile(user_profile);
 
-      // Perfil
-      await sbUpsert("user_profiles", [
-        { user_id, profile_json: user_profile, updated_at: new Date().toISOString() },
-      ]);
+    // Persistir perfil
+    await sbUpsert("user_profiles", [
+      { user_id, profile_json: user_profile, updated_at: new Date().toISOString() },
+    ]);
 
-      // Memoria
-      const memItems = await sbSelectMany(
-        "memory_items",
-        `select=kind,content,score&user_id=eq.${encodeURIComponent(user_id)}&is_active=eq.true&order=score.desc,updated_at.desc&limit=8`
+    // Memoria
+    const memItems = await sbSelectMany(
+      "memory_items",
+      `select=kind,content,score&user_id=eq.${encodeURIComponent(user_id)}&is_active=eq.true&order=score.desc,updated_at.desc&limit=8`
+    );
+    const memoryBlock = formatMemoryForPrompt(memItems);
+    const memory_used = Boolean(memoryBlock);
+
+    // Cache por evento (regla de oro)
+    const event_key = `${content_type}:${date_key}`;
+
+    if (!force_regenerate) {
+      const cached = await sbSelectOne(
+        "generated_events",
+        `select=output_text&user_id=eq.${encodeURIComponent(user_id)}&event_key=eq.${encodeURIComponent(event_key)}&limit=1`
       );
-      memoryBlock = formatMemoryForPrompt(memItems);
-      memory_used = Boolean(memoryBlock);
-
-      // Cache: si NO forzás, devolvemos lo guardado
-      if (!force_regenerate) {
-        const cached = await sbSelectOne(
-          "generated_events",
-          `select=output_text&user_id=eq.${encodeURIComponent(user_id)}&event_key=eq.${encodeURIComponent(
-            event_key
-          )}&limit=1`
-        );
-
-        if (cached?.output_text) {
-          return Response.json(
-            { ok: true, text: cached.output_text, cached: true, memory_used },
-            { status: 200 }
-          );
-        }
+      if (cached?.output_text) {
+        return Response.json({ ok: true, text: cached.output_text, cached: true, memory_used }, { status: 200 });
       }
     }
 
-    // Prompt final
-    let finalPrompt = prompt;
-
-    if (content_type === "horoscopo_diario") {
-      const base = buildDailyHoroscopePrompt(user_profile);
-      finalPrompt = memoryBlock ? `${base}\n\n${memoryBlock}` : base;
+    // Prompt
+    const base = buildPromptFromRegistry({ content_type, user_profile, input_text, question });
+    if (!base) {
+      return Response.json({ ok: false, error: `No hay template para content_type=${content_type}` }, { status: 400 });
     }
 
+    const finalPrompt = memoryBlock ? `${base}\n\n${memoryBlock}` : base;
+
+    // OpenAI
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return Response.json({ ok: false, error: "Falta OPENAI_API_KEY" }, { status: 500 });
 
@@ -277,20 +267,14 @@ export async function POST(req: Request) {
     const data = await r.json();
     const text = data?.choices?.[0]?.message?.content?.trim() || "";
 
-    // Guardar/actualizar cache si era horoscopo_diario
-    if (content_type === "horoscopo_diario") {
-      const date_key = todayISO();
-      const user_id = normalizeUserIdFromProfile(user_profile);
-      const event_key = `horoscopo_diario:${date_key}`;
-
-      await sbUpsertEvent({
-        user_id,
-        content_type: "horoscopo_diario",
-        event_key,
-        date_key,
-        output_text: text,
-      });
-    }
+    // Guardar evento (upsert por UNIQUE user_id,event_key)
+    await sbUpsertEvent({
+      user_id,
+      content_type,
+      event_key,
+      date_key,
+      output_text: text,
+    });
 
     return Response.json({ ok: true, text, cached: false, memory_used }, { status: 200 });
   } catch (e: any) {
