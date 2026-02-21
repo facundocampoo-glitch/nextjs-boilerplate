@@ -41,6 +41,7 @@ function chineseZodiac(year: number) {
   return animals[(idx + 12) % 12];
 }
 
+// --------- Prompt base ---------
 function buildDailyHoroscopePrompt(user_profile: any) {
   const sign = zodiacSign(user_profile.birth_date);
   const year = parseInt(String(user_profile.birth_date).slice(0, 4), 10);
@@ -112,6 +113,25 @@ async function sbSelectOne(table: string, query: string) {
   return Array.isArray(arr) && arr.length > 0 ? arr[0] : null;
 }
 
+async function sbSelectMany(table: string, query: string) {
+  const { url, serviceKey } = getSupabaseConfig();
+  const endpoint = `${url}/rest/v1/${table}?${query}`;
+  const r = await fetch(endpoint, {
+    method: "GET",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+    },
+  });
+
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(`Supabase select error: ${t}`);
+  }
+  const arr = await r.json();
+  return Array.isArray(arr) ? arr : [];
+}
+
 async function sbUpsert(table: string, rows: any[]) {
   const { url, serviceKey } = getSupabaseConfig();
   const endpoint = `${url}/rest/v1/${table}`;
@@ -156,6 +176,28 @@ async function sbInsert(table: string, row: any) {
   return { ok: true, duplicate: false };
 }
 
+// --------- Memoria: formatear para prompt ---------
+function formatMemoryForPrompt(items: Array<{ kind?: string; content?: string }>) {
+  if (!items || items.length === 0) return "";
+
+  const lines = items
+    .slice(0, 8)
+    .map((it) => {
+      const k = String(it?.kind || "nota").trim();
+      const c = String(it?.content || "").trim();
+      if (!c) return null;
+      return `- (${k}) ${c}`;
+    })
+    .filter(Boolean);
+
+  if (lines.length === 0) return "";
+
+  return `
+Memoria activa del usuario (hechos/patrones). Usala para afinar el texto, sin explicarla:
+${lines.join("\n")}
+`.trim();
+}
+
 // --------- API ---------
 export async function POST(req: Request) {
   try {
@@ -196,6 +238,7 @@ export async function POST(req: Request) {
     }
 
     // 3) Cache server-side SOLO para horoscopo_diario
+    let memoryBlock = "";
     if (content_type === "horoscopo_diario") {
       const date_key = todayISO();
       const user_id = normalizeUserIdFromProfile(user_profile);
@@ -210,7 +253,14 @@ export async function POST(req: Request) {
         },
       ]);
 
-      // 3.2) Buscar si ya existe el texto de hoy
+      // 3.2) Leer memoria activa (para prompt)
+      const memItems = await sbSelectMany(
+        "memory_items",
+        `select=kind,content,score&user_id=eq.${encodeURIComponent(user_id)}&is_active=eq.true&order=score.desc,updated_at.desc&limit=8`
+      );
+      memoryBlock = formatMemoryForPrompt(memItems);
+
+      // 3.3) Buscar si ya existe el texto de hoy (cache)
       const cached = await sbSelectOne(
         "generated_events",
         `select=output_text&user_id=eq.${encodeURIComponent(user_id)}&event_key=eq.${encodeURIComponent(
@@ -225,11 +275,13 @@ export async function POST(req: Request) {
 
     // 4) Construimos prompt final
     let finalPrompt = prompt;
+
     if (content_type === "horoscopo_diario") {
-      finalPrompt = buildDailyHoroscopePrompt(user_profile);
+      const base = buildDailyHoroscopePrompt(user_profile);
+      finalPrompt = memoryBlock ? `${base}\n\n${memoryBlock}` : base;
     }
 
-    // 5) Llamada a OpenAI (igual que antes)
+    // 5) Llamada a OpenAI
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return Response.json({ ok: false, error: "Falta OPENAI_API_KEY" }, { status: 500 });
