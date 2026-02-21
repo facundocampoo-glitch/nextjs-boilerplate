@@ -1,5 +1,5 @@
 export const runtime = "nodejs";
-
+import { getPromptTemplate } from "@/prompts/registry";
 // --------- Helpers de fecha / usuario ---------
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -39,39 +39,45 @@ function chineseZodiac(year: number) {
   const idx = (year - 4) % 12;
   return animals[(idx + 12) % 12];
 }
-
+function applyTemplate(template: string, vars: Record<string, string>) {
+  let out = template;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.split(`{{${k}}}`).join(v);
+  }
+  return out;
+}
 function buildDailyHoroscopePrompt(user_profile: any) {
-  const sign = zodiacSign(user_profile.birth_date);
-  const year = parseInt(String(user_profile.birth_date).slice(0, 4), 10);
-  const animal = chineseZodiac(year);
+  const template = getPromptTemplate("horoscopo_diario");
 
-  return `
+  // fallback seguro: si por algún motivo no existe el template
+  if (!template) {
+    return `
 Actuás como Mia: filo urbano, sin incienso, con humor contenido. Aire visual: bloques cortos.
 Idioma: ${user_profile.language || "es"}.
 
 Datos:
 - Nombre: ${user_profile.name}
-- Signo solar: ${sign}
-- Animal chino: ${animal}
 - Lugar nacimiento: ${user_profile.birth_place}
 
 Tarea:
 Generá HORÓSCOPO DIARIO para hoy.
-
-Formato:
-
-**${sign.toUpperCase()} — HOY.**
-
-Párrafo breve (2–3 líneas) que abra el día.
-
-Luego 3 bloques:
-
-**Peligro:** (1–2 líneas)
-**Oportunidad:** (1–2 líneas)
-**Micro-gestos:** (2–4 bullets cortos)
-
-No expliques astrología. No uses lenguaje místico. Operá.
 `.trim();
+  }
+
+  const sign = zodiacSign(user_profile.birth_date);
+  const year = parseInt(String(user_profile.birth_date).slice(0, 4), 10);
+  const animal = chineseZodiac(year);
+
+  const filled = applyTemplate(template, {
+    language: String(user_profile.language || "es"),
+    name: String(user_profile.name || ""),
+    sign: String(sign),
+    chinese_animal: String(animal),
+    birth_place: String(user_profile.birth_place || ""),
+    SIGN_UPPER: String(sign).toUpperCase(),
+  });
+
+  return filled;
 }
 
 // --------- Supabase REST ---------
