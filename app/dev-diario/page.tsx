@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DevDiario() {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const storageKey = `horoscopo_diario_${todayKey}`;
+
   const [body, setBody] = useState(`{
   "content_type": "horoscopo_diario",
   "user_profile": {
@@ -18,26 +21,37 @@ export default function DevDiario() {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      setText(saved);
+    }
+  }, []);
+
   async function run() {
     setLoading(true);
     setError("");
     setText("");
 
     try {
-      const r = await fetch("/api/generate", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body,
       });
 
-      const data = await r.json();
+      const data = await res.json();
 
-      if (!r.ok || !data.ok) {
-        setError(data?.error || `Error ${r.status}`);
+      if (!res.ok || data.ok === false) {
+        setError(data.error || `Error ${res.status}`);
         return;
       }
 
       setText(data.text);
+
+      // 🔒 Guardar resultado del día
+      localStorage.setItem(storageKey, data.text);
+
     } catch (e: any) {
       setError(e?.message || "Error desconocido");
     } finally {
@@ -46,21 +60,34 @@ export default function DevDiario() {
   }
 
   return (
-    <main style={{ padding: 18, fontFamily: "system-ui", maxWidth: 860, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 20, marginBottom: 10 }}>DEV — Horóscopo Diario (user_profile)</h1>
+    <main style={{ padding: 16, fontFamily: "system-ui", maxWidth: 860, margin: "0 auto" }}>
+      <h1 style={{ fontSize: 20, marginBottom: 10 }}>
+        DEV — Horóscopo Diario (user_profile)
+      </h1>
 
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        rows={14}
-        style={{ width: "100%", padding: 12, fontSize: 13, borderRadius: 12, border: "1px solid #ddd" }}
+        style={{
+          width: "100%",
+          padding: 12,
+          fontSize: 13,
+          borderRadius: 12,
+          border: "1px solid #ddd",
+          minHeight: 220
+        }}
       />
 
       <div style={{ marginTop: 12 }}>
         <button
           onClick={run}
           disabled={loading}
-          style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid #ccc", cursor: "pointer" }}
+          style={{
+            padding: "10px 16px",
+            borderRadius: 12,
+            border: "1px solid #ccc",
+            cursor: "pointer"
+          }}
         >
           {loading ? "Generando..." : "Probar horóscopo diario"}
         </button>
