@@ -1,65 +1,155 @@
 import Image from "next/image";
 
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-medium tracking-wide text-white/80">
+      {children}
+    </span>
+  );
+}
+
+function PrimaryButton({ children }: { children: React.ReactNode }) {
+  return (
+    <button className="w-full rounded-2xl bg-[#94c7c9] px-4 py-3 text-sm font-semibold text-[#1e0d0d] active:scale-[0.99]">
+      {children}
+    </button>
+  );
+}
+
+function GhostButton({ children }: { children: React.ReactNode }) {
+  return (
+    <button className="w-full rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-white/90 active:scale-[0.99]">
+      {children}
+    </button>
+  );
+}
+
+function NavItem({ label, active }: { label: string; active?: boolean }) {
+  return (
+    <button
+      className={`flex-1 py-3 text-xs font-semibold tracking-wide ${
+        active ? "text-[#94c7c9]" : "text-white/70"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen px-6 pb-28 pt-6">
+      {/* Top bar */}
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-semibold tracking-[0.18em]">MIA</div>
+          <Chip>BASE · USD 12.90</Chip>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+
+        {/* Menu placeholder (lo conectamos luego) */}
+        <button
+          aria-label="Menú"
+          className="rounded-full bg-white/10 px-3 py-2 text-xs font-semibold text-white/90"
+        >
+          menú
+        </button>
+      </header>
+
+      {/* Hero */}
+      <section className="mt-10">
+        <div className="text-[22px] font-semibold leading-8 tracking-tight">
+          mirada astral
+        </div>
+
+        <div className="mt-3 text-sm text-white/70">
+          carta astral + solar + chino. texto y voz.
+        </div>
+
+        {/* Mia + QR */}
+        <div className="mt-8 flex items-end justify-between gap-4">
+          {/* Mia image placeholder */}
+          <div className="relative h-[360px] w-[240px] overflow-hidden rounded-[28px] bg-black/35 shadow-sm">
+            {/* Si ya tenés la imagen final, ponela en /public/mia.png */}
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+              src="/mia.png"
+              alt="Mia"
+              fill
+              className="object-cover opacity-95"
+              priority
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {/* Vignette */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_0%,rgba(0,0,0,0.55)_100%)]" />
+          </div>
+
+          {/* QR placeholder */}
+          <div className="flex flex-col items-center gap-2">
+            <div className="grid h-28 w-28 place-items-center rounded-2xl bg-white/10">
+              <div className="h-20 w-20 rounded-xl bg-white/15" />
+            </div>
+            <div className="text-[11px] font-medium text-white/70">
+              compartir app
+            </div>
+          </div>
         </div>
-      </main>
+
+        {/* Signature */}
+        <div className="mt-6 text-sm text-white/70">
+          <span className="font-semibold text-white/90">honestidad brutal</span>{" "}
+          <span className="text-white/70">— sin incienso</span>
+        </div>
+
+        {/* Actions */}
+        <div className="mt-8 space-y-3">
+          <PrimaryButton>generar mi mirada astral</PrimaryButton>
+          <div className="grid grid-cols-2 gap-3">
+            <GhostButton>leer</GhostButton>
+            <GhostButton>escuchar</GhostButton>
+          </div>
+        </div>
+
+        {/* Shortcuts (secondary) */}
+        <div className="mt-10 space-y-4">
+          <div className="text-xs font-semibold tracking-[0.18em] text-white/60">
+            accesos
+          </div>
+          <div className="space-y-3">
+            <button className="w-full rounded-2xl bg-black/25 px-4 py-4 text-left">
+              <div className="text-sm font-semibold text-white/90">cartas</div>
+              <div className="mt-1 text-xs text-white/60">
+                marselles · demo en overlay
+              </div>
+            </button>
+
+            <button className="w-full rounded-2xl bg-black/25 px-4 py-4 text-left">
+              <div className="text-sm font-semibold text-white/90">sueños</div>
+              <div className="mt-1 text-xs text-white/60">
+                interpretación · demo en overlay
+              </div>
+            </button>
+
+            <button className="w-full rounded-2xl bg-black/25 px-4 py-4 text-left">
+              <div className="text-sm font-semibold text-white/90">
+                actos que fortalecen
+              </div>
+              <div className="mt-1 text-xs text-white/60">
+                psicomagia · demo en overlay
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0">
+        <div className="mx-auto w-full max-w-[440px] bg-[#1e0d0d]/80 backdrop-blur">
+          <div className="flex border-t border-white/10">
+            <NavItem label="astral" active />
+            <NavItem label="marselles" />
+            <NavItem label="psicomagia" />
+            <NavItem label="sueños" />
+          </div>
+        </div>
+      </nav>
     </div>
   );
 }
