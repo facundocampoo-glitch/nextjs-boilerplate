@@ -1,0 +1,18 @@
+{
+  "module": "mia-core/conciencia-madre",
+  "load_order": [
+    "ACUERDO_OPERATIVO.txt",
+    "MANIFIESTO_DE_VOZ_MIA.md",
+    "ARQ_FORMATO_AIRE_Y_CIERRES_MIA.md",
+    "ARQ_TONO_HUMOR_IRONICO_MIA.md",
+    "ARQ_LIMITES_HUMOR_MIA.md",
+    "ARQ_TONO_FILOSO_MIA.md",
+    "ARQ_MOTOR_CARACTER_MIA.md",
+    "ANTI_REPETICION_MIA.md",
+    "BANCO_MECANISMOS_MIA_300.txt",
+    "BANCO_OCURRENCIAS_MIA_1000.txt",
+    "05_CHECKLIST_VALIDACION_MIA.txt",
+    "06_VALIDACION_MIA_LOGICA.txt",
+    "PROMPT_RAIZ_CONCIENCIA_MADRE__MOTOR_MIA300.txt"
+  ]
+}
