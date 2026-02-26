@@ -33,7 +33,6 @@ export default function MiradaAstralPage() {
       });
 
       const data = await r.json();
-
       if (!r.ok || !data?.ok) {
         setError(data?.error || `Error ${r.status}`);
         return;
@@ -48,25 +47,29 @@ export default function MiradaAstralPage() {
   }
 
   return (
-    <main style={{
-      minHeight: "100vh",
-      background: "linear-gradient(180deg,#120404,#2a0a0a)",
-      color: "#f5f5f5",
-      padding: "40px 20px",
-      fontFamily: "system-ui"
-    }}>
-      <div style={{ maxWidth: 760, margin: "0 auto" }}>
-        
-        <h1 style={{
-          fontSize: 28,
-          letterSpacing: "0.15em",
-          fontWeight: 600,
-          marginBottom: 10
-        }}>
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#0b0b0e",
+        color: "#e6e6e6",
+        padding: "60px 24px",
+        fontFamily: "system-ui",
+      }}
+    >
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <h1
+          style={{
+            fontSize: 26,
+            letterSpacing: "0.18em",
+            fontWeight: 600,
+            marginBottom: 12,
+            color: "#f0f0f0",
+          }}
+        >
           MIRADA ASTRAL
         </h1>
 
-        <p style={{ opacity: 0.6, marginBottom: 30 }}>
+        <p style={{ opacity: 0.45, marginBottom: 36 }}>
           Nombre, fecha, hora y lugar de nacimiento.
         </p>
 
@@ -77,13 +80,13 @@ export default function MiradaAstralPage() {
           placeholder="Ej: Facundo, 04/10/1972, 18:30, Mendoza, Argentina"
           style={{
             width: "100%",
-            padding: 16,
-            borderRadius: 16,
-            border: "1px solid rgba(255,255,255,0.1)",
-            background: "rgba(255,255,255,0.04)",
-            color: "#fff",
+            padding: 18,
+            borderRadius: 18,
+            border: "1px solid #1f1f23",
+            background: "#141418",
+            color: "#e6e6e6",
             fontSize: 15,
-            outline: "none"
+            outline: "none",
           }}
         />
 
@@ -91,44 +94,51 @@ export default function MiradaAstralPage() {
           onClick={generar}
           disabled={loading || !datos.trim()}
           style={{
-            marginTop: 20,
-            padding: "14px 22px",
+            marginTop: 24,
+            padding: "14px 24px",
             borderRadius: 999,
-            border: "none",
-            background: loading ? "#555" : "#c92b2b",
-            color: "#fff",
+            border: "1px solid #2a2a30",
+            background: "#1c1c22",
+            color: "#f0f0f0",
             cursor: "pointer",
-            fontWeight: 500
+            fontWeight: 500,
+            transition: "0.2s ease",
           }}
         >
           {loading ? "Generando..." : "Generar lectura"}
         </button>
 
         {error && (
-          <div style={{
-            marginTop: 20,
-            padding: 12,
-            borderRadius: 12,
-            background: "rgba(255,0,0,0.1)",
-            color: "#ff6b6b"
-          }}>
+          <div
+            style={{
+              marginTop: 24,
+              padding: 16,
+              borderRadius: 16,
+              background: "#1a1012",
+              border: "1px solid #3a1d22",
+              color: "#ff7b7b",
+            }}
+          >
             {error}
           </div>
         )}
 
         {text && (
-          <div style={{
-            marginTop: 30,
-            padding: 20,
-            borderRadius: 20,
-            background: "rgba(255,255,255,0.05)",
-            lineHeight: 1.6,
-            fontSize: 15
-          }}>
+          <div
+            style={{
+              marginTop: 36,
+              padding: 28,
+              borderRadius: 24,
+              background: "#121217",
+              border: "1px solid #1e1e24",
+              lineHeight: 1.7,
+              fontSize: 15,
+              color: "#dcdcdc",
+            }}
+          >
             {text}
           </div>
         )}
-
       </div>
     </main>
   );
