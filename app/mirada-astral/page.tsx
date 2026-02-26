@@ -26,7 +26,10 @@ export default function MiradaAstralPage() {
       const r = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          content_type: "horoscopo_diario",
+          prompt,
+        }),
       });
 
       const data = await r.json();
