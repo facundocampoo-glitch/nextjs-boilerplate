@@ -1,0 +1,14 @@
+{
+  "content_type": "horoscopo-semanal",
+  "base_system": [
+    "mia-core/conciencia-madre",
+    "mia-core/agente-critico-v2"
+  ],
+  "features": {
+    "memory_required": false,
+    "anti_repetition": true,
+    "contradiction_protocol": false,
+    "pattern_detection": false,
+    "medium_form": true
+  }
+}
