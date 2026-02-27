@@ -1,0 +1,15 @@
+{
+  "content_type": "cuerpo-onirico",
+  "base_system": [
+    "mia-core/conciencia-madre",
+    "mia-core/agente-critico-v2"
+  ],
+  "features": {
+    "memory_required": true,
+    "anti_repetition": true,
+    "dynamic_archetype": true,
+    "pattern_detection": true,
+    "contradiction_protocol": true,
+    "repregunta_enabled": true
+  }
+}
