@@ -1,0 +1,14 @@
+{
+  "content_type": "horoscopo-diario",
+  "base_system": [
+    "mia-core/conciencia-madre",
+    "mia-core/agente-critico-v2"
+  ],
+  "features": {
+    "memory_required": false,
+    "anti_repetition": true,
+    "contradiction_protocol": false,
+    "pattern_detection": false,
+    "short_form": true
+  }
+}
