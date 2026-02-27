@@ -1,0 +1,7 @@
+{
+  "content_type": "cuerpo-astral",
+  "base_system": [
+    "mia-core/conciencia-madre",
+    "mia-core/agente-critico-v2"
+  ]
+}
