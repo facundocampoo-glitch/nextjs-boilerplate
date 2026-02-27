@@ -1,0 +1,15 @@
+{
+  "content_type": "tarot-marselles",
+  "base_system": [
+    "mia-core/conciencia-madre",
+    "mia-core/agente-critico-v2"
+  ],
+  "features": {
+    "memory_required": true,
+    "anti_repetition": true,
+    "dynamic_archetype": true,
+    "pattern_detection": true,
+    "contradiction_protocol": true,
+    "card_integration": true
+  }
+}
