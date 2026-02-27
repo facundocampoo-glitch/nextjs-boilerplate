@@ -1,0 +1,8 @@
+VALIDACIÓN — ONÍRICO (OBLIGATORIA)
+
+1) Generar la salida completa con la estructura del PROMPT RAÍZ.
+2) Aplicar reglas de ACUERDO + MANIFIESTO + ARQs.
+3) Pasar el texto por 05_CHECKLIST_ONIRICO_MIA.txt.
+4) Si falla algo → reescribir y volver al punto 3.
+5) Repetir hasta OK total.
+6) Entregar SOLO el texto final terminado (sin meta, sin avisos).
