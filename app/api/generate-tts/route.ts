@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const stability = asNumber((body as any)?.stability, 0.55);
     const similarity = asNumber((body as any)?.similarity, 0.85);
 
-    // 1️⃣ llamar /api/generate
+    // 1) generar texto
     const baseUrl = baseUrlFromReq(req);
 
     const genRes = await fetch(`${baseUrl}/api/generate`, {
@@ -50,7 +50,6 @@ export async function POST(req: Request) {
     });
 
     const genJson = await genRes.json().catch(() => null);
-
     if (!genRes.ok || !genJson) {
       return NextResponse.json(
         { ok: false, error: "Fallo en /api/generate", details: genJson },
@@ -73,7 +72,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2️⃣ TTS
+    // 2) tts
     const elevenKey = process.env.ELEVENLABS_API_KEY;
     if (!elevenKey) {
       return NextResponse.json(
@@ -91,19 +90,18 @@ export async function POST(req: Request) {
       apiKey: elevenKey,
     });
 
-    return NextResponse.json({
-      ok: true,
-      text,
-      audio_base64: audio.audio_base64,
-      voice_id_used: audio.voice_id_used,
-      locale_normalized: audio.locale_normalized,
-      chained_tts: true,
+    // devolvemos MP3 directo (no JSON)
+    const mp3Buffer = Buffer.from(audio.audio_base64, "base64");
 
-      cached: !!genJson?.cached,
-      memory_used: !!genJson?.memory_used,
-      attempts: genJson?.attempts,
-      char_count: genJson?.char_count,
-      validation_reasons: genJson?.validation_reasons,
+    return new NextResponse(mp3Buffer, {
+      status: 200,
+      headers: {
+        "Content-Type": "audio/mpeg",
+        "Cache-Control": "no-store",
+        "X-MIA-Voice-Id": audio.voice_id_used,
+        "X-MIA-Locale": audio.locale_normalized,
+        // si querés el texto, lo podés pedir aparte en /api/generate
+      },
     });
   } catch (e: any) {
     return NextResponse.json(
