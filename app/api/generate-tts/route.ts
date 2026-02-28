@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const stability = asNumber((body as any)?.stability, 0.55);
     const similarity = asNumber((body as any)?.similarity, 0.85);
 
-    // 1) generar texto
+    // 1) generar texto (sin encadenado interno en Next: llamamos generate por HTTP)
     const baseUrl = baseUrlFromReq(req);
 
     const genRes = await fetch(`${baseUrl}/api/generate`, {
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
       apiKey: elevenKey,
     });
 
-    // devolvemos MP3 directo (no JSON)
+    // ✅ devolver MP3 directo (no JSON base64)
     const mp3Buffer = Buffer.from(audio.audio_base64, "base64");
 
     return new NextResponse(mp3Buffer, {
@@ -100,7 +100,6 @@ export async function POST(req: Request) {
         "Cache-Control": "no-store",
         "X-MIA-Voice-Id": audio.voice_id_used,
         "X-MIA-Locale": audio.locale_normalized,
-        // si querés el texto, lo podés pedir aparte en /api/generate
       },
     });
   } catch (e: any) {
