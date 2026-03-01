@@ -1,6 +1,8 @@
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 
+const OPENAI_TIMEOUT_MS = 20000;
+
 export async function POST(req: Request) {
   const start = Date.now();
   let attempts = 1;
@@ -17,6 +19,9 @@ export async function POST(req: Request) {
       return miaJson({ error: "Invalid prompt" }, { status: 400 });
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
     const result = await fetch(process.env.OPENAI_ENDPOINT!, {
       method: "POST",
       headers: {
@@ -27,7 +32,10 @@ export async function POST(req: Request) {
         model: "gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeout);
 
     if (!result.ok) {
       const totalMs = Date.now() - start;
@@ -44,7 +52,19 @@ export async function POST(req: Request) {
       { output: data.choices?.[0]?.message?.content ?? "" },
       { attempts, totalMs }
     );
-  } catch {
-    return miaJson({ error: "Generation failed" }, { status: 500 });
+  } catch (error) {
+    const totalMs = Date.now() - start;
+
+    if ((error as Error).name === "AbortError") {
+      return miaJson(
+        { error: "OpenAI timeout" },
+        { status: 504, attempts, totalMs }
+      );
+    }
+
+    return miaJson(
+      { error: "Generation failed" },
+      { status: 500, attempts, totalMs }
+    );
   }
 }
