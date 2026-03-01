@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { MIA_CONFIG } from "@/lib/mia/config";
+import { miaJson } from "@/lib/mia/response";
 
 export async function POST(req: Request) {
   const start = Date.now();
@@ -14,10 +15,7 @@ export async function POST(req: Request) {
       text.trim().length === 0 ||
       text.length > MIA_CONFIG.LIMITS.MAX_TTS_CHARS
     ) {
-      return NextResponse.json(
-        { error: "Invalid text" },
-        { status: 400 }
-      );
+      return miaJson({ error: "Invalid text" }, { status: 400 });
     }
 
     const voiceMap = MIA_CONFIG.VOICE.MAP;
@@ -45,6 +43,14 @@ export async function POST(req: Request) {
       }
     );
 
+    if (!elevenRes.ok) {
+      const totalMs = Date.now() - start;
+      return miaJson(
+        { error: "ElevenLabs request failed" },
+        { status: 502, attempts, totalMs }
+      );
+    }
+
     const audioBuffer = await elevenRes.arrayBuffer();
     const elevenMs = Date.now() - elevenStart;
     const totalMs = Date.now() - start;
@@ -59,9 +65,6 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "TTS failed" },
-      { status: 500 }
-    );
+    return miaJson({ error: "TTS failed" }, { status: 500 });
   }
 }
