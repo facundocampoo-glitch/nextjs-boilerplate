@@ -9,8 +9,6 @@ function isLocaleKey(value: unknown, map: VoiceMap): value is LocaleKey {
   return typeof value === "string" && value in map;
 }
 
-const ELEVEN_TIMEOUT_MS = 20000;
-
 export async function POST(req: Request) {
   const start = Date.now();
   let attempts = 1;
@@ -36,7 +34,10 @@ export async function POST(req: Request) {
     const voiceId = voiceMap[safeLocale];
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), ELEVEN_TIMEOUT_MS);
+    const timeout = setTimeout(
+      () => controller.abort(),
+      MIA_CONFIG.TIMEOUTS.ELEVEN_MS
+    );
 
     const elevenStart = Date.now();
 
