@@ -1,3 +1,4 @@
+// app/api/generate-tts/route.ts
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
@@ -12,25 +13,38 @@ function asNumber(v: unknown, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function now() {
+  return Date.now();
+}
+
 function baseUrlFromReq(req: Request): string {
-  const host =
-    req.headers.get("x-forwarded-host") ||
-    req.headers.get("host") ||
-    "localhost:3000";
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
   const proto = req.headers.get("x-forwarded-proto") || "http";
   return `${proto}://${host}`;
 }
 
+function safeFilePart(s: string): string {
+  return (s || "u")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .slice(0, 40);
+}
+
+function timestamp(): string {
+  const d = new Date();
+  return d.toISOString().replace(/:/g, "-");
+}
+
 export async function POST(req: Request) {
+  const t0 = now();
+
   try {
     const body = await req.json().catch(() => null);
-    if (!body || typeof body !== "object") {
-      return NextResponse.json(
-        { ok: false, error: "Body JSON inválido" },
-        { status: 400 }
-      );
+    if (!body) {
+      return NextResponse.json({ ok: false, error: "Body inválido" }, { status: 400 });
     }
 
+    const user_id = safeFilePart(asString((body as any)?.user_id));
     const locale =
       asString((body as any)?.user_profile?.locale) ||
       asString((body as any)?.locale) ||
@@ -40,46 +54,35 @@ export async function POST(req: Request) {
     const stability = asNumber((body as any)?.stability, 0.55);
     const similarity = asNumber((body as any)?.similarity, 0.85);
 
-    // 1) generar texto (sin encadenado interno en Next: llamamos generate por HTTP)
+    // GENERATE
     const baseUrl = baseUrlFromReq(req);
-
     const genRes = await fetch(`${baseUrl}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
-    const genJson = await genRes.json().catch(() => null);
-    if (!genRes.ok || !genJson) {
-      return NextResponse.json(
-        { ok: false, error: "Fallo en /api/generate", details: genJson },
-        { status: 502 }
-      );
+    const genJson = await genRes.json();
+    if (!genRes.ok) {
+      return NextResponse.json({ ok: false, error: "generate failed" }, { status: 502 });
     }
 
     if (genJson?.needs_sensorial) {
-      return NextResponse.json({
-        ...genJson,
-        chained_tts: false,
-      });
+      return NextResponse.json({ ...genJson, chained_tts: false });
     }
 
-    const text = asString(genJson?.text).trim();
+    const text = asString(genJson?.text);
     if (!text) {
-      return NextResponse.json(
-        { ok: false, error: "Generate no devolvió text válido" },
-        { status: 502 }
-      );
+      return NextResponse.json({ ok: false, error: "No text" }, { status: 502 });
     }
 
-    // 2) tts
+    // ELEVEN
     const elevenKey = process.env.ELEVENLABS_API_KEY;
     if (!elevenKey) {
-      return NextResponse.json(
-        { ok: false, error: "Falta ELEVENLABS_API_KEY" },
-        { status: 500 }
-      );
+      return NextResponse.json({ ok: false, error: "No ELEVEN key" }, { status: 500 });
     }
+
+    const tEleven = now();
 
     const audio = await elevenTtsToBase64({
       text,
@@ -90,22 +93,33 @@ export async function POST(req: Request) {
       apiKey: elevenKey,
     });
 
-    // ✅ devolver MP3 directo (no JSON base64)
-    const mp3Buffer = Buffer.from(audio.audio_base64, "base64");
+    const ms_eleven = now() - tEleven;
+    const ms_total = now() - t0;
 
-    return new NextResponse(mp3Buffer, {
+    console.log("[MIA]", {
+      user_id,
+      attempts: genJson?.attempts,
+      validation_ok: genJson?.validation_ok,
+      ms_eleven,
+      ms_total,
+    });
+
+    const mp3 = Buffer.from(audio.audio_base64, "base64");
+
+    const filename = `${user_id || "u"}_${timestamp()}.mp3`;
+
+    return new NextResponse(mp3, {
       status: 200,
       headers: {
         "Content-Type": "audio/mpeg",
-        "Cache-Control": "no-store",
-        "X-MIA-Voice-Id": audio.voice_id_used,
-        "X-MIA-Locale": audio.locale_normalized,
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "X-MIA-Eleven-ms": String(ms_eleven),
+        "X-MIA-Total-ms": String(ms_total),
+        "X-MIA-Attempts": String(genJson?.attempts || 1),
+        "X-MIA-Validation": String(genJson?.validation_ok ?? true),
       },
     });
   } catch (e: any) {
-    return NextResponse.json(
-      { ok: false, error: e?.message || "Error desconocido" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: e?.message }, { status: 500 });
   }
 }
