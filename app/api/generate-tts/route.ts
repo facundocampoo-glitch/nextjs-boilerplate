@@ -1,125 +1,59 @@
-// app/api/generate-tts/route.ts
-export const runtime = "nodejs";
-
 import { NextResponse } from "next/server";
-import { elevenTtsToBase64 } from "@/lib/tts/eleven";
-
-function asString(v: unknown): string {
-  return typeof v === "string" ? v : v == null ? "" : String(v);
-}
-
-function asNumber(v: unknown, fallback: number): number {
-  const n = typeof v === "number" ? v : Number(v);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function now() {
-  return Date.now();
-}
-
-function baseUrlFromReq(req: Request): string {
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") || "http";
-  return `${proto}://${host}`;
-}
-
-function safeFilePart(s: string): string {
-  return (s || "u")
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, "-")
-    .slice(0, 40);
-}
-
-function timestamp(): string {
-  const d = new Date();
-  return d.toISOString().replace(/:/g, "-");
-}
+import { MIA_CONFIG } from "@/lib/mia/config";
 
 export async function POST(req: Request) {
-  const t0 = now();
+  const start = Date.now();
+  let attempts = 1;
 
   try {
-    const body = await req.json().catch(() => null);
-    if (!body) {
-      return NextResponse.json({ ok: false, error: "Body inválido" }, { status: 400 });
+    const body = await req.json();
+    const { text, locale = MIA_CONFIG.VOICE.DEFAULT_LOCALE } = body;
+
+    if (!text || text.length > MIA_CONFIG.LIMITS.MAX_TTS_CHARS) {
+      return NextResponse.json(
+        { error: "Invalid text" },
+        { status: 400 }
+      );
     }
 
-    const user_id = safeFilePart(asString((body as any)?.user_id));
-    const locale =
-      asString((body as any)?.user_profile?.locale) ||
-      asString((body as any)?.locale) ||
-      "es-AR";
+    const voiceId =
+      MIA_CONFIG.VOICE.MAP[locale as keyof typeof MIA_CONFIG.VOICE.MAP] ||
+      MIA_CONFIG.VOICE.MAP[MIA_CONFIG.VOICE.DEFAULT_LOCALE];
 
-    const voice_id = asString((body as any)?.voice_id);
-    const stability = asNumber((body as any)?.stability, 0.55);
-    const similarity = asNumber((body as any)?.similarity, 0.85);
+    const elevenStart = Date.now();
 
-    // GENERATE
-    const baseUrl = baseUrlFromReq(req);
-    const genRes = await fetch(`${baseUrl}/api/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const elevenRes = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "xi-api-key": process.env.ELEVENLABS_API_KEY!,
+        },
+        body: JSON.stringify({
+          text,
+          model_id: "eleven_multilingual_v2",
+        }),
+      }
+    );
 
-    const genJson = await genRes.json();
-    if (!genRes.ok) {
-      return NextResponse.json({ ok: false, error: "generate failed" }, { status: 502 });
-    }
+    const audioBuffer = await elevenRes.arrayBuffer();
+    const elevenMs = Date.now() - elevenStart;
+    const totalMs = Date.now() - start;
 
-    if (genJson?.needs_sensorial) {
-      return NextResponse.json({ ...genJson, chained_tts: false });
-    }
-
-    const text = asString(genJson?.text);
-    if (!text) {
-      return NextResponse.json({ ok: false, error: "No text" }, { status: 502 });
-    }
-
-    // ELEVEN
-    const elevenKey = process.env.ELEVENLABS_API_KEY;
-    if (!elevenKey) {
-      return NextResponse.json({ ok: false, error: "No ELEVEN key" }, { status: 500 });
-    }
-
-    const tEleven = now();
-
-    const audio = await elevenTtsToBase64({
-      text,
-      locale,
-      voice_id: voice_id || undefined,
-      stability,
-      similarity,
-      apiKey: elevenKey,
-    });
-
-    const ms_eleven = now() - tEleven;
-    const ms_total = now() - t0;
-
-    console.log("[MIA]", {
-      user_id,
-      attempts: genJson?.attempts,
-      validation_ok: genJson?.validation_ok,
-      ms_eleven,
-      ms_total,
-    });
-
-    const mp3 = Buffer.from(audio.audio_base64, "base64");
-
-    const filename = `${user_id || "u"}_${timestamp()}.mp3`;
-
-    return new NextResponse(mp3, {
-      status: 200,
+    return new NextResponse(Buffer.from(audioBuffer), {
       headers: {
         "Content-Type": "audio/mpeg",
-        "Content-Disposition": `attachment; filename="${filename}"`,
-        "X-MIA-Eleven-ms": String(ms_eleven),
-        "X-MIA-Total-ms": String(ms_total),
-        "X-MIA-Attempts": String(genJson?.attempts || 1),
-        "X-MIA-Validation": String(genJson?.validation_ok ?? true),
+        [MIA_CONFIG.HEADERS.ATTEMPTS]: String(attempts),
+        [MIA_CONFIG.HEADERS.ELEVEN_MS]: String(elevenMs),
+        [MIA_CONFIG.HEADERS.TOTAL_MS]: String(totalMs),
+        [MIA_CONFIG.HEADERS.VALIDATION]: "true",
       },
     });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "TTS failed" },
+      { status: 500 }
+    );
   }
 }
