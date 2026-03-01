@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { MIA_CONFIG } from "@/lib/mia/config";
+import { miaJson } from "@/lib/mia/response";
 
 export async function POST(req: Request) {
   const start = Date.now();
@@ -9,16 +9,16 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { prompt } = body;
 
-    if (!prompt || prompt.length > MIA_CONFIG.LIMITS.MAX_PROMPT_CHARS) {
-      return NextResponse.json(
+    if (
+      typeof prompt !== "string" ||
+      prompt.trim().length === 0 ||
+      prompt.length > MIA_CONFIG.LIMITS.MAX_PROMPT_CHARS
+    ) {
+      return miaJson(
         { error: "Invalid prompt" },
         { status: 400 }
       );
     }
-
-    // 👉 aquí va tu lógica actual de generación GPT
-    // NO modificar tu integración existente
-    // Solo mantenerla dentro del try
 
     const result = await fetch(process.env.OPENAI_ENDPOINT!, {
       method: "POST",
@@ -33,21 +33,17 @@ export async function POST(req: Request) {
     });
 
     const data = await result.json();
-
     const totalMs = Date.now() - start;
 
-    return NextResponse.json(
+    return miaJson(
       { output: data.choices?.[0]?.message?.content ?? "" },
       {
-        headers: {
-          [MIA_CONFIG.HEADERS.ATTEMPTS]: String(attempts),
-          [MIA_CONFIG.HEADERS.TOTAL_MS]: String(totalMs),
-          [MIA_CONFIG.HEADERS.VALIDATION]: "true",
-        },
+        attempts,
+        totalMs,
       }
     );
   } catch (error) {
-    return NextResponse.json(
+    return miaJson(
       { error: "Generation failed" },
       { status: 500 }
     );
