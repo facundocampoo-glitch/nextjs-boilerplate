@@ -14,10 +14,7 @@ export async function POST(req: Request) {
       prompt.trim().length === 0 ||
       prompt.length > MIA_CONFIG.LIMITS.MAX_PROMPT_CHARS
     ) {
-      return miaJson(
-        { error: "Invalid prompt" },
-        { status: 400 }
-      );
+      return miaJson({ error: "Invalid prompt" }, { status: 400 });
     }
 
     const result = await fetch(process.env.OPENAI_ENDPOINT!, {
@@ -32,20 +29,22 @@ export async function POST(req: Request) {
       }),
     });
 
+    if (!result.ok) {
+      const totalMs = Date.now() - start;
+      return miaJson(
+        { error: "OpenAI request failed" },
+        { status: 502, attempts, totalMs }
+      );
+    }
+
     const data = await result.json();
     const totalMs = Date.now() - start;
 
     return miaJson(
       { output: data.choices?.[0]?.message?.content ?? "" },
-      {
-        attempts,
-        totalMs,
-      }
+      { attempts, totalMs }
     );
-  } catch (error) {
-    return miaJson(
-      { error: "Generation failed" },
-      { status: 500 }
-    );
+  } catch {
+    return miaJson({ error: "Generation failed" }, { status: 500 });
   }
 }
