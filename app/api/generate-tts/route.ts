@@ -7,18 +7,26 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { text, locale = MIA_CONFIG.VOICE.DEFAULT_LOCALE } = body;
+    const { text, locale } = body;
 
-    if (!text || text.length > MIA_CONFIG.LIMITS.MAX_TTS_CHARS) {
+    if (
+      typeof text !== "string" ||
+      text.trim().length === 0 ||
+      text.length > MIA_CONFIG.LIMITS.MAX_TTS_CHARS
+    ) {
       return NextResponse.json(
         { error: "Invalid text" },
         { status: 400 }
       );
     }
 
-    const voiceId =
-      MIA_CONFIG.VOICE.MAP[locale as keyof typeof MIA_CONFIG.VOICE.MAP] ||
-      MIA_CONFIG.VOICE.MAP[MIA_CONFIG.VOICE.DEFAULT_LOCALE];
+    const voiceMap = MIA_CONFIG.VOICE.MAP;
+    const safeLocale =
+      typeof locale === "string" && locale in voiceMap
+        ? (locale as keyof typeof voiceMap)
+        : MIA_CONFIG.VOICE.DEFAULT_LOCALE;
+
+    const voiceId = voiceMap[safeLocale];
 
     const elevenStart = Date.now();
 
