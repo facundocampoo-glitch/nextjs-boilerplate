@@ -2,6 +2,7 @@ import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 import { TAROT_SYSTEM_PROMPT } from "@/lib/mia/prompts/tarot";
 import { CONTENT_TYPES } from "@/lib/mia/content-types";
+import { generateText } from "@/lib/mia/core/generate";
 
 export async function POST(req: Request) {
   const start = Date.now();
@@ -29,21 +30,11 @@ export async function POST(req: Request) {
       MIA_CONFIG.TIMEOUTS.OPENAI_MS
     );
 
-    const result = await fetch(process.env.OPENAI_ENDPOINT!, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: TAROT_SYSTEM_PROMPT },
-          { role: "user", content: question },
-        ],
-      }),
-      signal: controller.signal,
-    });
+    const result = await generateText(
+      TAROT_SYSTEM_PROMPT,
+      question,
+      controller.signal
+    );
 
     clearTimeout(timeout);
 
