@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 import { TAROT_SYSTEM_PROMPT } from "@/lib/mia/prompts/tarot";
+import { CONTENT_TYPES } from "@/lib/mia/content-types";
 
 type VoiceMap = typeof MIA_CONFIG.VOICE.MAP;
 type LocaleKey = keyof VoiceMap;
@@ -12,7 +13,8 @@ function isLocaleKey(value: unknown, map: VoiceMap): value is LocaleKey {
 
 export async function POST(req: Request) {
   const start = Date.now();
-  let attempts = 1;
+  const attempts = 1;
+  const contentType = CONTENT_TYPES.TAROT_TTS;
 
   try {
     const body = await req.json();
@@ -23,7 +25,10 @@ export async function POST(req: Request) {
       question.trim().length === 0 ||
       question.length > MIA_CONFIG.LIMITS.MAX_PROMPT_CHARS
     ) {
-      return miaJson({ error: "Invalid question" }, { status: 400 });
+      return miaJson(
+        { error: "Invalid question", contentType },
+        { status: 400 }
+      );
     }
 
     // 1️⃣ Generar texto Tarot
@@ -55,7 +60,7 @@ export async function POST(req: Request) {
     if (!result.ok) {
       const totalMs = Date.now() - start;
       return miaJson(
-        { error: "OpenAI request failed" },
+        { error: "OpenAI request failed", contentType },
         { status: 502, attempts, totalMs }
       );
     }
@@ -93,7 +98,7 @@ export async function POST(req: Request) {
     if (!elevenRes.ok) {
       const totalMs = Date.now() - start;
       return miaJson(
-        { error: "ElevenLabs request failed" },
+        { error: "ElevenLabs request failed", contentType },
         { status: 502, attempts, totalMs }
       );
     }
@@ -116,13 +121,13 @@ export async function POST(req: Request) {
 
     if ((error as Error).name === "AbortError") {
       return miaJson(
-        { error: "Timeout" },
+        { error: "Timeout", contentType },
         { status: 504, attempts, totalMs }
       );
     }
 
     return miaJson(
-      { error: "Tarot TTS failed" },
+      { error: "Tarot TTS failed", contentType },
       { status: 500, attempts, totalMs }
     );
   }
