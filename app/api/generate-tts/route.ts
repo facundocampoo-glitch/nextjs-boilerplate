@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 
+type VoiceMap = typeof MIA_CONFIG.VOICE.MAP;
+type LocaleKey = keyof VoiceMap;
+
+function isLocaleKey(value: unknown, map: VoiceMap): value is LocaleKey {
+  return typeof value === "string" && value in map;
+}
+
 export async function POST(req: Request) {
   const start = Date.now();
   let attempts = 1;
@@ -19,10 +26,10 @@ export async function POST(req: Request) {
     }
 
     const voiceMap = MIA_CONFIG.VOICE.MAP;
-    const safeLocale =
-      typeof locale === "string" && locale in voiceMap
-        ? (locale as keyof typeof voiceMap)
-        : MIA_CONFIG.VOICE.DEFAULT_LOCALE;
+
+    const safeLocale: LocaleKey = isLocaleKey(locale, voiceMap)
+      ? locale
+      : (MIA_CONFIG.VOICE.DEFAULT_LOCALE as LocaleKey);
 
     const voiceId = voiceMap[safeLocale];
 
