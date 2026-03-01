@@ -9,6 +9,11 @@ export const MIA_CONFIG = {
     MAX_TTS_CHARS: 5000,
   },
 
+  TIMEOUTS: {
+    OPENAI_MS: 20000,
+    ELEVEN_MS: 20000,
+  },
+
   VOICE: {
     DEFAULT_LOCALE: "es-AR",
     MAP: {
