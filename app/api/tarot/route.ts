@@ -1,10 +1,12 @@
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 import { TAROT_SYSTEM_PROMPT } from "@/lib/mia/prompts/tarot";
+import { CONTENT_TYPES } from "@/lib/mia/content-types";
 
 export async function POST(req: Request) {
   const start = Date.now();
-  let attempts = 1;
+  const attempts = 1;
+  const contentType = CONTENT_TYPES.TAROT;
 
   try {
     const body = await req.json();
@@ -15,7 +17,10 @@ export async function POST(req: Request) {
       question.trim().length === 0 ||
       question.length > MIA_CONFIG.LIMITS.MAX_PROMPT_CHARS
     ) {
-      return miaJson({ error: "Invalid question" }, { status: 400 });
+      return miaJson(
+        { error: "Invalid question", contentType },
+        { status: 400 }
+      );
     }
 
     const controller = new AbortController();
@@ -45,7 +50,7 @@ export async function POST(req: Request) {
     if (!result.ok) {
       const totalMs = Date.now() - start;
       return miaJson(
-        { error: "OpenAI request failed" },
+        { error: "OpenAI request failed", contentType },
         { status: 502, attempts, totalMs }
       );
     }
@@ -54,7 +59,10 @@ export async function POST(req: Request) {
     const totalMs = Date.now() - start;
 
     return miaJson(
-      { output: data.choices?.[0]?.message?.content ?? "" },
+      {
+        output: data.choices?.[0]?.message?.content ?? "",
+        contentType,
+      },
       { attempts, totalMs }
     );
   } catch (error) {
@@ -62,13 +70,13 @@ export async function POST(req: Request) {
 
     if ((error as Error).name === "AbortError") {
       return miaJson(
-        { error: "OpenAI timeout" },
+        { error: "OpenAI timeout", contentType },
         { status: 504, attempts, totalMs }
       );
     }
 
     return miaJson(
-      { error: "Tarot generation failed" },
+      { error: "Tarot generation failed", contentType },
       { status: 500, attempts, totalMs }
     );
   }
