@@ -9,6 +9,8 @@ function isLocaleKey(value: unknown, map: VoiceMap): value is LocaleKey {
   return typeof value === "string" && value in map;
 }
 
+const ELEVEN_TIMEOUT_MS = 20000;
+
 export async function POST(req: Request) {
   const start = Date.now();
   let attempts = 1;
@@ -33,6 +35,9 @@ export async function POST(req: Request) {
 
     const voiceId = voiceMap[safeLocale];
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), ELEVEN_TIMEOUT_MS);
+
     const elevenStart = Date.now();
 
     const elevenRes = await fetch(
@@ -47,8 +52,11 @@ export async function POST(req: Request) {
           text,
           model_id: "eleven_multilingual_v2",
         }),
+        signal: controller.signal,
       }
     );
+
+    clearTimeout(timeout);
 
     if (!elevenRes.ok) {
       const totalMs = Date.now() - start;
@@ -72,6 +80,18 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    return miaJson({ error: "TTS failed" }, { status: 500 });
+    const totalMs = Date.now() - start;
+
+    if ((error as Error).name === "AbortError") {
+      return miaJson(
+        { error: "ElevenLabs timeout" },
+        { status: 504, attempts, totalMs }
+      );
+    }
+
+    return miaJson(
+      { error: "TTS failed" },
+      { status: 500, attempts, totalMs }
+    );
   }
 }
