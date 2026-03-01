@@ -1,8 +1,6 @@
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 
-const OPENAI_TIMEOUT_MS = 20000;
-
 export async function POST(req: Request) {
   const start = Date.now();
   let attempts = 1;
@@ -20,7 +18,10 @@ export async function POST(req: Request) {
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+    const timeout = setTimeout(
+      () => controller.abort(),
+      MIA_CONFIG.TIMEOUTS.OPENAI_MS
+    );
 
     const result = await fetch(process.env.OPENAI_ENDPOINT!, {
       method: "POST",
