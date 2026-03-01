@@ -13,9 +13,12 @@ function asObject(v: unknown): Record<string, any> {
   return v && typeof v === "object" ? (v as any) : {};
 }
 
+function nowMs(): number {
+  return Date.now();
+}
+
 function extractTextFromOpenAIResponse(json: any): string {
   try {
-    // Camino típico: output[].content[].text
     const out = json?.output;
     if (Array.isArray(out)) {
       for (const item of out) {
@@ -28,11 +31,8 @@ function extractTextFromOpenAIResponse(json: any): string {
         }
       }
     }
-
-    // output_text directo (fallback)
     const ot = json?.output_text;
     if (typeof ot === "string" && ot.trim()) return ot.trim();
-
     return "";
   } catch {
     return "";
@@ -93,7 +93,52 @@ function buildUserPrompt(body: any): string {
     .join("\n");
 }
 
+async function callOpenAI(args: {
+  apiKey: string;
+  model: string;
+  system: string;
+  user: string;
+}): Promise<{ ok: boolean; text: string; ms: number; raw?: any }> {
+  const t0 = nowMs();
+  const r = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${args.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: args.model,
+      input: [
+        { role: "system", content: args.system },
+        { role: "user", content: args.user },
+      ],
+    }),
+  });
+
+  const raw = await r.json().catch(() => null);
+  const ms = nowMs() - t0;
+
+  if (!r.ok || !raw) return { ok: false, text: "", ms, raw };
+  const text = extractTextFromOpenAIResponse(raw);
+  return { ok: !!text, text: text || "", ms, raw };
+}
+
+function buildRepairHint(reasons: string[]): string {
+  const r = reasons.length ? reasons.join(" | ") : "Estructura inválida.";
+  return [
+    "",
+    "CORRECCIÓN OBLIGATORIA:",
+    "Reescribí TODO cumpliendo ESTRICTO 5 bloques con doble salto entre bloques.",
+    "Ningún bloque > 5 líneas.",
+    "El bloque 4 debe contener UNA micro-acción hoy (imperativo claro).",
+    "Sin didáctica (no Jung/Freud/psicoanálisis/chamanismo).",
+    `Errores detectados: ${r}`,
+  ].join("\n");
+}
+
 export async function POST(req: Request) {
+  const tStart = nowMs();
+
   try {
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== "object") {
@@ -113,62 +158,96 @@ export async function POST(req: Request) {
       });
     }
 
-    // 1) OpenAI
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ ok: false, error: "Falta OPENAI_API_KEY" }, { status: 500 });
     }
 
     const system = buildSystemPrompt(locale);
-    const user = buildUserPrompt(body);
+    const baseUser = buildUserPrompt(body);
     const model = asString((body as any)?.model) || "gpt-4o-mini";
 
-    const r = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        input: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-      }),
-    });
+    const maxAttempts = 3;
 
-    const json = await r.json().catch(() => null);
-    if (!r.ok || !json) {
-      return NextResponse.json(
-        { ok: false, error: "Fallo OpenAI /v1/responses", details: json },
-        { status: 502 }
-      );
+    let attempts = 0;
+    let ms_openai_total = 0;
+
+    let lastText = "";
+    let lastValidation = { ok: false, reasons: ["Sin intento aún."], blocks: [] as string[] };
+    let lastCleanNotes: string[] = [];
+
+    let userPrompt = baseUser;
+
+    while (attempts < maxAttempts) {
+      attempts += 1;
+
+      // 1) OpenAI
+      const oa = await callOpenAI({ apiKey, model, system, user: userPrompt });
+      ms_openai_total += oa.ms;
+
+      if (!oa.ok) {
+        // Si OpenAI no devolvió texto, intentamos otra vez con hint más duro
+        userPrompt = baseUser + buildRepairHint(["OpenAI no devolvió texto utilizable."]);
+        lastText = "";
+        lastValidation = { ok: false, reasons: ["OpenAI no devolvió texto utilizable."], blocks: [] };
+        continue;
+      }
+
+      // 2) clean
+      const tClean0 = nowMs();
+      const cleaned = cleanTTS(oa.text, { expectedBlocks: 5, maxLinesPerBlock: 5, maxChars: 1200 });
+      const ms_clean = nowMs() - tClean0;
+
+      lastText = cleaned.text;
+      lastCleanNotes = cleaned.notes || [];
+
+      // 3) validate
+      const tVal0 = nowMs();
+      const validation = validateTTSStructure(lastText, { expectedBlocks: 5, maxLinesPerBlock: 5 });
+      const ms_validate = nowMs() - tVal0;
+
+      lastValidation = validation;
+
+      // Si OK → salimos
+      if (validation.ok) {
+        const total_ms = nowMs() - tStart;
+        return NextResponse.json({
+          ok: true,
+          text: lastText,
+          attempts,
+          char_count: lastText.length,
+          validation_ok: true,
+          validation_reasons: [],
+          clean_notes: lastCleanNotes,
+
+          // observabilidad mínima (C parte 1)
+          ms_openai_total,
+          ms_clean,
+          ms_validate,
+          ms_total: total_ms,
+
+          cached: false,
+          memory_used: false,
+        });
+      }
+
+      // Si NO ok → reintentar con hint basado en reasons
+      userPrompt = baseUser + buildRepairHint(validation.reasons);
     }
 
-    let text = extractTextFromOpenAIResponse(json);
-    if (!text) {
-      return NextResponse.json(
-        { ok: false, error: "OpenAI no devolvió texto utilizable", details: json },
-        { status: 502 }
-      );
-    }
-
-    // 2) Post-procesado TTS
-    const cleaned = cleanTTS(text, { expectedBlocks: 5, maxLinesPerBlock: 5, maxChars: 1200 });
-    text = cleaned.text;
-
-    // 3) Validación estructura
-    const validation = validateTTSStructure(text, { expectedBlocks: 5, maxLinesPerBlock: 5 });
-
+    // Si agotamos intentos → devolvemos lo mejor que tengamos + reasons
+    const total_ms = nowMs() - tStart;
     return NextResponse.json({
       ok: true,
-      text,
+      text: lastText,
+      attempts,
+      char_count: lastText.length,
+      validation_ok: lastValidation.ok,
+      validation_reasons: lastValidation.reasons,
+      clean_notes: lastCleanNotes,
 
-      attempts: 1,
-      char_count: text.length,
-      validation_ok: validation.ok,
-      validation_reasons: validation.reasons,
+      ms_openai_total,
+      ms_total: total_ms,
 
       cached: false,
       memory_used: false,
