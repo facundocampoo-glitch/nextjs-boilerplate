@@ -34,7 +34,7 @@ export async function generateText(
             "PROHIBIDO: tono coach, moralina, cierre suave tipo consejo espiritual.",
             "Formato: texto libre, punzante, concreto. Si hace falta, una micro-acción final (1 línea).",
             "No describas el proceso. No digas qué carta salió. No nombres arcanos salvo que el usuario lo pida.",
-          ].join("\n"),
+          ].join(\"\\n\"),
         },
         { role: "user", content: userInput },
       ],
