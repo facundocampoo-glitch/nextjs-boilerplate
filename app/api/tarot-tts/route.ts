@@ -3,6 +3,8 @@ import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
 import { TAROT_SYSTEM_PROMPT } from "@/lib/mia/prompts/tarot";
 import { CONTENT_TYPES } from "@/lib/mia/content-types";
+import { generateText } from "@/lib/mia/core/generate";
+import { synthesizeSpeech } from "@/lib/mia/core/tts";
 
 type VoiceMap = typeof MIA_CONFIG.VOICE.MAP;
 type LocaleKey = keyof VoiceMap;
@@ -31,33 +33,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1️⃣ Generar texto Tarot
+    // 1️⃣ Generar texto
 
-    const controller = new AbortController();
-    const timeout = setTimeout(
-      () => controller.abort(),
+    const textController = new AbortController();
+    const textTimeout = setTimeout(
+      () => textController.abort(),
       MIA_CONFIG.TIMEOUTS.OPENAI_MS
     );
 
-    const result = await fetch(process.env.OPENAI_ENDPOINT!, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: TAROT_SYSTEM_PROMPT },
-          { role: "user", content: question },
-        ],
-      }),
-      signal: controller.signal,
-    });
+    const textRes = await generateText(
+      TAROT_SYSTEM_PROMPT,
+      question,
+      textController.signal
+    );
 
-    clearTimeout(timeout);
+    clearTimeout(textTimeout);
 
-    if (!result.ok) {
+    if (!textRes.ok) {
       const totalMs = Date.now() - start;
       return miaJson(
         { error: "OpenAI request failed", contentType },
@@ -65,7 +57,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const data = await result.json();
+    const data = await textRes.json();
     const textOutput = data.choices?.[0]?.message?.content ?? "";
 
     // 2️⃣ Convertir a audio
@@ -78,22 +70,21 @@ export async function POST(req: Request) {
 
     const voiceId = voiceMap[safeLocale];
 
+    const audioController = new AbortController();
+    const audioTimeout = setTimeout(
+      () => audioController.abort(),
+      MIA_CONFIG.TIMEOUTS.ELEVEN_MS
+    );
+
     const elevenStart = Date.now();
 
-    const elevenRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": process.env.ELEVENLABS_API_KEY!,
-        },
-        body: JSON.stringify({
-          text: textOutput,
-          model_id: "eleven_multilingual_v2",
-        }),
-      }
+    const elevenRes = await synthesizeSpeech(
+      voiceId,
+      textOutput,
+      audioController.signal
     );
+
+    clearTimeout(audioTimeout);
 
     if (!elevenRes.ok) {
       const totalMs = Date.now() - start;
