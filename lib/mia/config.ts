@@ -17,12 +17,14 @@ export const MIA_CONFIG = {
   VOICE: {
     DEFAULT_LOCALE: "es-AR",
     MAP: {
-      "es-AR": "PEGAR_ID_REAL_ES_AR",
-      "es-ES": "PEGAR_ID_REAL_ES_ES",
-      "pt-BR": "PEGAR_ID_REAL_PT_BR",
-      "en-US": "PEGAR_ID_REAL_EN_US",
-      "it-IT": "PEGAR_ID_REAL_IT_IT",
-      "de-DE": "PEGAR_ID_REAL_DE_DE",
+      "es-AR": "2hBQlTZaZFX0dHO0y3bF",
+    
+      "pt-BR": "XezKlk7prWCFz2gKGulA",
+      "pt-PT": "fcjp97CTeheGebtw6zL2",
+      "en-US": "Aa0QEjBhgN0DHiiQifLE",
+      "it-IT": "ENqLMqhEn7dTrhAzJVHq",
+      "de-DE": "0DoceCNfxPBnvAtymo2M",
+      "fr-FR": "s7NdtjPNiNqyTlywVdTK",
     },
   },
 
