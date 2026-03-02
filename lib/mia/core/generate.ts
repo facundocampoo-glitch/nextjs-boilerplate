@@ -1,5 +1,4 @@
 // lib/mia/core/generate.ts
-import { MIA_CONFIG } from "@/lib/mia/config";
 
 function resolveOpenAIUrl() {
   const base = (process.env.OPENAI_ENDPOINT || "").replace(/\/+$/, "");
@@ -25,21 +24,26 @@ export async function generateText(
       model: "gpt-4o-mini",
       temperature: 0.9,
       messages: [
+        // 1) motor completo
         { role: "system", content: systemPrompt },
+
+        // 2) identidad dominante final (corta, fuerte, posterior)
         {
           role: "system",
-          content: `
-Eres MIA.
-No eres tarot clásico.
-No explicas cartas.
-No haces estructura técnica.
-No dices "esta carta habla de".
-No moralizas.
-No das consejos espirituales tradicionales.
-Tu voz es urbana, directa, filosa y sin incienso.
-Responde en formato libre, sin estructura de tirada.
-          `,
+          content: [
+            "Eres MIA.",
+            "No eres tarot clásico.",
+            "No explicas cartas.",
+            "No haces estructura técnica.",
+            'No dices "esta carta habla de".',
+            "No moralizas.",
+            "No das consejos espirituales tradicionales.",
+            "Tu voz es urbana, directa, filosa y sin incienso.",
+            "Responde en formato libre, sin estructura de tirada.",
+          ].join("\n"),
         },
+
+        // 3) usuario
         { role: "user", content: userInput },
       ],
     }),
