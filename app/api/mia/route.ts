@@ -5,12 +5,8 @@ import { CONTENT_TYPES } from "@/lib/mia/content-types";
 import { generateText } from "@/lib/mia/core/generate";
 import { synthesizeSpeech } from "@/lib/mia/core/tts";
 
-// ✅ Motor real (raw text, sin editar)
-import PROMPT_RAIZ from "@/prompts/mia-core/conciencia-madre/PROMPT_RAIZ_CONCIENCIA_MADRE__MOTOR_MIA300.txt?raw";
-import ACUERDO_OPERATIVO from "@/prompts/mia-core/conciencia-madre/ACUERDO_OPERATIVO.txt?raw";
-import ANTI_REPETICION from "@/prompts/mia-core/conciencia-madre/ANTI_REPETICION_MIA.md?raw";
-import MANIFIESTO from "@/prompts/mia-core/conciencia-madre/MANIFIESTO_DE_VOZ_MIA.md?raw";
-import BANCO_OCURRENCIAS from "@/prompts/mia-core/conciencia-madre/BANCO_OCURRENCIAS_MIA_1000.txt?raw";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 type VoiceMap = typeof MIA_CONFIG.VOICE.MAP;
 type LocaleKey = keyof VoiceMap;
@@ -26,21 +22,64 @@ function isTtsType(contentType: string) {
   );
 }
 
-function buildSystemPrompt(contentType: string) {
-  // ✅ Nada de resúmenes. Nada de recortes.
-  // Orden: motor -> acuerdos -> manifiesto -> anti repetición -> banco -> selector de tipo
-  const base =
-    [
-      PROMPT_RAIZ,
-      ACUERDO_OPERATIVO,
-      MANIFIESTO,
-      ANTI_REPETICION,
-      BANCO_OCURRENCIAS,
-      `\n\n# CONTENT_TYPE\n${contentType}\n`,
-      `# INSTRUCCIÓN\nResponde siguiendo EXACTAMENTE el motor y acuerdos anteriores. No resumas el motor. No pidas disculpas. No expliques el sistema.\n`,
-    ].join("\n\n");
+const MOTOR_DIR = path.join(
+  process.cwd(),
+  "prompts",
+  "mia-core",
+  "conciencia-madre"
+);
 
-  return base;
+async function loadMotorTexts() {
+  // ✅ Lee tus archivos TAL CUAL están en el repo (sin loaders, sin import)
+  const [
+    PROMPT_RAIZ,
+    ACUERDO_OPERATIVO,
+    MANIFIESTO,
+    ANTI_REPETICION,
+    BANCO_OCURRENCIAS,
+  ] = await Promise.all([
+    readFile(
+      path.join(MOTOR_DIR, "PROMPT_RAIZ_CONCIENCIA_MADRE__MOTOR_MIA300.txt"),
+      "utf8"
+    ),
+    readFile(path.join(MOTOR_DIR, "ACUERDO_OPERATIVO.txt"), "utf8"),
+    readFile(path.join(MOTOR_DIR, "MANIFIESTO_DE_VOZ_MIA.md"), "utf8"),
+    readFile(path.join(MOTOR_DIR, "ANTI_REPETICION_MIA.md"), "utf8"),
+    readFile(path.join(MOTOR_DIR, "BANCO_OCURRENCIAS_MIA_1000.txt"), "utf8"),
+  ]);
+
+  return {
+    PROMPT_RAIZ,
+    ACUERDO_OPERATIVO,
+    MANIFIESTO,
+    ANTI_REPETICION,
+    BANCO_OCURRENCIAS,
+  };
+}
+
+// Cache en memoria del worker (no cambia tus textos, solo evita re-reads)
+let motorCache:
+  | null
+  | Promise<Awaited<ReturnType<typeof loadMotorTexts>>> = null;
+
+async function getMotor() {
+  if (!motorCache) motorCache = loadMotorTexts();
+  return motorCache;
+}
+
+async function buildSystemPrompt(contentType: string) {
+  const motor = await getMotor();
+
+  // ✅ Orden fijo, sin resúmenes, sin recortes
+  return [
+    motor.PROMPT_RAIZ,
+    motor.ACUERDO_OPERATIVO,
+    motor.MANIFIESTO,
+    motor.ANTI_REPETICION,
+    motor.BANCO_OCURRENCIAS,
+    `\n\n# CONTENT_TYPE\n${contentType}\n`,
+    `# INSTRUCCIÓN\nResponde siguiendo EXACTAMENTE el motor y acuerdos anteriores. No resumas el motor. No expliques el sistema.\n`,
+  ].join("\n\n");
 }
 
 export async function POST(req: Request) {
@@ -71,7 +110,7 @@ export async function POST(req: Request) {
       return miaJson({ error: "Invalid input", contentType }, { status: 400 });
     }
 
-    const systemPrompt = buildSystemPrompt(contentType);
+    const systemPrompt = await buildSystemPrompt(contentType);
 
     // 1) texto
     const textController = new AbortController();
@@ -80,7 +119,11 @@ export async function POST(req: Request) {
       MIA_CONFIG.TIMEOUTS.OPENAI_MS
     );
 
-    const textRes = await generateText(systemPrompt, input, textController.signal);
+    const textRes = await generateText(
+      systemPrompt,
+      input,
+      textController.signal
+    );
 
     clearTimeout(textTimeout);
 
