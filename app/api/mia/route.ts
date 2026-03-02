@@ -30,10 +30,7 @@ export async function POST(req: Request) {
 
     if (!process.env.OPENAI_ENDPOINT || !process.env.OPENAI_API_KEY) {
       const totalMs = Date.now() - start;
-      return miaJson(
-        { error: "Missing OpenAI env" },
-        { status: 500, attempts, totalMs }
-      );
+      return miaJson({ error: "Missing OpenAI env" }, { status: 500, attempts, totalMs });
     }
 
     if (typeof contentType !== "string") {
@@ -53,16 +50,9 @@ export async function POST(req: Request) {
 
     // 1) texto
     const textController = new AbortController();
-    const textTimeout = setTimeout(
-      () => textController.abort(),
-      MIA_CONFIG.TIMEOUTS.OPENAI_MS
-    );
+    const textTimeout = setTimeout(() => textController.abort(), MIA_CONFIG.TIMEOUTS.OPENAI_MS);
 
-    const textRes = await generateText(
-      systemPrompt,
-      input,
-      textController.signal
-    );
+    const textRes = await generateText(systemPrompt, input, textController.signal);
 
     clearTimeout(textTimeout);
 
@@ -77,7 +67,6 @@ export async function POST(req: Request) {
     const data = await textRes.json();
     const outputText = data.choices?.[0]?.message?.content ?? "";
 
-    // 2) JSON si no es TTS
     if (!isTtsType(contentType)) {
       const totalMs = Date.now() - start;
       return miaJson({ output: outputText, contentType }, { attempts, totalMs });
@@ -107,25 +96,27 @@ export async function POST(req: Request) {
     const voiceId = voiceMap[safeLocale];
 
     const audioController = new AbortController();
-    const audioTimeout = setTimeout(
-      () => audioController.abort(),
-      MIA_CONFIG.TIMEOUTS.ELEVEN_MS
-    );
+    const audioTimeout = setTimeout(() => audioController.abort(), MIA_CONFIG.TIMEOUTS.ELEVEN_MS);
 
     const elevenStart = Date.now();
 
-    const elevenRes = await synthesizeSpeech(
-      voiceId,
-      outputText,
-      audioController.signal
-    );
+    const elevenRes = await synthesizeSpeech(voiceId, outputText, audioController.signal);
 
     clearTimeout(audioTimeout);
 
     if (!elevenRes.ok) {
       const totalMs = Date.now() - start;
+      const status = elevenRes.status;
+
+      let detail = "";
+      try {
+        detail = await elevenRes.text();
+      } catch {
+        detail = "";
+      }
+
       return miaJson(
-        { error: "ElevenLabs request failed", contentType },
+        { error: "ElevenLabs request failed", contentType, status, detail },
         { status: 502, attempts, totalMs }
       );
     }
@@ -150,9 +141,6 @@ export async function POST(req: Request) {
       return miaJson({ error: "Timeout" }, { status: 504, attempts, totalMs });
     }
 
-    return miaJson(
-      { error: "MIA request failed" },
-      { status: 500, attempts, totalMs }
-    );
+    return miaJson({ error: "MIA request failed" }, { status: 500, attempts, totalMs });
   }
 }
