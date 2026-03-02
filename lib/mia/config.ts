@@ -17,12 +17,12 @@ export const MIA_CONFIG = {
   VOICE: {
     DEFAULT_LOCALE: "es-AR",
     MAP: {
-      "es-AR": "mia_es_ar",
-      "es-ES": "mia_es_es",
-      "pt-BR": "mia_pt_br",
-      "en-US": "mia_en_us",
-      "it-IT": "mia_it_it",
-      "de-DE": "mia_de_de",
+      "es-AR": "PEGAR_ID_REAL_ES_AR",
+      "es-ES": "PEGAR_ID_REAL_ES_ES",
+      "pt-BR": "PEGAR_ID_REAL_PT_BR",
+      "en-US": "PEGAR_ID_REAL_EN_US",
+      "it-IT": "PEGAR_ID_REAL_IT_IT",
+      "de-DE": "PEGAR_ID_REAL_DE_DE",
     },
   },
 
