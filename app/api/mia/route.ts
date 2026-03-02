@@ -20,6 +20,13 @@ function isTtsType(contentType: string) {
   );
 }
 
+function errInfo(error: unknown) {
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message };
+  }
+  return { name: "UnknownError", message: String(error) };
+}
+
 export async function POST(req: Request) {
   const start = Date.now();
   const attempts = 1;
@@ -27,6 +34,20 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { contentType, input, locale } = body;
+
+    if (!process.env.OPENAI_ENDPOINT || !process.env.OPENAI_API_KEY) {
+      const totalMs = Date.now() - start;
+      return miaJson(
+        {
+          error: "Missing OpenAI env",
+          missing: {
+            OPENAI_ENDPOINT: !process.env.OPENAI_ENDPOINT,
+            OPENAI_API_KEY: !process.env.OPENAI_API_KEY,
+          },
+        },
+        { status: 500, attempts, totalMs }
+      );
+    }
 
     if (typeof contentType !== "string") {
       return miaJson({ error: "Invalid contentType" }, { status: 400 });
@@ -76,6 +97,18 @@ export async function POST(req: Request) {
     }
 
     // 3) TTS
+    if (!process.env.ELEVENLABS_API_KEY) {
+      const totalMs = Date.now() - start;
+      return miaJson(
+        {
+          error: "Missing ElevenLabs env",
+          missing: { ELEVENLABS_API_KEY: true },
+          contentType,
+        },
+        { status: 500, attempts, totalMs }
+      );
+    }
+
     if (outputText.length > MIA_CONFIG.LIMITS.MAX_TTS_CHARS) {
       return miaJson(
         { error: "Output too long for TTS", contentType },
@@ -129,13 +162,11 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     const totalMs = Date.now() - start;
-
-    if ((error as Error).name === "AbortError") {
-      return miaJson({ error: "Timeout" }, { status: 504, attempts, totalMs });
-    }
-
     return miaJson(
-      { error: "MIA request failed" },
+      {
+        error: "MIA request failed",
+        detail: errInfo(error),
+      },
       { status: 500, attempts, totalMs }
     );
   }
