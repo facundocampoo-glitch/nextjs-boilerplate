@@ -30,7 +30,6 @@ const MOTOR_DIR = path.join(
 );
 
 async function loadMotorTexts() {
-  // ✅ Lee tus archivos TAL CUAL están en el repo (sin loaders, sin import)
   const [
     PROMPT_RAIZ,
     ACUERDO_OPERATIVO,
@@ -57,7 +56,6 @@ async function loadMotorTexts() {
   };
 }
 
-// Cache en memoria del worker (no cambia tus textos, solo evita re-reads)
 let motorCache:
   | null
   | Promise<Awaited<ReturnType<typeof loadMotorTexts>>> = null;
@@ -70,16 +68,48 @@ async function getMotor() {
 async function buildSystemPrompt(contentType: string) {
   const motor = await getMotor();
 
-  // ✅ Orden fijo, sin resúmenes, sin recortes
-  return [
-    motor.PROMPT_RAIZ,
-    motor.ACUERDO_OPERATIVO,
-    motor.MANIFIESTO,
-    motor.ANTI_REPETICION,
-    motor.BANCO_OCURRENCIAS,
-    `\n\n# CONTENT_TYPE\n${contentType}\n`,
-    `# INSTRUCCIÓN\nResponde siguiendo EXACTAMENTE el motor y acuerdos anteriores. No resumas el motor. No expliques el sistema.\n`,
-  ].join("\n\n");
+  return `
+${motor.PROMPT_RAIZ}
+
+${motor.ACUERDO_OPERATIVO}
+
+${motor.MANIFIESTO}
+
+${motor.ANTI_REPETICION}
+
+${motor.BANCO_OCURRENCIAS}
+
+##############################
+# IDENTIDAD OBLIGATORIA
+##############################
+
+Eres MIA.
+No eres tarot clásico.
+No explicas cartas.
+No haces tiradas técnicas.
+No dices "esta carta habla de".
+No das estructura didáctica.
+No das consejos espirituales tradicionales.
+
+Tu voz es:
+- urbana
+- directa
+- filosa
+- honesta
+- sin incienso
+- sin estructura de blog
+
+Nunca explicas el sistema.
+Nunca explicas el tarot.
+Nunca resumes.
+Nunca moralizas.
+
+##############################
+# CONTENT_TYPE
+${contentType}
+
+Responde desde la identidad. Sin formato tradicional.
+`;
 }
 
 export async function POST(req: Request) {
@@ -112,7 +142,6 @@ export async function POST(req: Request) {
 
     const systemPrompt = await buildSystemPrompt(contentType);
 
-    // 1) texto
     const textController = new AbortController();
     const textTimeout = setTimeout(
       () => textController.abort(),
@@ -138,13 +167,11 @@ export async function POST(req: Request) {
     const data = await textRes.json();
     const outputText = data.choices?.[0]?.message?.content ?? "";
 
-    // 2) JSON si no es TTS
     if (!isTtsType(contentType)) {
       const totalMs = Date.now() - start;
       return miaJson({ output: outputText, contentType }, { attempts, totalMs });
     }
 
-    // 3) TTS
     if (!process.env.ELEVENLABS_API_KEY) {
       const totalMs = Date.now() - start;
       return miaJson(
