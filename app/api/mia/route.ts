@@ -20,13 +20,6 @@ function isTtsType(contentType: string) {
   );
 }
 
-function errInfo(error: unknown) {
-  if (error instanceof Error) {
-    return { name: error.name, message: error.message };
-  }
-  return { name: "UnknownError", message: String(error) };
-}
-
 export async function POST(req: Request) {
   const start = Date.now();
   const attempts = 1;
@@ -38,13 +31,7 @@ export async function POST(req: Request) {
     if (!process.env.OPENAI_ENDPOINT || !process.env.OPENAI_API_KEY) {
       const totalMs = Date.now() - start;
       return miaJson(
-        {
-          error: "Missing OpenAI env",
-          missing: {
-            OPENAI_ENDPOINT: !process.env.OPENAI_ENDPOINT,
-            OPENAI_API_KEY: !process.env.OPENAI_API_KEY,
-          },
-        },
+        { error: "Missing OpenAI env" },
         { status: 500, attempts, totalMs }
       );
     }
@@ -100,11 +87,7 @@ export async function POST(req: Request) {
     if (!process.env.ELEVENLABS_API_KEY) {
       const totalMs = Date.now() - start;
       return miaJson(
-        {
-          error: "Missing ElevenLabs env",
-          missing: { ELEVENLABS_API_KEY: true },
-          contentType,
-        },
+        { error: "Missing ElevenLabs env", contentType },
         { status: 500, attempts, totalMs }
       );
     }
@@ -162,11 +145,13 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     const totalMs = Date.now() - start;
+
+    if ((error as Error).name === "AbortError") {
+      return miaJson({ error: "Timeout" }, { status: 504, attempts, totalMs });
+    }
+
     return miaJson(
-      {
-        error: "MIA request failed",
-        detail: errInfo(error),
-      },
+      { error: "MIA request failed" },
       { status: 500, attempts, totalMs }
     );
   }
