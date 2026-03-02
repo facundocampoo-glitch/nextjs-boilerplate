@@ -1,130 +1,66 @@
 "use client";
 
 import { useState } from "react";
+import { miaText } from "@/lib/mia/client";
+import { CONTENT_TYPES } from "@/lib/mia/content-types";
 
 export default function DevPage() {
-  const [prompt, setPrompt] = useState(
-    "Decime una frase corta, irónica y tierna, en voseo rioplatense."
-  );
+  const [prompt, setPrompt] = useState("");
+  const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
-  const [audioUrl, setAudioUrl] = useState<string>("");
-  const [audioLoading, setAudioLoading] = useState(false);
-
-  async function run() {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setLoading(true);
-    setError("");
-    setResult("");
-    setAudioUrl("");
+    setError(null);
+    setOutput("");
 
     try {
-      const r = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+      const res = await miaText({
+        contentType: CONTENT_TYPES.GENERATE,
+        input: prompt,
       });
 
-      const data = await r.json();
-
-      if (!r.ok || !data.ok) {
-        setError(data?.error || `Error ${r.status}`);
-      } else {
-        setResult(data.text);
-      }
-    } catch (e: any) {
-      setError(e?.message || "Error desconocido");
+      setOutput(res.output);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
     } finally {
       setLoading(false);
     }
   }
 
-  async function speak() {
-    if (!result) return;
-
-    setAudioLoading(true);
-    setError("");
-    setAudioUrl("");
-
-    try {
-      const r = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: result }),
-      });
-
-      if (!r.ok) {
-        const err = await r.text();
-        setError(err);
-        return;
-      }
-
-      const blob = await r.blob();
-      const url = URL.createObjectURL(blob);
-      setAudioUrl(url);
-    } catch (e: any) {
-      setError(e?.message || "Error TTS");
-    } finally {
-      setAudioLoading(false);
-    }
-  }
-
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui" }}>
-      <h1 style={{ fontSize: 22, marginBottom: 12 }}>DEV — Test generate + tts</h1>
+    <main className="mx-auto max-w-3xl p-6 space-y-6">
+      <h1 className="text-2xl font-semibold">Dev Playground</h1>
 
-      <textarea
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        rows={5}
-        style={{ width: "100%", maxWidth: 760, padding: 12, fontSize: 14 }}
-      />
-
-      <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <button
-          onClick={run}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <textarea
+          className="w-full min-h-[140px] rounded-xl border p-3"
+          placeholder="Escribí algo..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
           disabled={loading}
-          style={{
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "1px solid #ccc",
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
-        >
-          {loading ? "Generando..." : "Probar generate"}
-        </button>
+        />
 
         <button
-          onClick={speak}
-          disabled={!result || audioLoading}
-          style={{
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "1px solid #ccc",
-            cursor: !result || audioLoading ? "not-allowed" : "pointer",
-            opacity: !result ? 0.5 : 1,
-          }}
+          type="submit"
+          className="rounded-xl border px-4 py-2 disabled:opacity-50"
+          disabled={loading || prompt.trim().length === 0}
         >
-          {audioLoading ? "Generando audio..." : "Escuchar"}
+          {loading ? "Generando..." : "Generar"}
         </button>
-      </div>
+      </form>
 
       {error && (
-        <pre style={{ marginTop: 16, color: "crimson", whiteSpace: "pre-wrap" }}>
-          {error}
-        </pre>
+        <div className="rounded-xl border p-3">
+          <p className="text-sm">{error}</p>
+        </div>
       )}
 
-      {result && (
-        <pre style={{ marginTop: 16, whiteSpace: "pre-wrap" }}>
-          {result}
-        </pre>
-      )}
-
-      {audioUrl && (
-        <div style={{ marginTop: 16 }}>
-          <audio controls autoPlay src={audioUrl} />
+      {output && (
+        <div className="rounded-xl border p-3 whitespace-pre-wrap">
+          {output}
         </div>
       )}
     </main>
