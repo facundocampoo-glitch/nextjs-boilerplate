@@ -1,9 +1,10 @@
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
+import { generateText } from "@/lib/mia/core/generate";
 
 export async function POST(req: Request) {
   const start = Date.now();
-  let attempts = 1;
+  const attempts = 1;
 
   try {
     const body = await req.json();
@@ -23,18 +24,11 @@ export async function POST(req: Request) {
       MIA_CONFIG.TIMEOUTS.OPENAI_MS
     );
 
-    const result = await fetch(process.env.OPENAI_ENDPOINT!, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-      }),
-      signal: controller.signal,
-    });
+    const result = await generateText(
+      "", // sin system prompt específico
+      prompt,
+      controller.signal
+    );
 
     clearTimeout(timeout);
 
