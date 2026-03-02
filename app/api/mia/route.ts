@@ -20,13 +20,13 @@ function getBasePrompt() {
       const filePath = path.join(basePath, file)
       return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : ""
     })
+    .filter(Boolean)
     .join("\n\n")
 }
 
 function buildSystemPrompt(contentType: string) {
   const base = getBasePrompt()
 
-  // 🔮 ENFORCEMENT TAROT MENSUAL 5+5 EN CRUZ
   if (contentType === "tarot_mensual") {
     return `
 ${base}
@@ -34,8 +34,6 @@ ${base}
 === INSTRUCCIÓN ESTRUCTURAL OBLIGATORIA ===
 
 Debes generar exactamente 10 cartas.
-
-Estructura obligatoria:
 
 Cruz central (5 cartas):
 1. Carta 1 - Posición central
@@ -52,16 +50,15 @@ Columna de proyección (5 cartas):
 10. Carta 10
 
 Reglas obligatorias:
+- Numerar del 1 al 10.
+- Nombrar cada carta explícitamente.
+- No omitir posiciones.
+- No menos de 10 cartas.
+- No más de 10 cartas.
+- Prohibido formato narrativo libre.
+- Prohibido resumen general sin estructura.
 
-- Debes numerar del 1 al 10.
-- Debes nombrar cada carta explícitamente.
-- No puedes omitir posiciones.
-- No puedes generar menos cartas.
-- No puedes generar más cartas.
-- No puedes responder en formato narrativo libre.
-- No puedes hacer resumen general sin estructura.
-
-El formato debe ser estrictamente estructurado.
+Formato estrictamente estructurado.
 `
   }
 
@@ -69,40 +66,50 @@ El formato debe ser estrictamente estructurado.
 }
 
 function resolveContentType(): string {
-  const now = new Date(
-    new Date().toLocaleString("en-US", { timeZone: TIMEZONE })
-  )
-
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }))
   const day = now.getDay()
   const date = now.getDate()
 
   if (day === 0) {
-    const isMonthly =
-      date <= 3 || date >= 28
-
+    const isMonthly = date <= 3 || date >= 28
     return isMonthly ? "tarot_mensual" : "tarot_semanal"
   }
-
   return "horoscopo_diario"
 }
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
-    const { prompt } = body
+    const body = await req.json().catch(() => null)
+    const prompt = body?.prompt
 
     if (!prompt) {
       return NextResponse.json({ error: "Missing prompt" }, { status: 400 })
     }
 
+    const endpoint = process.env.OPENAI_ENDPOINT
+    const apiKey = process.env.OPENAI_API_KEY
+
+    if (!endpoint || !apiKey) {
+      return NextResponse.json(
+        {
+          error: "Missing env",
+          missing: {
+            OPENAI_ENDPOINT: !endpoint,
+            OPENAI_API_KEY: !apiKey,
+          },
+        },
+        { status: 500 }
+      )
+    }
+
     const contentType = resolveContentType()
     const systemPrompt = buildSystemPrompt(contentType)
 
-    const response = await fetch(process.env.OPENAI_ENDPOINT!, {
+    const upstream = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
@@ -114,15 +121,44 @@ export async function POST(req: Request) {
       }),
     })
 
-    const data = await response.json()
+    const text = await upstream.text()
+    let data: any = null
+    try {
+      data = JSON.parse(text)
+    } catch {
+      data = { raw: text }
+    }
+
+    if (!upstream.ok) {
+      return NextResponse.json(
+        {
+          error: "Upstream error",
+          status: upstream.status,
+          statusText: upstream.statusText,
+          details: data,
+        },
+        { status: 500 }
+      )
+    }
+
+    const content = data?.choices?.[0]?.message?.content ?? ""
 
     return NextResponse.json({
-      content: data.choices?.[0]?.message?.content || "",
+      content,
       contentType,
     })
-  } catch (error) {
+  } catch (err: any) {
+    const dev = process.env.NODE_ENV !== "production"
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      {
+        error: "Internal Server Error",
+        ...(dev
+          ? {
+              message: err?.message ?? String(err),
+              stack: err?.stack ?? null,
+            }
+          : {}),
+      },
       { status: 500 }
     )
   }
