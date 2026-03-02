@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
+import { synthesizeSpeech } from "@/lib/mia/core/tts";
 
 type VoiceMap = typeof MIA_CONFIG.VOICE.MAP;
 type LocaleKey = keyof VoiceMap;
@@ -11,7 +12,7 @@ function isLocaleKey(value: unknown, map: VoiceMap): value is LocaleKey {
 
 export async function POST(req: Request) {
   const start = Date.now();
-  let attempts = 1;
+  const attempts = 1;
 
   try {
     const body = await req.json();
@@ -41,20 +42,10 @@ export async function POST(req: Request) {
 
     const elevenStart = Date.now();
 
-    const elevenRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": process.env.ELEVENLABS_API_KEY!,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_multilingual_v2",
-        }),
-        signal: controller.signal,
-      }
+    const elevenRes = await synthesizeSpeech(
+      voiceId,
+      text,
+      controller.signal
     );
 
     clearTimeout(timeout);
