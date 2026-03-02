@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
 import { MIA_CONFIG } from "@/lib/mia/config";
 import { miaJson } from "@/lib/mia/response";
-import { SYSTEM_PROMPTS } from "@/lib/mia/prompts";
 import { generateText } from "@/lib/mia/core/generate";
 
 export async function POST(req: Request) {
@@ -20,16 +18,13 @@ export async function POST(req: Request) {
       return miaJson({ error: "Invalid input" }, { status: 400 });
     }
 
-    const systemPrompt =
-      SYSTEM_PROMPTS["today"] ?? SYSTEM_PROMPTS["generate"] ?? "";
-
     const controller = new AbortController();
     const timeout = setTimeout(
       () => controller.abort(),
       MIA_CONFIG.TIMEOUTS.OPENAI_MS
     );
 
-    const res = await generateText(systemPrompt, input, controller.signal);
+    const res = await generateText("", input, controller.signal);
 
     clearTimeout(timeout);
 
@@ -43,7 +38,6 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     const output = data.choices?.[0]?.message?.content ?? "";
-
     const totalMs = Date.now() - start;
 
     return miaJson({ output }, { attempts, totalMs });
