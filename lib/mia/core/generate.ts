@@ -25,10 +25,7 @@ export async function generateText(
       model: "gpt-4o-mini",
       temperature: 0.9,
       messages: [
-        // Motor completo
         { role: "system", content: systemPrompt },
-
-        // IDENTIDAD DOMINANTE FINAL
         {
           role: "system",
           content: `
@@ -43,7 +40,6 @@ Tu voz es urbana, directa, filosa y sin incienso.
 Responde en formato libre, sin estructura de tirada.
           `,
         },
-
         { role: "user", content: userInput },
       ],
     }),
