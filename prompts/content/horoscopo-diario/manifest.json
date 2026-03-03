@@ -1,5 +1,5 @@
 {
-  "content_type": "horoscopo-diario",
+  "content_type": "horoscopo_diario",
   "base_system": [
     "mia-core/conciencia-madre",
     "mia-core/agente-critico-v2"
