@@ -1,5 +1,5 @@
 {
-  "content_type": "cuerpo-psicomagico",
+  "content_type": "cuerpo_psicomagico",
   "base_system": [
     "mia-core/conciencia-madre",
     "mia-core/agente-critico-v2"
