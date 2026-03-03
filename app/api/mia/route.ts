@@ -126,12 +126,11 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
 }
 
 /**
- * IMPORTANT:
- * Server-to-server internal calls inside Next dev can fail if you derive origin from req.url.
- * Use a stable internal base URL, overridable by env.
+ * INTERNAL TTS CALL
+ * In this repo the endpoint is /api/tts (NOT /api/generate-tts).
  */
 async function generateTtsBase64(baseUrl: string, text: string): Promise<string> {
-  const res = await fetch(`${baseUrl}/api/generate-tts`, {
+  const res = await fetch(`${baseUrl}/api/tts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
