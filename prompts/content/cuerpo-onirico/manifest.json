@@ -1,5 +1,5 @@
 {
-  "content_type": "cuerpo-onirico",
+  "content_type": "cuerpo_onirico",
   "base_system": [
     "mia-core/conciencia-madre",
     "mia-core/agente-critico-v2"
