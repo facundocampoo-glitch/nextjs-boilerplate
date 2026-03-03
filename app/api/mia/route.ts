@@ -35,35 +35,45 @@ ${base}
 
 Debes generar exactamente 10 cartas.
 
-Cruz central (5 cartas):
-1. Carta 1 - Posición central
-2. Carta 2 - Cruz izquierda
-3. Carta 3 - Cruz derecha
-4. Carta 4 - Cruz superior
-5. Carta 5 - Cruz inferior
+Cruz central:
+1. Carta central
+2. Cruz izquierda
+3. Cruz derecha
+4. Cruz superior
+5. Cruz inferior
 
-Columna de proyección (5 cartas):
+Columna de proyección:
 6. Carta 6
 7. Carta 7
 8. Carta 8
 9. Carta 9
 10. Carta 10
 
-Reglas obligatorias:
-- Numerar del 1 al 10.
-- Nombrar cada carta explícitamente.
-- No omitir posiciones.
-- No menos de 10 cartas.
-- No más de 10 cartas.
-- Prohibido formato narrativo libre.
-- Prohibido resumen general sin estructura.
-- No agregar conclusión fuera de las 10 cartas.
-
-Formato estrictamente estructurado.
+Reglas:
+- Numerar 1 a 10
+- Nombrar cada carta
+- No generar narrativa libre
+- No agregar conclusión fuera de las 10 cartas
 `
   }
 
   return base
+}
+
+function resolveContentType(): string {
+  const now = new Date(
+    new Date().toLocaleString("en-US", { timeZone: TIMEZONE })
+  )
+
+  const day = now.getDay()
+  const date = now.getDate()
+
+  if (day === 0) {
+    const isMonthly = date <= 3 || date >= 28
+    return isMonthly ? "tarot_mensual" : "tarot_semanal"
+  }
+
+  return "horoscopo_diario"
 }
 
 export async function POST(req: Request) {
@@ -91,8 +101,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // 🔒 FORZADO PARA PRUEBA
-    const contentType = "tarot_mensual"
+    const contentType = resolveContentType()
     const systemPrompt = buildSystemPrompt(contentType)
 
     const upstream = await fetch(endpoint, {
