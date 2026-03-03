@@ -1,231 +1,262 @@
-import { NextResponse } from "next/server"
-import fs from "fs"
-import path from "path"
+import { NextRequest, NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 
-function readFile(p: string) {
-  return fs.readFileSync(p, "utf8")
+type Manifest = {
+  content_type: string;
+  base_system: string[];
+  features?: Record<string, unknown>;
+};
+
+type LoadedDebug = {
+  base_system_dirs: string[];
+  base_system_files: string[];
+  item_dir: string;
+  item_files: string[];
+};
+
+type DebugPayload = {
+  manifest: Manifest;
+  loaded: LoadedDebug;
+};
+
+function normalizeContentType(ct: string): string {
+  return (ct || "").trim().toLowerCase().replace(/-/g, "_");
 }
 
-function normType(s: string) {
-  return String(s || "").trim().toLowerCase().replace(/-/g, "_")
+function isPromptFile(fileName: string): boolean {
+  const lower = fileName.toLowerCase();
+  if (lower === "manifest.json") return false;
+  return lower.endsWith(".txt") || lower.endsWith(".md");
 }
 
-function listManifests(): string[] {
-  const root = path.join(process.cwd(), "prompts", "content")
-  const out: string[] = []
+function sortStable(a: string, b: string) {
+  return a.localeCompare(b, "en");
+}
 
-  function walk(dir: string) {
-    const entries = fs.readdirSync(dir, { withFileTypes: true })
+async function listPromptFiles(dirAbs: string): Promise<string[]> {
+  const entries = await fs.readdir(dirAbs, { withFileTypes: true });
+  return entries
+    .filter((e) => e.isFile() && isPromptFile(e.name))
+    .map((e) => path.join(dirAbs, e.name))
+    .sort(sortStable);
+}
+
+async function readTextFile(fileAbs: string): Promise<string> {
+  return fs.readFile(fileAbs, "utf8");
+}
+
+async function findAllManifests(contentRootAbs: string): Promise<Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }>> {
+  const results: Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }> = [];
+
+  async function walk(dirAbs: string) {
+    const entries = await fs.readdir(dirAbs, { withFileTypes: true });
     for (const e of entries) {
-      const full = path.join(dir, e.name)
-      if (e.isDirectory()) walk(full)
-      else if (e.isFile() && e.name === "manifest.json") out.push(full)
-    }
-  }
-
-  if (!fs.existsSync(root)) return []
-  walk(root)
-  return out
-}
-
-type ManifestV1 = {
-  content_type: string
-  base_system?: string[]
-  files?: string[] // por si lo usás en el futuro
-}
-
-function loadManifestByContentType(contentType: string): { mf: ManifestV1; dir: string } | null {
-  const wanted = normType(contentType)
-  for (const mfPath of listManifests()) {
-    try {
-      const parsed = JSON.parse(readFile(mfPath)) as any
-      const ct = parsed?.content_type
-      if (typeof ct === "string" && normType(ct) === wanted) {
-        return { mf: parsed as ManifestV1, dir: path.dirname(mfPath) }
-      }
-    } catch {
-      // ignore broken json
-    }
-  }
-  return null
-}
-
-function loadTextFilesFromDir(dir: string): { text: string; files: string[] } {
-  if (!fs.existsSync(dir)) return { text: "", files: [] }
-
-  const entries = fs.readdirSync(dir)
-  const files = entries
-    .filter((name) => {
-      const full = path.join(dir, name)
-      if (!fs.existsSync(full)) return false
-      const st = fs.statSync(full)
-      if (!st.isFile()) return false
-      const lower = name.toLowerCase()
-      if (lower === ".keep") return false
-      if (lower === "manifest.json") return false
-      return lower.endsWith(".txt") || lower.endsWith(".md")
-    })
-    .sort((a, b) => a.localeCompare(b, "es"))
-
-  const text = files
-    .map((f) => {
-      const full = path.join(dir, f)
-      const content = readFile(full).trim()
-      return content ? `=== ${f} ===\n${content}` : ""
-    })
-    .filter(Boolean)
-    .join("\n\n")
-
-  return { text, files: files.map((f) => path.relative(process.cwd(), path.join(dir, f))) }
-}
-
-/**
- * Carga base_system EXACTAMENTE como lo configuraste,
- * pero:
- * - deduplica por nombre de archivo (para evitar reglas repetidas/contradictorias)
- * - mantiene el orden: primero conciencia-madre, luego agente-critico-v2 (solo lo que no esté repetido)
- */
-function loadBaseSystemDedup(mf: ManifestV1): { text: string; files: string[]; dirs: string[] } {
-  const base = Array.isArray(mf.base_system) ? mf.base_system : []
-  const usedDirs: string[] = []
-  const loadedFiles: string[] = []
-
-  const seenNames = new Set<string>() // dedupe por filename (case-insensitive)
-  const chunks: string[] = []
-
-  for (const rel of base) {
-    const dir = path.join(process.cwd(), "prompts", rel)
-    usedDirs.push(path.relative(process.cwd(), dir))
-
-    if (!fs.existsSync(dir)) continue
-
-    const entries = fs.readdirSync(dir)
-      .filter((name) => {
-        const full = path.join(dir, name)
-        if (!fs.existsSync(full)) return false
-        const st = fs.statSync(full)
-        if (!st.isFile()) return false
-        const lower = name.toLowerCase()
-        if (lower === ".keep") return false
-        if (lower === "manifest.json") return false
-        return lower.endsWith(".txt") || lower.endsWith(".md")
-      })
-      .sort((a, b) => a.localeCompare(b, "es"))
-
-    for (const name of entries) {
-      const key = name.toLowerCase()
-      if (seenNames.has(key)) {
-        // ⚠️ duplicado: lo saltamos (no cambiamos tu sistema, evitamos contradicción)
-        continue
-      }
-      seenNames.add(key)
-
-      const full = path.join(dir, name)
-      const content = readFile(full).trim()
-      if (!content) continue
-
-      chunks.push(`=== ${name} ===\n${content}`)
-      loadedFiles.push(path.relative(process.cwd(), full))
-    }
-  }
-
-  return { text: chunks.join("\n\n"), files: loadedFiles, dirs: usedDirs }
-}
-
-/**
- * El prompt del ÍTEM se toma de la carpeta del item:
- * prompts/content/<item>/ (todo .txt/.md excepto manifest)
- * Esto respeta tu manera de trabajar: "cada item tiene su prompt".
- */
-function loadItemFolder(dir: string): { text: string; files: string[] } {
-  return loadTextFilesFromDir(dir)
-}
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json()
-    const input = body?.prompt ?? body?.input
-    const contentType = body?.contentType
-    const debug = Boolean(body?.debug)
-
-    if (!input) return NextResponse.json({ error: "Missing input" }, { status: 400 })
-    if (!contentType) return NextResponse.json({ error: "Missing contentType" }, { status: 400 })
-
-    const endpoint = process.env.OPENAI_ENDPOINT
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!endpoint || !apiKey) {
-      return NextResponse.json(
-        { error: "Missing env", missing: { OPENAI_ENDPOINT: !endpoint, OPENAI_API_KEY: !apiKey } },
-        { status: 500 }
-      )
-    }
-
-    const found = loadManifestByContentType(String(contentType))
-    if (!found) {
-      const available: string[] = []
-      for (const mfPath of listManifests()) {
+      const full = path.join(dirAbs, e.name);
+      if (e.isDirectory()) {
+        await walk(full);
+      } else if (e.isFile() && e.name === "manifest.json") {
         try {
-          const p = JSON.parse(readFile(mfPath)) as any
-          if (typeof p?.content_type === "string") available.push(normType(p.content_type))
-        } catch {}
+          const raw = await fs.readFile(full, "utf8");
+          const parsed = JSON.parse(raw) as Manifest;
+          if (!parsed?.content_type || !Array.isArray(parsed?.base_system)) continue;
+          results.push({ dirAbs: path.dirname(full), manifestAbs: full, manifest: parsed });
+        } catch {
+          // ignore invalid manifest
+        }
       }
-      available.sort((a, b) => a.localeCompare(b, "es"))
+    }
+  }
+
+  await walk(contentRootAbs);
+  return results;
+}
+
+function dedupByBasenameKeepFirst(filesAbs: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const f of filesAbs) {
+    const base = path.basename(f);
+    if (seen.has(base)) continue;
+    seen.add(base);
+    out.push(f);
+  }
+  return out;
+}
+
+function buildSystemBundle(parts: Array<{ title: string; text: string }>): string {
+  // Un separador simple y estable; evita mezclar reglas sin aire.
+  return parts
+    .map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`)
+    .join("\n");
+}
+
+async function openaiChat(systemText: string, userText: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
+
+  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: systemText },
+        { role: "user", content: userText },
+      ],
+      temperature: 0.9,
+    }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`OpenAI error: ${res.status} ${res.statusText} ${txt}`.trim());
+  }
+
+  const data = (await res.json()) as any;
+  const content = data?.choices?.[0]?.message?.content;
+  if (typeof content !== "string" || !content.trim()) {
+    throw new Error("OpenAI returned empty content");
+  }
+  return content.trim();
+}
+
+async function generateTtsBase64(origin: string, text: string): Promise<string> {
+  const res = await fetch(`${origin}/api/generate-tts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`TTS error: ${res.status} ${res.statusText} ${txt}`.trim());
+  }
+
+  const buf = Buffer.from(await res.arrayBuffer());
+  return buf.toString("base64");
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+
+    const input = typeof body?.input === "string" ? body.input : "";
+    const contentTypeRaw = typeof body?.contentType === "string" ? body.contentType : "";
+    const debug = Boolean(body?.debug);
+    const tts = Boolean(body?.tts);
+
+    const contentType = normalizeContentType(contentTypeRaw);
+    if (!contentType) {
       return NextResponse.json(
-        { error: "Unknown contentType (no manifest)", contentType: String(contentType), available },
+        { error: "Missing contentType" },
         { status: 400 }
-      )
+      );
     }
 
-    const { mf, dir } = found
+    // Rutas base
+    const rootAbs = process.cwd();
+    const promptsAbs = path.join(rootAbs, "prompts");
+    const contentAbs = path.join(promptsAbs, "content");
 
-    const baseLoaded = loadBaseSystemDedup(mf)
-    const itemLoaded = loadItemFolder(dir)
+    // Buscar manifest del contentType
+    const manifests = await findAllManifests(contentAbs);
+    const available = Array.from(
+      new Set(manifests.map((m) => normalizeContentType(m.manifest.content_type)))
+    ).sort(sortStable);
 
-    const systemPrompt = [baseLoaded.text, itemLoaded.text].filter(Boolean).join("\n\n")
+    const match = manifests.find((m) => normalizeContentType(m.manifest.content_type) === contentType);
+    if (!match) {
+      return NextResponse.json(
+        {
+          error: `Unknown contentType: ${contentType}`,
+          available,
+        },
+        { status: 400 }
+      );
+    }
 
-    const upstream = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+    const manifest = match.manifest;
+
+    // Cargar base_system (orden declarado)
+    const baseSystemDirsAbs = (manifest.base_system || []).map((rel) => path.join(promptsAbs, rel));
+    const baseSystemFilesAbsNested: string[] = [];
+    for (const dirAbs of baseSystemDirsAbs) {
+      const files = await listPromptFiles(dirAbs);
+      baseSystemFilesAbsNested.push(...files);
+    }
+
+    // Dedup runtime por nombre de archivo (sin tocar manifests)
+    const baseSystemFilesAbs = dedupByBasenameKeepFirst(baseSystemFilesAbsNested);
+
+    // Cargar archivos del ítem
+    const itemDirAbs = match.dirAbs;
+    const itemFilesAbs = (await listPromptFiles(itemDirAbs)).sort(sortStable);
+
+    // Bundle final
+    const systemParts: Array<{ title: string; text: string }> = [];
+
+    // base_system
+    for (const f of baseSystemFilesAbs) {
+      systemParts.push({
+        title: path.relative(promptsAbs, f),
+        text: await readTextFile(f),
+      });
+    }
+
+    // item prompts
+    for (const f of itemFilesAbs) {
+      systemParts.push({
+        title: path.relative(promptsAbs, f),
+        text: await readTextFile(f),
+      });
+    }
+
+    const systemText = buildSystemBundle(systemParts);
+
+    // User payload
+    const userText = input || "";
+
+    // Generar contenido
+    const content = await openaiChat(systemText, userText);
+
+    const debugPayload: DebugPayload = {
+      manifest: {
+        ...manifest,
+        content_type: normalizeContentType(manifest.content_type),
       },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: String(input) },
-        ],
-        temperature: 0.7,
-      }),
-    })
+      loaded: {
+        base_system_dirs: baseSystemDirsAbs.map((d) => path.relative(rootAbs, d).replaceAll("\\", "/")),
+        base_system_files: baseSystemFilesAbs.map((f) => path.relative(rootAbs, f).replaceAll("\\", "/")),
+        item_dir: path.relative(rootAbs, itemDirAbs).replaceAll("\\", "/"),
+        item_files: itemFilesAbs.map((f) => path.relative(rootAbs, f).replaceAll("\\", "/")),
+      },
+    };
 
-    const data = await upstream.json()
-
-    const res: any = {
-      content: data?.choices?.[0]?.message?.content ?? "",
-      contentType: String(contentType),
+    // Opcional: TTS
+    let audioBase64: string | undefined;
+    if (tts) {
+      const origin = new URL(req.url).origin;
+      audioBase64 = await generateTtsBase64(origin, content);
     }
 
-    if (debug) {
-      res.debug = {
-        manifest: {
-          content_type: mf.content_type,
-          base_system: mf.base_system ?? [],
-        },
-        loaded: {
-          base_system_dirs: baseLoaded.dirs,
-          base_system_files: baseLoaded.files,
-          item_dir: path.relative(process.cwd(), dir),
-          item_files: itemLoaded.files,
-        },
-      }
-    }
-
-    return NextResponse.json(res)
+    return NextResponse.json({
+      content,
+      contentType: contentType,
+      ...(tts ? { audioBase64 } : {}),
+      ...(debug ? { debug: debugPayload } : {}),
+    });
   } catch (err: any) {
     return NextResponse.json(
-      { error: "Internal Server Error", message: err?.message ?? String(err) },
+      {
+        error: err?.message || "Unknown error",
+      },
       { status: 500 }
-    )
+    );
   }
 }
