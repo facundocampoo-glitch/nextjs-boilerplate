@@ -10,34 +10,56 @@ function readFileSafe(p: string) {
   }
 }
 
-function loadConcienciaMadre() {
-  const base = path.join(process.cwd(), "prompts/mia-core/conciencia-madre")
+function loadConcienciaMadreAll() {
+  const dir = path.join(process.cwd(), "prompts", "mia-core", "conciencia-madre")
 
-  const files = [
-    "PROMPT_RAIZ_CONCIENCIA_MADRE__MOTOR_MIA300.txt",
-    "ACUERDO_OPERATIVO.txt",
-    "MANIFIESTO_DE_VOZ_MIA.md",
-    "ANTI_REPETICION_MIA.md",
-    "BANCO_OCURRENCIAS_MIA_1000.txt",
-  ]
+  let entries: string[] = []
+  try {
+    entries = fs.readdirSync(dir)
+  } catch {
+    return ""
+  }
+
+  const files = entries
+    .filter((name) => {
+      const full = path.join(dir, name)
+      if (!fs.existsSync(full)) return false
+      const stat = fs.statSync(full)
+      if (!stat.isFile()) return false
+
+      const lower = name.toLowerCase()
+      const isText = lower.endsWith(".txt") || lower.endsWith(".md")
+      if (!isText) return false
+      if (lower === ".keep") return false
+      if (lower === "manifest.json") return false
+
+      return true
+    })
+    .sort((a, b) => a.localeCompare(b, "es"))
 
   return files
-    .map(f => readFileSafe(path.join(base, f)))
+    .map((f) => {
+      const content = readFileSafe(path.join(dir, f)).trim()
+      return content ? `=== ${f} ===\n${content}` : ""
+    })
     .filter(Boolean)
     .join("\n\n")
 }
 
 function loadContentPrompt(contentType: string) {
-  const map: Record<string,string> = {
-    horoscopo_diario: "prompts/content/horoscopo-diario/PROMPT_HOROSCOPO_DIARIO_GENERADOR.txt",
-    horoscopo_semanal: "prompts/content/horoscopo-semanal/PROMPT_HOROSCOPO_SEMANAL_GENERADOR.txt",
-    tarot_marselles: "prompts/content/tarot-marselles/PROMPT_TAROT_MARSELLES_GENERADOR.txt"
+  const map: Record<string, string> = {
+    horoscopo_diario:
+      "prompts/content/horoscopo-diario/PROMPT_HOROSCOPO_DIARIO_GENERADOR.txt",
+    horoscopo_semanal:
+      "prompts/content/horoscopo-semanal/PROMPT_HOROSCOPO_SEMANAL_GENERADOR.txt",
+    tarot_marselles:
+      "prompts/content/tarot-marselles/PROMPT_TAROT_MARSELLES_GENERADOR.txt",
   }
 
   const file = map[contentType]
   if (!file) return ""
 
-  return readFileSafe(path.join(process.cwd(), file))
+  return readFileSafe(path.join(process.cwd(), file)).trim()
 }
 
 export async function POST(req: Request) {
@@ -51,38 +73,38 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing prompt" }, { status: 400 })
     }
 
-    const basePrompt = loadConcienciaMadre()
+    const basePrompt = loadConcienciaMadreAll()
     const contentPrompt = loadContentPrompt(contentType)
 
-    const systemPrompt = `
-${basePrompt}
-
-${contentPrompt}
-`
+    const systemPrompt = [
+      basePrompt,
+      contentPrompt ? `=== PROMPT_ITEM_${contentType} ===\n${contentPrompt}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n")
 
     const response = await fetch(process.env.OPENAI_ENDPOINT!, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: prompt }
+          { role: "user", content: prompt },
         ],
-        temperature: 0.7
-      })
+        temperature: 0.7,
+      }),
     })
 
     const data = await response.json()
 
     return NextResponse.json({
       content: data?.choices?.[0]?.message?.content ?? "",
-      contentType
+      contentType,
     })
-
   } catch (err: any) {
     return NextResponse.json(
       { error: "Internal Server Error", message: err?.message },
