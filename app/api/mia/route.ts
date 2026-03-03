@@ -57,6 +57,7 @@ Reglas obligatorias:
 - No más de 10 cartas.
 - Prohibido formato narrativo libre.
 - Prohibido resumen general sin estructura.
+- No agregar conclusión fuera de las 10 cartas.
 
 Formato estrictamente estructurado.
 `
@@ -65,22 +66,10 @@ Formato estrictamente estructurado.
   return base
 }
 
-function resolveContentType(): string {
-  const now = new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }))
-  const day = now.getDay()
-  const date = now.getDate()
-
-  if (day === 0) {
-    const isMonthly = date <= 3 || date >= 28
-    return isMonthly ? "tarot_mensual" : "tarot_semanal"
-  }
-  return "horoscopo_diario"
-}
-
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => null)
-    const prompt = body?.prompt
+    const body = await req.json()
+    const { prompt } = body
 
     if (!prompt) {
       return NextResponse.json({ error: "Missing prompt" }, { status: 400 })
@@ -102,7 +91,8 @@ export async function POST(req: Request) {
       )
     }
 
-    const contentType = resolveContentType()
+    // 🔒 FORZADO PARA PRUEBA
+    const contentType = "tarot_mensual"
     const systemPrompt = buildSystemPrompt(contentType)
 
     const upstream = await fetch(endpoint, {
@@ -121,25 +111,7 @@ export async function POST(req: Request) {
       }),
     })
 
-    const text = await upstream.text()
-    let data: any = null
-    try {
-      data = JSON.parse(text)
-    } catch {
-      data = { raw: text }
-    }
-
-    if (!upstream.ok) {
-      return NextResponse.json(
-        {
-          error: "Upstream error",
-          status: upstream.status,
-          statusText: upstream.statusText,
-          details: data,
-        },
-        { status: 500 }
-      )
-    }
+    const data = await upstream.json()
 
     const content = data?.choices?.[0]?.message?.content ?? ""
 
@@ -148,17 +120,8 @@ export async function POST(req: Request) {
       contentType,
     })
   } catch (err: any) {
-    const dev = process.env.NODE_ENV !== "production"
     return NextResponse.json(
-      {
-        error: "Internal Server Error",
-        ...(dev
-          ? {
-              message: err?.message ?? String(err),
-              stack: err?.stack ?? null,
-            }
-          : {}),
-      },
+      { error: "Internal Server Error", message: err?.message },
       { status: 500 }
     )
   }
