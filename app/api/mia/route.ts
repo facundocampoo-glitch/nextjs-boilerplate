@@ -31,29 +31,26 @@ function buildSystemPrompt(contentType: string) {
     return `
 ${base}
 
-=== INSTRUCCIÓN ESTRUCTURAL OBLIGATORIA ===
+=== TAROT MENSUAL ===
 
-Debes generar exactamente 10 cartas.
+Generar exactamente 10 cartas.
 
-Cruz central:
 1. Carta central
 2. Cruz izquierda
 3. Cruz derecha
 4. Cruz superior
 5. Cruz inferior
-
-Columna de proyección:
-6. Carta 6
-7. Carta 7
-8. Carta 8
-9. Carta 9
-10. Carta 10
+6.
+7.
+8.
+9.
+10.
 
 Reglas:
-- Numerar 1 a 10
+- Numerar 1-10
 - Nombrar cada carta
-- No generar narrativa libre
-- No agregar conclusión fuera de las 10 cartas
+- No narrativa libre
+- No conclusión
 `
   }
 
@@ -79,7 +76,9 @@ function resolveContentType(): string {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { prompt } = body
+
+    const prompt = body.prompt ?? body.input
+    const contentType = body.contentType ?? resolveContentType()
 
     if (!prompt) {
       return NextResponse.json({ error: "Missing prompt" }, { status: 400 })
@@ -88,23 +87,9 @@ export async function POST(req: Request) {
     const endpoint = process.env.OPENAI_ENDPOINT
     const apiKey = process.env.OPENAI_API_KEY
 
-    if (!endpoint || !apiKey) {
-      return NextResponse.json(
-        {
-          error: "Missing env",
-          missing: {
-            OPENAI_ENDPOINT: !endpoint,
-            OPENAI_API_KEY: !apiKey,
-          },
-        },
-        { status: 500 }
-      )
-    }
-
-    const contentType = resolveContentType()
     const systemPrompt = buildSystemPrompt(contentType)
 
-    const upstream = await fetch(endpoint, {
+    const upstream = await fetch(endpoint!, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -122,10 +107,8 @@ export async function POST(req: Request) {
 
     const data = await upstream.json()
 
-    const content = data?.choices?.[0]?.message?.content ?? ""
-
     return NextResponse.json({
-      content,
+      content: data?.choices?.[0]?.message?.content || "",
       contentType,
     })
   } catch (err: any) {
