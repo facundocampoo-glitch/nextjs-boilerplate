@@ -1,12 +1,10 @@
-// lib/mia/client.ts
-
 type MiaTextResponse = {
   output: string;
   contentType?: string;
 };
 
 export async function miaText(input: {
-  contentType: string;
+  contentType?: string;
   input: string;
   locale?: string;
 }): Promise<MiaTextResponse> {
@@ -16,20 +14,20 @@ export async function miaText(input: {
     body: JSON.stringify(input),
   });
 
-  const data = (await res.json()) as any;
+  const data = await res.json();
 
   if (!res.ok) {
     throw new Error(data?.error ?? "MIA text request failed");
   }
 
   return {
-    output: String(data?.output ?? ""),
+    output: String(data?.content ?? ""),
     contentType: data?.contentType,
   };
 }
 
 export async function miaTts(input: {
-  contentType: string;
+  contentType?: string;
   input: string;
   locale?: string;
 }): Promise<Blob> {
