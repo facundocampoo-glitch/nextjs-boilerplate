@@ -46,7 +46,9 @@ async function readTextFile(fileAbs: string): Promise<string> {
   return fs.readFile(fileAbs, "utf8");
 }
 
-async function findAllManifests(contentRootAbs: string): Promise<Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }>> {
+async function findAllManifests(
+  contentRootAbs: string
+): Promise<Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }>> {
   const results: Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }> = [];
 
   async function walk(dirAbs: string) {
@@ -85,10 +87,7 @@ function dedupByBasenameKeepFirst(filesAbs: string[]): string[] {
 }
 
 function buildSystemBundle(parts: Array<{ title: string; text: string }>): string {
-  // Un separador simple y estable; evita mezclar reglas sin aire.
-  return parts
-    .map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`)
-    .join("\n");
+  return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
 }
 
 async function openaiChat(systemText: string, userText: string): Promise<string> {
@@ -126,8 +125,13 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
   return content.trim();
 }
 
-async function generateTtsBase64(origin: string, text: string): Promise<string> {
-  const res = await fetch(`${origin}/api/generate-tts`, {
+/**
+ * IMPORTANT:
+ * Server-to-server internal calls inside Next dev can fail if you derive origin from req.url.
+ * Use a stable internal base URL, overridable by env.
+ */
+async function generateTtsBase64(baseUrl: string, text: string): Promise<string> {
+  const res = await fetch(`${baseUrl}/api/generate-tts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
@@ -153,37 +157,34 @@ export async function POST(req: NextRequest) {
 
     const contentType = normalizeContentType(contentTypeRaw);
     if (!contentType) {
-      return NextResponse.json(
-        { error: "Missing contentType" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing contentType" }, { status: 400 });
     }
 
-    // Rutas base
+    // Base paths
     const rootAbs = process.cwd();
     const promptsAbs = path.join(rootAbs, "prompts");
     const contentAbs = path.join(promptsAbs, "content");
 
-    // Buscar manifest del contentType
+    // Find matching manifest by normalized content_type
     const manifests = await findAllManifests(contentAbs);
     const available = Array.from(
       new Set(manifests.map((m) => normalizeContentType(m.manifest.content_type)))
     ).sort(sortStable);
 
-    const match = manifests.find((m) => normalizeContentType(m.manifest.content_type) === contentType);
+    const match = manifests.find(
+      (m) => normalizeContentType(m.manifest.content_type) === contentType
+    );
+
     if (!match) {
       return NextResponse.json(
-        {
-          error: `Unknown contentType: ${contentType}`,
-          available,
-        },
+        { error: `Unknown contentType: ${contentType}`, available },
         { status: 400 }
       );
     }
 
     const manifest = match.manifest;
 
-    // Cargar base_system (orden declarado)
+    // Load base_system (declared order)
     const baseSystemDirsAbs = (manifest.base_system || []).map((rel) => path.join(promptsAbs, rel));
     const baseSystemFilesAbsNested: string[] = [];
     for (const dirAbs of baseSystemDirsAbs) {
@@ -191,17 +192,16 @@ export async function POST(req: NextRequest) {
       baseSystemFilesAbsNested.push(...files);
     }
 
-    // Dedup runtime por nombre de archivo (sin tocar manifests)
+    // Runtime dedup by filename (no manifest mutation)
     const baseSystemFilesAbs = dedupByBasenameKeepFirst(baseSystemFilesAbsNested);
 
-    // Cargar archivos del ítem
+    // Load item prompts
     const itemDirAbs = match.dirAbs;
     const itemFilesAbs = (await listPromptFiles(itemDirAbs)).sort(sortStable);
 
-    // Bundle final
+    // Build system bundle
     const systemParts: Array<{ title: string; text: string }> = [];
 
-    // base_system
     for (const f of baseSystemFilesAbs) {
       systemParts.push({
         title: path.relative(promptsAbs, f),
@@ -209,7 +209,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // item prompts
     for (const f of itemFilesAbs) {
       systemParts.push({
         title: path.relative(promptsAbs, f),
@@ -218,11 +217,9 @@ export async function POST(req: NextRequest) {
     }
 
     const systemText = buildSystemBundle(systemParts);
-
-    // User payload
     const userText = input || "";
 
-    // Generar contenido
+    // Generate content
     const content = await openaiChat(systemText, userText);
 
     const debugPayload: DebugPayload = {
@@ -231,32 +228,31 @@ export async function POST(req: NextRequest) {
         content_type: normalizeContentType(manifest.content_type),
       },
       loaded: {
-        base_system_dirs: baseSystemDirsAbs.map((d) => path.relative(rootAbs, d).replaceAll("\\", "/")),
-        base_system_files: baseSystemFilesAbs.map((f) => path.relative(rootAbs, f).replaceAll("\\", "/")),
+        base_system_dirs: baseSystemDirsAbs.map((d) =>
+          path.relative(rootAbs, d).replaceAll("\\", "/")
+        ),
+        base_system_files: baseSystemFilesAbs.map((f) =>
+          path.relative(rootAbs, f).replaceAll("\\", "/")
+        ),
         item_dir: path.relative(rootAbs, itemDirAbs).replaceAll("\\", "/"),
         item_files: itemFilesAbs.map((f) => path.relative(rootAbs, f).replaceAll("\\", "/")),
       },
     };
 
-    // Opcional: TTS
+    // Optional: TTS (internal base URL)
     let audioBase64: string | undefined;
     if (tts) {
-      const origin = new URL(req.url).origin;
-      audioBase64 = await generateTtsBase64(origin, content);
+      const baseUrl = process.env.MIA_INTERNAL_BASE_URL || "http://localhost:3000";
+      audioBase64 = await generateTtsBase64(baseUrl, content);
     }
 
     return NextResponse.json({
       content,
-      contentType: contentType,
+      contentType,
       ...(tts ? { audioBase64 } : {}),
       ...(debug ? { debug: debugPayload } : {}),
     });
   } catch (err: any) {
-    return NextResponse.json(
-      {
-        error: err?.message || "Unknown error",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err?.message || "Unknown error" }, { status: 500 });
   }
 }
