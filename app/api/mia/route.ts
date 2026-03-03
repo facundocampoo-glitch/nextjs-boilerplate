@@ -7,7 +7,6 @@ function readFile(p: string) {
 }
 
 function normType(s: string) {
-  // "horoscopo-diario" <-> "horoscopo_diario"
   return String(s || "").trim().toLowerCase().replace(/-/g, "_")
 }
 
@@ -32,7 +31,7 @@ function listManifests(): string[] {
 type ManifestV1 = {
   content_type: string
   base_system?: string[]
-  files?: string[]
+  files?: string[] // por si lo usás en el futuro
 }
 
 function loadManifestByContentType(contentType: string): { mf: ManifestV1; dir: string } | null {
@@ -80,21 +79,66 @@ function loadTextFilesFromDir(dir: string): { text: string; files: string[] } {
   return { text, files: files.map((f) => path.relative(process.cwd(), path.join(dir, f))) }
 }
 
-function loadBaseSystemFromManifest(mf: ManifestV1): { text: string; files: string[]; dirs: string[] } {
+/**
+ * Carga base_system EXACTAMENTE como lo configuraste,
+ * pero:
+ * - deduplica por nombre de archivo (para evitar reglas repetidas/contradictorias)
+ * - mantiene el orden: primero conciencia-madre, luego agente-critico-v2 (solo lo que no esté repetido)
+ */
+function loadBaseSystemDedup(mf: ManifestV1): { text: string; files: string[]; dirs: string[] } {
   const base = Array.isArray(mf.base_system) ? mf.base_system : []
-  const allTexts: string[] = []
-  const allFiles: string[] = []
   const usedDirs: string[] = []
+  const loadedFiles: string[] = []
+
+  const seenNames = new Set<string>() // dedupe por filename (case-insensitive)
+  const chunks: string[] = []
 
   for (const rel of base) {
     const dir = path.join(process.cwd(), "prompts", rel)
     usedDirs.push(path.relative(process.cwd(), dir))
-    const loaded = loadTextFilesFromDir(dir)
-    if (loaded.text) allTexts.push(loaded.text)
-    allFiles.push(...loaded.files)
+
+    if (!fs.existsSync(dir)) continue
+
+    const entries = fs.readdirSync(dir)
+      .filter((name) => {
+        const full = path.join(dir, name)
+        if (!fs.existsSync(full)) return false
+        const st = fs.statSync(full)
+        if (!st.isFile()) return false
+        const lower = name.toLowerCase()
+        if (lower === ".keep") return false
+        if (lower === "manifest.json") return false
+        return lower.endsWith(".txt") || lower.endsWith(".md")
+      })
+      .sort((a, b) => a.localeCompare(b, "es"))
+
+    for (const name of entries) {
+      const key = name.toLowerCase()
+      if (seenNames.has(key)) {
+        // ⚠️ duplicado: lo saltamos (no cambiamos tu sistema, evitamos contradicción)
+        continue
+      }
+      seenNames.add(key)
+
+      const full = path.join(dir, name)
+      const content = readFile(full).trim()
+      if (!content) continue
+
+      chunks.push(`=== ${name} ===\n${content}`)
+      loadedFiles.push(path.relative(process.cwd(), full))
+    }
   }
 
-  return { text: allTexts.join("\n\n"), files: allFiles, dirs: usedDirs }
+  return { text: chunks.join("\n\n"), files: loadedFiles, dirs: usedDirs }
+}
+
+/**
+ * El prompt del ÍTEM se toma de la carpeta del item:
+ * prompts/content/<item>/ (todo .txt/.md excepto manifest)
+ * Esto respeta tu manera de trabajar: "cada item tiene su prompt".
+ */
+function loadItemFolder(dir: string): { text: string; files: string[] } {
+  return loadTextFilesFromDir(dir)
 }
 
 export async function POST(req: Request) {
@@ -132,12 +176,12 @@ export async function POST(req: Request) {
       )
     }
 
-    const { mf } = found
+    const { mf, dir } = found
 
-    // Carga estricta de base_system (tu arquitectura real)
-    const baseLoaded = loadBaseSystemFromManifest(mf)
+    const baseLoaded = loadBaseSystemDedup(mf)
+    const itemLoaded = loadItemFolder(dir)
 
-    const systemPrompt = baseLoaded.text
+    const systemPrompt = [baseLoaded.text, itemLoaded.text].filter(Boolean).join("\n\n")
 
     const upstream = await fetch(endpoint, {
       method: "POST",
@@ -171,6 +215,8 @@ export async function POST(req: Request) {
         loaded: {
           base_system_dirs: baseLoaded.dirs,
           base_system_files: baseLoaded.files,
+          item_dir: path.relative(process.cwd(), dir),
+          item_files: itemLoaded.files,
         },
       }
     }
