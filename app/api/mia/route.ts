@@ -2,8 +2,13 @@ import { NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
 
-function readFileSafe(p: string) {
+function readFile(p: string) {
   return fs.readFileSync(p, "utf8")
+}
+
+function normType(s: string) {
+  // "horoscopo-diario" <-> "horoscopo_diario"
+  return String(s || "").trim().toLowerCase().replace(/-/g, "_")
 }
 
 function listManifests(): string[] {
@@ -24,27 +29,29 @@ function listManifests(): string[] {
   return out
 }
 
-type Manifest = { contentType: string; files: string[] }
+type ManifestV1 = {
+  content_type: string
+  base_system?: string[]
+  files?: string[]
+}
 
-function loadManifestByContentType(contentType: string): { manifest: Manifest; dir: string } | null {
-  const manifests = listManifests()
-
-  for (const mfPath of manifests) {
+function loadManifestByContentType(contentType: string): { mf: ManifestV1; dir: string } | null {
+  const wanted = normType(contentType)
+  for (const mfPath of listManifests()) {
     try {
-      const raw = readFileSafe(mfPath)
-      const parsed = JSON.parse(raw) as Manifest
-      if (parsed?.contentType === contentType && Array.isArray(parsed.files)) {
-        return { manifest: parsed, dir: path.dirname(mfPath) }
+      const parsed = JSON.parse(readFile(mfPath)) as any
+      const ct = parsed?.content_type
+      if (typeof ct === "string" && normType(ct) === wanted) {
+        return { mf: parsed as ManifestV1, dir: path.dirname(mfPath) }
       }
     } catch {
-      // ignore broken manifest
+      // ignore broken json
     }
   }
   return null
 }
 
-function loadConcienciaMadreAll(): { text: string; files: string[] } {
-  const dir = path.join(process.cwd(), "prompts", "mia-core", "conciencia-madre")
+function loadTextFilesFromDir(dir: string): { text: string; files: string[] } {
   if (!fs.existsSync(dir)) return { text: "", files: [] }
 
   const entries = fs.readdirSync(dir)
@@ -63,81 +70,74 @@ function loadConcienciaMadreAll(): { text: string; files: string[] } {
 
   const text = files
     .map((f) => {
-      const content = readFileSafe(path.join(dir, f)).trim()
+      const full = path.join(dir, f)
+      const content = readFile(full).trim()
       return content ? `=== ${f} ===\n${content}` : ""
     })
     .filter(Boolean)
     .join("\n\n")
 
-  return { text, files: files.map((f) => `prompts/mia-core/conciencia-madre/${f}`) }
+  return { text, files: files.map((f) => path.relative(process.cwd(), path.join(dir, f))) }
 }
 
-function loadItemPromptFromManifest(contentType: string): { text: string; files: string[] } {
-  const found = loadManifestByContentType(contentType)
-  if (!found) return { text: "", files: [] }
+function loadBaseSystemFromManifest(mf: ManifestV1): { text: string; files: string[]; dirs: string[] } {
+  const base = Array.isArray(mf.base_system) ? mf.base_system : []
+  const allTexts: string[] = []
+  const allFiles: string[] = []
+  const usedDirs: string[] = []
 
-  const { manifest, dir } = found
-  const loadedFiles: string[] = []
+  for (const rel of base) {
+    const dir = path.join(process.cwd(), "prompts", rel)
+    usedDirs.push(path.relative(process.cwd(), dir))
+    const loaded = loadTextFilesFromDir(dir)
+    if (loaded.text) allTexts.push(loaded.text)
+    allFiles.push(...loaded.files)
+  }
 
-  const text = manifest.files
-    .map((rel) => {
-      const full = path.join(dir, rel)
-      const content = readFileSafe(full).trim()
-      loadedFiles.push(path.relative(process.cwd(), full))
-      return content ? `=== ${path.basename(rel)} ===\n${content}` : ""
-    })
-    .filter(Boolean)
-    .join("\n\n")
-
-  return { text, files: loadedFiles }
+  return { text: allTexts.join("\n\n"), files: allFiles, dirs: usedDirs }
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-
-    const prompt = body?.prompt ?? body?.input
+    const input = body?.prompt ?? body?.input
     const contentType = body?.contentType
     const debug = Boolean(body?.debug)
 
-    if (!prompt) return NextResponse.json({ error: "Missing prompt" }, { status: 400 })
+    if (!input) return NextResponse.json({ error: "Missing input" }, { status: 400 })
     if (!contentType) return NextResponse.json({ error: "Missing contentType" }, { status: 400 })
 
     const endpoint = process.env.OPENAI_ENDPOINT
     const apiKey = process.env.OPENAI_API_KEY
     if (!endpoint || !apiKey) {
       return NextResponse.json(
-        {
-          error: "Missing env",
-          missing: { OPENAI_ENDPOINT: !endpoint, OPENAI_API_KEY: !apiKey },
-        },
+        { error: "Missing env", missing: { OPENAI_ENDPOINT: !endpoint, OPENAI_API_KEY: !apiKey } },
         { status: 500 }
       )
     }
 
-    // 🔒 MODO ESTRICTO: si no existe manifest, NO inventamos nada.
-    const itemFound = loadManifestByContentType(String(contentType))
-    if (!itemFound) {
-      // listado útil para que no haya “magia”
+    const found = loadManifestByContentType(String(contentType))
+    if (!found) {
       const available: string[] = []
-      for (const mf of listManifests()) {
+      for (const mfPath of listManifests()) {
         try {
-          const parsed = JSON.parse(readFileSafe(mf)) as any
-          if (typeof parsed?.contentType === "string") available.push(parsed.contentType)
+          const p = JSON.parse(readFile(mfPath)) as any
+          if (typeof p?.content_type === "string") available.push(normType(p.content_type))
         } catch {}
       }
       available.sort((a, b) => a.localeCompare(b, "es"))
-
       return NextResponse.json(
-        { error: "Unknown contentType (no manifest)", contentType, available },
+        { error: "Unknown contentType (no manifest)", contentType: String(contentType), available },
         { status: 400 }
       )
     }
 
-    const madre = loadConcienciaMadreAll()
-    const item = loadItemPromptFromManifest(String(contentType))
+    const { mf } = found
 
-    const systemPrompt = [madre.text, item.text].filter(Boolean).join("\n\n")
+    // Carga estricta de base_system (tu arquitectura real)
+    const baseLoaded = loadBaseSystemFromManifest(mf)
+
+    const systemPrompt = baseLoaded.text
 
     const upstream = await fetch(endpoint, {
       method: "POST",
@@ -149,7 +149,7 @@ export async function POST(req: Request) {
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: String(prompt) },
+          { role: "user", content: String(input) },
         ],
         temperature: 0.7,
       }),
@@ -159,14 +159,18 @@ export async function POST(req: Request) {
 
     const res: any = {
       content: data?.choices?.[0]?.message?.content ?? "",
-      contentType,
+      contentType: String(contentType),
     }
 
     if (debug) {
       res.debug = {
+        manifest: {
+          content_type: mf.content_type,
+          base_system: mf.base_system ?? [],
+        },
         loaded: {
-          concienciaMadreFiles: madre.files,
-          itemFiles: item.files,
+          base_system_dirs: baseLoaded.dirs,
+          base_system_files: baseLoaded.files,
         },
       }
     }
