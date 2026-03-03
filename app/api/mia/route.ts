@@ -2,75 +2,42 @@ import { NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
 
-const TIMEZONE = "America/Argentina/Buenos_Aires"
+function readFileSafe(p: string) {
+  try {
+    return fs.readFileSync(p, "utf8")
+  } catch {
+    return ""
+  }
+}
 
-function getBasePrompt() {
-  const basePath = path.join(process.cwd(), "prompts", "mia-core", "conciencia-madre")
+function loadConcienciaMadre() {
+  const base = path.join(process.cwd(), "prompts/mia-core/conciencia-madre")
 
   const files = [
-    "PROMPT_RAIZ.txt",
+    "PROMPT_RAIZ_CONCIENCIA_MADRE__MOTOR_MIA300.txt",
     "ACUERDO_OPERATIVO.txt",
-    "MANIFIESTO.txt",
+    "MANIFIESTO_DE_VOZ_MIA.md",
     "ANTI_REPETICION_MIA.md",
     "BANCO_OCURRENCIAS_MIA_1000.txt",
   ]
 
   return files
-    .map((file) => {
-      const filePath = path.join(basePath, file)
-      return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : ""
-    })
+    .map(f => readFileSafe(path.join(base, f)))
     .filter(Boolean)
     .join("\n\n")
 }
 
-function buildSystemPrompt(contentType: string) {
-  const base = getBasePrompt()
-
-  if (contentType === "tarot_mensual") {
-    return `
-${base}
-
-=== TAROT MENSUAL ===
-
-Generar exactamente 10 cartas.
-
-1. Carta central
-2. Cruz izquierda
-3. Cruz derecha
-4. Cruz superior
-5. Cruz inferior
-6.
-7.
-8.
-9.
-10.
-
-Reglas:
-- Numerar 1-10
-- Nombrar cada carta
-- No narrativa libre
-- No conclusión
-`
+function loadContentPrompt(contentType: string) {
+  const map: Record<string,string> = {
+    horoscopo_diario: "prompts/content/horoscopo-diario/PROMPT_HOROSCOPO_DIARIO_GENERADOR.txt",
+    horoscopo_semanal: "prompts/content/horoscopo-semanal/PROMPT_HOROSCOPO_SEMANAL_GENERADOR.txt",
+    tarot_marselles: "prompts/content/tarot-marselles/PROMPT_TAROT_MARSELLES_GENERADOR.txt"
   }
 
-  return base
-}
+  const file = map[contentType]
+  if (!file) return ""
 
-function resolveContentType(): string {
-  const now = new Date(
-    new Date().toLocaleString("en-US", { timeZone: TIMEZONE })
-  )
-
-  const day = now.getDay()
-  const date = now.getDate()
-
-  if (day === 0) {
-    const isMonthly = date <= 3 || date >= 28
-    return isMonthly ? "tarot_mensual" : "tarot_semanal"
-  }
-
-  return "horoscopo_diario"
+  return readFileSafe(path.join(process.cwd(), file))
 }
 
 export async function POST(req: Request) {
@@ -78,39 +45,44 @@ export async function POST(req: Request) {
     const body = await req.json()
 
     const prompt = body.prompt ?? body.input
-    const contentType = body.contentType ?? resolveContentType()
+    const contentType = body.contentType ?? "horoscopo_diario"
 
     if (!prompt) {
       return NextResponse.json({ error: "Missing prompt" }, { status: 400 })
     }
 
-    const endpoint = process.env.OPENAI_ENDPOINT
-    const apiKey = process.env.OPENAI_API_KEY
+    const basePrompt = loadConcienciaMadre()
+    const contentPrompt = loadContentPrompt(contentType)
 
-    const systemPrompt = buildSystemPrompt(contentType)
+    const systemPrompt = `
+${basePrompt}
 
-    const upstream = await fetch(endpoint!, {
+${contentPrompt}
+`
+
+    const response = await fetch(process.env.OPENAI_ENDPOINT!, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: prompt },
+          { role: "user", content: prompt }
         ],
-        temperature: 0.7,
-      }),
+        temperature: 0.7
+      })
     })
 
-    const data = await upstream.json()
+    const data = await response.json()
 
     return NextResponse.json({
-      content: data?.choices?.[0]?.message?.content || "",
-      contentType,
+      content: data?.choices?.[0]?.message?.content ?? "",
+      contentType
     })
+
   } catch (err: any) {
     return NextResponse.json(
       { error: "Internal Server Error", message: err?.message },
