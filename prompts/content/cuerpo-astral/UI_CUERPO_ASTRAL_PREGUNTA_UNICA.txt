@@ -1,0 +1,2 @@
+¿Cómo te llamás?
+Pasame: fecha de nacimiento (dd/mm/aaaa), hora (hh:mm si la tenés) y lugar (ciudad, provincia, país).

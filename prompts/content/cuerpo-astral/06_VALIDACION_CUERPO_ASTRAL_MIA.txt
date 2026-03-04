@@ -1,0 +1,8 @@
+VALIDACIÓN — CUERPO ASTRAL (OBLIGATORIA)
+
+1) Generar salida completa con la estructura del PROMPT RAÍZ.
+2) Aplicar ACUERDO + MANIFIESTO + ARQs.
+3) Pasar 05_CHECKLIST_CUERPO_ASTRAL_MIA.txt.
+4) Si falla algo → reescribir y volver al punto 3.
+5) Repetir hasta OK total.
+6) Entregar SOLO el texto final terminado (sin meta, sin avisos).
