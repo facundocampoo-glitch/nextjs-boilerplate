@@ -17,6 +17,11 @@ type Manifest = {
   features?: Record<string, unknown>;
 };
 
+type ProfileTraits = {
+  updated_at: string;
+  traits: Record<string, any>;
+};
+
 function normalizeContentType(ct: string): string {
   return (ct || "").trim().toLowerCase().replace(/-/g, "_");
 }
@@ -86,7 +91,6 @@ function buildSystemBundle(parts: Array<{ title: string; text: string }>): strin
   return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
 }
 
-// OpenAI (no tocamos min/max por item; eso vive en prompts)
 async function openaiChat(systemText: string, userText: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
@@ -172,6 +176,90 @@ instruction: Use 1-3 of these as imagery/metaphor seeds. Do not quote them verba
 [/MIA_OCCURRENCES]`;
 }
 
+// ---- profile_traits.json (independiente del engine) ----
+
+async function safeReadJson<T>(fileAbs: string): Promise<T | null> {
+  try {
+    const raw = await fs.readFile(fileAbs, "utf8");
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+async function ensureDir(dirAbs: string) {
+  await fs.mkdir(dirAbs, { recursive: true }).catch(() => {});
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function updateTraits(traits: Record<string, any>, args: {
+  input: string;
+  contentType: string;
+  mechanismsInjected: string[];
+  occurrencesInjected: string[];
+  outputLength: number;
+}) {
+  const inputLen = (args.input || "").trim().length;
+
+  traits.sessions_count = (traits.sessions_count ?? 0) + 1;
+
+  const symbolicPressure = clamp((args.occurrencesInjected?.length ?? 0) + (args.mechanismsInjected?.length ?? 0), 0, 12);
+  const directPressure = inputLen <= 12 ? 2 : inputLen <= 40 ? 1 : 0;
+
+  traits.prefers_direct_language_score = clamp((traits.prefers_direct_language_score ?? 0) + directPressure, -50, 50);
+  traits.likes_symbolic_imagery_score = clamp((traits.likes_symbolic_imagery_score ?? 0) + (symbolicPressure >= 6 ? 2 : 1), -50, 50);
+
+  const ct = normalizeContentType(args.contentType);
+  if (ct.includes("tarot")) traits.tolerates_confrontation_score = clamp((traits.tolerates_confrontation_score ?? 0) + 2, -50, 50);
+  else traits.tolerates_confrontation_score = clamp((traits.tolerates_confrontation_score ?? 0) + 1, -50, 50);
+
+  if (args.outputLength >= 1200) traits.prefers_depth_score = clamp((traits.prefers_depth_score ?? 0) + 2, -50, 50);
+  else if (args.outputLength >= 800) traits.prefers_depth_score = clamp((traits.prefers_depth_score ?? 0) + 1, -50, 50);
+
+  const direct = traits.prefers_direct_language_score ?? 0;
+  const symbolic = traits.likes_symbolic_imagery_score ?? 0;
+  const confront = traits.tolerates_confrontation_score ?? 0;
+
+  if (symbolic >= 8 && confront >= 6) traits.tone_affinity = "raw_poetic";
+  else if (direct >= 8) traits.tone_affinity = "direct_clean";
+  else if (symbolic >= 8) traits.tone_affinity = "symbolic_soft";
+  else traits.tone_affinity = "balanced";
+
+  traits.prefers_direct_language = direct >= 8;
+  traits.likes_symbolic_imagery = symbolic >= 8;
+  traits.tolerates_confrontation = confront >= 8;
+}
+
+function buildProfileBlock(traits: Record<string, any>): string {
+  const keys = [
+    "tone_affinity",
+    "prefers_direct_language",
+    "likes_symbolic_imagery",
+    "tolerates_confrontation",
+    "prefers_depth_score",
+    "prefers_direct_language_score",
+    "likes_symbolic_imagery_score",
+    "tolerates_confrontation_score",
+    "sessions_count",
+  ];
+
+  const lines = keys
+    .filter((k) => traits[k] !== undefined)
+    .map((k) => `${k}: ${typeof traits[k] === "string" ? traits[k] : JSON.stringify(traits[k])}`);
+
+  return `[MIA_PROFILE]
+${lines.length ? lines.join("\n") : "none"}
+instruction: Adapt tone/intensity/imagery to this user's narrative profile. Do not mention these fields.
+[/MIA_PROFILE]`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -190,8 +278,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing contentType" }, { status: 400 });
     }
 
-    // 🔥 Esto es lo que cambia todo:
-    // una lectura queda identificada para replay/share/analytics/audio.
     const readingId = crypto.randomUUID();
 
     const rootAbs = process.cwd();
@@ -246,7 +332,7 @@ export async function POST(req: NextRequest) {
 
     const systemText = buildSystemBundle(systemParts);
 
-    // ✅ MEMORIA (antes de OpenAI)
+    // Memoria
     const memory = new MemoryEngine(userId, { window_days: 30 });
     await memory.load();
 
@@ -268,19 +354,44 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    // ✅ MECANISMOS + OCURRENCIAS (anti-repetición por user)
+    // Perfil traits independiente
+    const userDir = path.join(rootAbs, "mia-memory", "user_memory", userId);
+    await ensureDir(userDir);
+    const traitsAbs = path.join(userDir, "profile_traits.json");
+
+    const existing = await safeReadJson<ProfileTraits>(traitsAbs);
+    const traits = (existing?.traits && typeof existing.traits === "object") ? existing.traits : {};
+
     const mechanisms = await pickMechanisms({ userId, count: 3 });
     const occurrences = await pickOccurrences({ userId, count: 5, minLen: 6 });
 
+    const profileBlock = buildProfileBlock(traits);
     const mechanismBlock = buildMechanismBlock(mechanisms);
     const occurrenceBlock = buildOccurrenceBlock(occurrences);
 
     const baseUserText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
-    const userText = `${memoryBlock}\n\n${mechanismBlock}\n\n${occurrenceBlock}\n\n${baseUserText}`;
+    const userText =
+      `${memoryBlock}\n\n` +
+      `${profileBlock}\n\n` +
+      `${mechanismBlock}\n\n` +
+      `${occurrenceBlock}\n\n` +
+      `${baseUserText}`;
 
     const content = await openaiChat(systemText, userText);
 
-    // ✅ Persistir memoria: sesión + mecanismos + ocurrencias reales + readingId
+    // Update traits después de generar
+    updateTraits(traits, {
+      input,
+      contentType,
+      mechanismsInjected: mechanisms,
+      occurrencesInjected: occurrences,
+      outputLength: content.length,
+    });
+
+    const toWrite: ProfileTraits = { updated_at: nowIso(), traits };
+    await fs.writeFile(traitsAbs, JSON.stringify(toWrite, null, 2), "utf8");
+
+    // Guardar sesión con readingId
     memory.addSession({
       content_type: contentType,
       item_key: contentType,
@@ -293,13 +404,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // mecanismo macro (contentType)
     memory.markMechanismUsed(contentType);
-
-    // mecanismos reales seleccionados
     for (const m of mechanisms) memory.markMechanismUsed(m);
-
-    // ocurrencias reales seleccionadas
     for (const occ of occurrences) memory.markOccurrenceUsed(occ);
 
     await memory.save();
@@ -312,6 +418,7 @@ export async function POST(req: NextRequest) {
         ? {
             debug: {
               userId,
+              profileTraits: traits,
               mechanismsInjected: mechanisms,
               occurrencesInjected: occurrences,
               memorySignals: {
