@@ -2,12 +2,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import crypto from "crypto";
 
 // Memoria
 import { MemoryEngine } from "../../../mia-memory/memory-engine";
-// Selector de ocurrencias (ya existe)
+// Ocurrencias
 import { pickOccurrences } from "../../../mia-memory/occurrence-selector";
-// Selector de mecanismos (debe existir)
+// Mecanismos
 import { pickMechanisms } from "../../../mia-memory/mechanism-selector";
 
 type Manifest = {
@@ -85,7 +86,7 @@ function buildSystemBundle(parts: Array<{ title: string; text: string }>): strin
   return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
 }
 
-// OpenAI (no tocamos tus min/max de prompts)
+// OpenAI (no tocamos min/max por item; eso vive en prompts)
 async function openaiChat(systemText: string, userText: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
@@ -189,6 +190,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing contentType" }, { status: 400 });
     }
 
+    // 🔥 Esto es lo que cambia todo:
+    // una lectura queda identificada para replay/share/analytics/audio.
+    const readingId = crypto.randomUUID();
+
     const rootAbs = process.cwd();
     const promptsAbs = path.join(rootAbs, "prompts");
     const contentAbs = path.join(promptsAbs, "content");
@@ -275,11 +280,12 @@ export async function POST(req: NextRequest) {
 
     const content = await openaiChat(systemText, userText);
 
-    // ✅ Persistir memoria
+    // ✅ Persistir memoria: sesión + mecanismos + ocurrencias reales + readingId
     memory.addSession({
       content_type: contentType,
       item_key: contentType,
       meta: {
+        reading_id: readingId,
         input_length: input.length,
         output_length: content.length,
         debug,
@@ -287,18 +293,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // contentType como mecanismo macro
+    // mecanismo macro (contentType)
     memory.markMechanismUsed(contentType);
 
-    // 🔥 registrar mecanismos reales seleccionados
+    // mecanismos reales seleccionados
     for (const m of mechanisms) memory.markMechanismUsed(m);
 
-    // 🔥 registrar ocurrencias reales seleccionadas
+    // ocurrencias reales seleccionadas
     for (const occ of occurrences) memory.markOccurrenceUsed(occ);
 
     await memory.save();
 
     return NextResponse.json({
+      readingId,
       content,
       contentType,
       ...(debug
