@@ -1,6 +1,10 @@
+// app/api/mia/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+
+// ✅ Memoria evolutiva (por usuario)
+import { openMIAUserMemory } from "../../../mia-memory/memory-adapter";
 
 type Manifest = {
   content_type: string;
@@ -196,7 +200,10 @@ export async function POST(req: NextRequest) {
     );
 
     if (!match) {
-      return NextResponse.json({ error: `Unknown contentType: ${contentType}` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Unknown contentType: ${contentType}` },
+        { status: 400 }
+      );
     }
 
     const manifest = match.manifest;
@@ -245,6 +252,22 @@ export async function POST(req: NextRequest) {
       audioBase64 = await generateTtsBase64(baseUrl, content);
     }
 
+    // ✅ MEMORIA: solo si todo salió bien (texto + tts si aplica)
+    const { commit, signals } = await openMIAUserMemory({
+      userId,
+      contentType,
+      itemKey: contentType,
+      meta: {
+        input_length: input.length,
+        output_length: content.length,
+        tts,
+        debug,
+        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+      },
+    });
+
+    await commit();
+
     return NextResponse.json({
       content,
       contentType,
@@ -256,6 +279,7 @@ export async function POST(req: NextRequest) {
               item_files: itemFilesAbs.map((f) =>
                 path.relative(rootAbs, f).replaceAll("\\", "/")
               ),
+              memorySignals: signals, // ✅ solo en debug (no rompe front)
             },
           }
         : {}),
