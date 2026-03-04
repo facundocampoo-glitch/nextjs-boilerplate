@@ -5,7 +5,7 @@ import path from "path";
 
 // Memoria (ya existente)
 import { MemoryEngine } from "../../../mia-memory/memory-engine";
-// Ocurrencias (nuevo, ya creado)
+// Ocurrencias (ya existe)
 import { pickOccurrences } from "../../../mia-memory/occurrence-selector";
 
 type Manifest = {
@@ -83,7 +83,7 @@ function buildSystemBundle(parts: Array<{ title: string; text: string }>): strin
   return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
 }
 
-// OpenAI (sin tocar tu estilo; si cambiaste esto antes, dejalo como lo tengas)
+// OpenAI (dejamos tu estilo base; no tocamos min/max de prompts)
 async function openaiChat(systemText: string, userText: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
@@ -253,8 +253,8 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    // ✅ OCURRENCIAS (inyección)
-    const occurrences = await pickOccurrences({ count: 5, minLen: 6 });
+    // ✅ OCURRENCIAS (inyección) — ahora pasan userId para anti-repetición por usuario
+    const occurrences = await pickOccurrences({ userId, count: 5, minLen: 6 });
     const occurrenceBlock = buildOccurrenceBlock(occurrences);
 
     const baseUserText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
@@ -262,7 +262,7 @@ export async function POST(req: NextRequest) {
 
     const content = await openaiChat(systemText, userText);
 
-    // ✅ Persistir memoria
+    // ✅ Persistir memoria (sesión + mecanismos + ocurrencias reales)
     memory.addSession({
       content_type: contentType,
       item_key: contentType,
@@ -275,7 +275,11 @@ export async function POST(req: NextRequest) {
     });
 
     memory.markMechanismUsed(contentType);
-    memory.markOccurrenceUsed(contentType);
+
+    // 🔥 ESTE ERA EL PUNTO CLAVE: registrar ocurrencias reales seleccionadas
+    for (const occ of occurrences) {
+      memory.markOccurrenceUsed(occ);
+    }
 
     await memory.save();
 
