@@ -27,6 +27,7 @@ function normalizeContentType(ct: string): string {
 function isPromptFile(fileName: string): boolean {
   const lower = fileName.toLowerCase();
   if (lower === "manifest.json") return false;
+  if (lower === ".keep") return false;
   return lower.endsWith(".txt") || lower.endsWith(".md");
 }
 
@@ -145,6 +146,44 @@ async function generateTtsBase64(baseUrl: string, text: string): Promise<string>
   return buf.toString("base64");
 }
 
+/**
+ * Order item prompt files so module "constitution" always wins.
+ * This prevents the module from becoming generic.
+ */
+function itemPriority(fileAbs: string): number {
+  const b = path.basename(fileAbs).toLowerCase();
+
+  // Highest priority: agreement + root + validation logic
+  if (b.includes("acuerdo_operativo")) return 10;
+  if (b.includes("manifiesto")) return 20;
+  if (b.includes("prompt_raiz") || (b.startsWith("prompt_raiz"))) return 30;
+
+  // Module-specific QA
+  if (b.includes("checklist")) return 40;
+  if (b.includes("validacion")) return 50;
+
+  // UI helpers/questions (still module-specific)
+  if (b.includes("ui_") || b.includes("_ui_") || b.includes("pregunta")) return 60;
+
+  // Structure/demo docs
+  if (b.includes("estructura")) return 70;
+  if (b.includes("demo")) return 80;
+
+  // Generator prompt should be last among item files
+  if (b.includes("generador") || b.startsWith("prompt_")) return 90;
+
+  return 75;
+}
+
+function sortItemFiles(filesAbs: string[]): string[] {
+  return [...filesAbs].sort((a, b) => {
+    const pa = itemPriority(a);
+    const pb = itemPriority(b);
+    if (pa !== pb) return pa - pb;
+    return sortStable(a, b);
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -194,9 +233,9 @@ export async function POST(req: NextRequest) {
     // Runtime dedup by filename (no manifest mutation)
     const baseSystemFilesAbs = dedupByBasenameKeepFirst(baseSystemFilesAbsNested);
 
-    // Load item prompts
+    // Load item prompts (now with priority ordering)
     const itemDirAbs = match.dirAbs;
-    const itemFilesAbs = (await listPromptFiles(itemDirAbs)).sort(sortStable);
+    const itemFilesAbs = sortItemFiles(await listPromptFiles(itemDirAbs));
 
     // Build system bundle
     const systemParts: Array<{ title: string; text: string }> = [];
