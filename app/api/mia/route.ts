@@ -253,7 +253,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ MEMORIA: solo si todo salió bien (texto + tts si aplica)
-    const { commit, signals } = await openMIAUserMemory({
+    const { memory, commit, signals } = await openMIAUserMemory({
       userId,
       contentType,
       itemKey: contentType,
@@ -265,6 +265,10 @@ export async function POST(req: NextRequest) {
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       },
     });
+
+    // ✅ Marcamos mecanismo/ocurrencia (v1 simple: usar contentType como key estable)
+    memory.markMechanismUsed(contentType);
+    memory.markOccurrenceUsed(contentType);
 
     await commit();
 
