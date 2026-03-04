@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
-// Memoria
+// Memoria (ya existente)
 import { MemoryEngine } from "../../../mia-memory/memory-engine";
-// Selector de ocurrencias
+// Ocurrencias (nuevo, ya creado)
 import { pickOccurrences } from "../../../mia-memory/occurrence-selector";
 
 type Manifest = {
@@ -83,19 +83,15 @@ function buildSystemBundle(parts: Array<{ title: string; text: string }>): strin
   return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
 }
 
-// OpenAI estable
+// OpenAI (sin tocar tu estilo; si cambiaste esto antes, dejalo como lo tengas)
 async function openaiChat(systemText: string, userText: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
 
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
-
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    signal: controller.signal,
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
@@ -108,37 +104,61 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
       ],
       temperature: 0.9,
       top_p: 0.9,
-      max_tokens: 800,
-      frequency_penalty: 0.4,
-      presence_penalty: 0.4,
     }),
   });
-
-  clearTimeout(timeout);
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
     throw new Error(`OpenAI error: ${res.status} ${res.statusText} ${txt}`.trim());
   }
 
-  const data = await res.json() as any;
+  const data = (await res.json()) as any;
   const content = data?.choices?.[0]?.message?.content;
-
-  if (!content || typeof content !== "string") {
+  if (typeof content !== "string" || !content.trim()) {
     throw new Error("OpenAI returned empty content");
   }
 
   return content.trim();
 }
 
-function buildMemoryBlock(userId: string, contentType: string, avoid: string[]) {
+function buildMemoryBlock(args: {
+  userId: string;
+  contentType: string;
+  recentMechanismHits: Array<{ key: string; used_count: number; days_ago: number }>;
+  recentOccurrenceHits: Array<{ key: string; used_count: number; days_ago: number }>;
+}): string {
+  const topM = args.recentMechanismHits.slice(0, 8);
+  const topO = args.recentOccurrenceHits.slice(0, 8);
+
+  const mechLine =
+    topM.length === 0
+      ? "none"
+      : topM.map((h) => `${h.key}(${h.used_count},${h.days_ago}d)`).join(", ");
+
+  const occLine =
+    topO.length === 0
+      ? "none"
+      : topO.map((h) => `${h.key}(${h.used_count},${h.days_ago}d)`).join(", ");
+
+  const avoid = topM.slice(0, 3).map((h) => h.key);
   const avoidLine = avoid.length ? avoid.join(", ") : "none";
 
   return `[MIA_MEMORY]
-user_id: ${userId}
-current_content_type: ${contentType}
+user_id: ${args.userId}
+current_content_type: ${args.contentType}
+recent_mechanisms_30d: ${mechLine}
+recent_occurrences_30d: ${occLine}
 avoid_repeating_30d: ${avoidLine}
+instruction: Use this memory to reduce repetition and vary structure/imagery while keeping the requested content_type.
 [/MIA_MEMORY]`;
+}
+
+function buildOccurrenceBlock(occurrences: string[]): string {
+  if (!occurrences.length) return `[MIA_OCCURRENCES]\nnone\n[/MIA_OCCURRENCES]`;
+  return `[MIA_OCCURRENCES]
+${occurrences.map((o) => `- ${o}`).join("\n")}
+instruction: Use 1-3 of these as imagery/metaphor seeds. Do not quote them verbatim unless it fits naturally.
+[/MIA_OCCURRENCES]`;
 }
 
 export async function POST(req: NextRequest) {
@@ -155,6 +175,9 @@ export async function POST(req: NextRequest) {
         : "anonymous";
 
     const contentType = normalizeContentType(contentTypeRaw);
+    if (!contentType) {
+      return NextResponse.json({ error: "Missing contentType" }, { status: 400 });
+    }
 
     const rootAbs = process.cwd();
     const promptsAbs = path.join(rootAbs, "prompts");
@@ -208,38 +231,45 @@ export async function POST(req: NextRequest) {
 
     const systemText = buildSystemBundle(systemParts);
 
-    // MEMORIA
+    // ✅ MEMORIA (antes de OpenAI)
     const memory = new MemoryEngine(userId, { window_days: 30 });
     await memory.load();
 
-    const avoid = memory.getRecentMechanismHits(30).map((h) => h.key).slice(0, 3);
+    const recentMechanismHits30 = memory.getRecentMechanismHits(30);
+    const recentOccurrenceHits30 = memory.getRecentOccurrenceHits(30);
 
-    const memoryBlock = buildMemoryBlock(userId, contentType, avoid);
+    const memoryBlock = buildMemoryBlock({
+      userId,
+      contentType,
+      recentMechanismHits: recentMechanismHits30.map((h) => ({
+        key: h.key,
+        used_count: h.used_count,
+        days_ago: h.days_ago,
+      })),
+      recentOccurrenceHits: recentOccurrenceHits30.map((h) => ({
+        key: h.key,
+        used_count: h.used_count,
+        days_ago: h.days_ago,
+      })),
+    });
 
-    // OCURRENCIAS
-    const occurrences = await pickOccurrences({ count: 5 });
+    // ✅ OCURRENCIAS (inyección)
+    const occurrences = await pickOccurrences({ count: 5, minLen: 6 });
+    const occurrenceBlock = buildOccurrenceBlock(occurrences);
 
-    const occurrenceBlock =
-`[MIA_OCCURRENCES]
-${occurrences.join("\n")}
-[/MIA_OCCURRENCES]`;
-
-    const userText =
-`${memoryBlock}
-
-${occurrenceBlock}
-
-[USER:${userId}]
-${input}`;
+    const baseUserText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
+    const userText = `${memoryBlock}\n\n${occurrenceBlock}\n\n${baseUserText}`;
 
     const content = await openaiChat(systemText, userText);
 
+    // ✅ Persistir memoria
     memory.addSession({
       content_type: contentType,
       item_key: contentType,
       meta: {
         input_length: input.length,
         output_length: content.length,
+        debug,
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       },
     });
@@ -255,7 +285,12 @@ ${input}`;
       ...(debug
         ? {
             debug: {
+              userId,
               occurrencesInjected: occurrences,
+              memorySignals: {
+                recentMechanismHits30,
+                recentOccurrenceHits30,
+              },
             },
           }
         : {}),
