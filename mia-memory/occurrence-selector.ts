@@ -2,20 +2,45 @@ import fs from "fs/promises";
 import path from "path";
 
 type PickOptions = {
-  count?: number; // cuántas ocurrencias devolver
-  minLen?: number; // filtrar líneas muy cortas
-  seedKey?: string; // opcional: para estabilizar por userId/contentType (fase siguiente)
+  userId?: string;
+  count?: number;
+  minLen?: number;
 };
 
-/**
- * Lee el BANCO_OCURRENCIAS_MIA_1000 y devuelve N líneas "ocurrencias" listas para inyectar.
- * Por ahora: random simple (suficiente para variación inmediata).
- */
+async function loadUserUsedOccurrences(userId: string): Promise<Set<string>> {
+  try {
+    const root = process.cwd();
+
+    const file = path.join(
+      root,
+      "mia-memory",
+      "user_memory",
+      userId,
+      "occurrences_used.json"
+    );
+
+    const raw = await fs.readFile(file, "utf8");
+    const data = JSON.parse(raw);
+
+    const used = new Set<string>();
+
+    for (const key of Object.keys(data)) {
+      used.add(key);
+    }
+
+    return used;
+  } catch {
+    return new Set();
+  }
+}
+
 export async function pickOccurrences(opts: PickOptions = {}): Promise<string[]> {
-  const count = Math.max(1, Math.min(12, opts.count ?? 5));
-  const minLen = Math.max(1, opts.minLen ?? 6);
+  const count = opts.count ?? 5;
+  const minLen = opts.minLen ?? 6;
+  const userId = opts.userId ?? "anonymous";
 
   const root = process.cwd();
+
   const fileAbs = path.join(
     root,
     "prompts",
@@ -26,16 +51,21 @@ export async function pickOccurrences(opts: PickOptions = {}): Promise<string[]>
 
   const raw = await fs.readFile(fileAbs, "utf8");
 
-  const lines = raw
+  const allLines = raw
     .split("\n")
     .map((l) => l.trim())
     .filter((l) => l.length >= minLen);
 
-  // shuffle simple
-  for (let i = lines.length - 1; i > 0; i--) {
+  const used = await loadUserUsedOccurrences(userId);
+
+  const available = allLines.filter((l) => !used.has(l));
+
+  const pool = available.length > count ? available : allLines;
+
+  for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [lines[i], lines[j]] = [lines[j], lines[i]];
+    [pool[i], pool[j]] = [pool[j], pool[i]];
   }
 
-  return lines.slice(0, Math.min(count, lines.length));
+  return pool.slice(0, count);
 }
