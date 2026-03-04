@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
-// Memoria (ya existente)
+// Memoria
 import { MemoryEngine } from "../../../mia-memory/memory-engine";
-// Ocurrencias (ya existe)
+// Selector de ocurrencias (ya existe)
 import { pickOccurrences } from "../../../mia-memory/occurrence-selector";
+// Selector de mecanismos (debe existir)
+import { pickMechanisms } from "../../../mia-memory/mechanism-selector";
 
 type Manifest = {
   content_type: string;
@@ -83,7 +85,7 @@ function buildSystemBundle(parts: Array<{ title: string; text: string }>): strin
   return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
 }
 
-// OpenAI (dejamos tu estilo base; no tocamos min/max de prompts)
+// OpenAI (no tocamos tus min/max de prompts)
 async function openaiChat(systemText: string, userText: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
@@ -151,6 +153,14 @@ recent_occurrences_30d: ${occLine}
 avoid_repeating_30d: ${avoidLine}
 instruction: Use this memory to reduce repetition and vary structure/imagery while keeping the requested content_type.
 [/MIA_MEMORY]`;
+}
+
+function buildMechanismBlock(mechanisms: string[]): string {
+  if (!mechanisms.length) return `[MIA_MECHANISMS]\nnone\n[/MIA_MECHANISMS]`;
+  return `[MIA_MECHANISMS]
+${mechanisms.map((m) => `- ${m}`).join("\n")}
+instruction: Apply 1-2 of these narrative mechanisms. Do not list them; embody them.
+[/MIA_MECHANISMS]`;
 }
 
 function buildOccurrenceBlock(occurrences: string[]): string {
@@ -253,16 +263,19 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    // ✅ OCURRENCIAS (inyección) — ahora pasan userId para anti-repetición por usuario
+    // ✅ MECANISMOS + OCURRENCIAS (anti-repetición por user)
+    const mechanisms = await pickMechanisms({ userId, count: 3 });
     const occurrences = await pickOccurrences({ userId, count: 5, minLen: 6 });
+
+    const mechanismBlock = buildMechanismBlock(mechanisms);
     const occurrenceBlock = buildOccurrenceBlock(occurrences);
 
     const baseUserText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
-    const userText = `${memoryBlock}\n\n${occurrenceBlock}\n\n${baseUserText}`;
+    const userText = `${memoryBlock}\n\n${mechanismBlock}\n\n${occurrenceBlock}\n\n${baseUserText}`;
 
     const content = await openaiChat(systemText, userText);
 
-    // ✅ Persistir memoria (sesión + mecanismos + ocurrencias reales)
+    // ✅ Persistir memoria
     memory.addSession({
       content_type: contentType,
       item_key: contentType,
@@ -274,12 +287,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // contentType como mecanismo macro
     memory.markMechanismUsed(contentType);
 
-    // 🔥 ESTE ERA EL PUNTO CLAVE: registrar ocurrencias reales seleccionadas
-    for (const occ of occurrences) {
-      memory.markOccurrenceUsed(occ);
-    }
+    // 🔥 registrar mecanismos reales seleccionados
+    for (const m of mechanisms) memory.markMechanismUsed(m);
+
+    // 🔥 registrar ocurrencias reales seleccionadas
+    for (const occ of occurrences) memory.markOccurrenceUsed(occ);
 
     await memory.save();
 
@@ -290,6 +305,7 @@ export async function POST(req: NextRequest) {
         ? {
             debug: {
               userId,
+              mechanismsInjected: mechanisms,
               occurrencesInjected: occurrences,
               memorySignals: {
                 recentMechanismHits30,
