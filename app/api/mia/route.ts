@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
-// ✅ Memoria evolutiva (por usuario)
-import { openMIAUserMemory } from "../../../mia-memory/memory-adapter";
+// ✅ Memoria evolutiva (inyectada en userText)
+import { MemoryEngine } from "../../../mia-memory/memory-engine";
 
 type Manifest = {
   content_type: string;
@@ -170,6 +170,38 @@ async function generateTtsBase64(baseUrl: string, text: string): Promise<string>
   return buf.toString("base64");
 }
 
+function buildMemoryBlock(args: {
+  userId: string;
+  contentType: string;
+  recentMechanismHits: Array<{ key: string; used_count: number; days_ago: number }>;
+  recentOccurrenceHits: Array<{ key: string; used_count: number; days_ago: number }>;
+}): string {
+  const topM = args.recentMechanismHits.slice(0, 8);
+  const topO = args.recentOccurrenceHits.slice(0, 8);
+
+  const mechLine =
+    topM.length === 0
+      ? "none"
+      : topM.map((h) => `${h.key}(${h.used_count},${h.days_ago}d)`).join(", ");
+
+  const occLine =
+    topO.length === 0
+      ? "none"
+      : topO.map((h) => `${h.key}(${h.used_count},${h.days_ago}d)`).join(", ");
+
+  const avoid = topM.slice(0, 3).map((h) => h.key);
+  const avoidLine = avoid.length ? avoid.join(", ") : "none";
+
+  return `[MIA_MEMORY]
+user_id: ${args.userId}
+current_content_type: ${args.contentType}
+recent_mechanisms_30d: ${mechLine}
+recent_occurrences_30d: ${occLine}
+avoid_repeating_30d: ${avoidLine}
+instruction: Use this memory to reduce repetition and vary structure/imagery while keeping the requested content_type.
+[/MIA_MEMORY]`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -241,7 +273,30 @@ export async function POST(req: NextRequest) {
 
     const systemText = buildSystemBundle(systemParts);
 
-    const userText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
+    // ✅ MEMORIA: se carga ANTES de OpenAI para inyectar en userText
+    const memory = new MemoryEngine(userId, { window_days: 30 });
+    await memory.load();
+
+    const recentMechanismHits30 = memory.getRecentMechanismHits(30);
+    const recentOccurrenceHits30 = memory.getRecentOccurrenceHits(30);
+
+    const memoryBlock = buildMemoryBlock({
+      userId,
+      contentType,
+      recentMechanismHits: recentMechanismHits30.map((h) => ({
+        key: h.key,
+        used_count: h.used_count,
+        days_ago: h.days_ago,
+      })),
+      recentOccurrenceHits: recentOccurrenceHits30.map((h) => ({
+        key: h.key,
+        used_count: h.used_count,
+        days_ago: h.days_ago,
+      })),
+    });
+
+    const baseUserText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
+    const userText = `${memoryBlock}\n\n${baseUserText}`;
 
     const content = await openaiChat(systemText, userText);
 
@@ -252,11 +307,10 @@ export async function POST(req: NextRequest) {
       audioBase64 = await generateTtsBase64(baseUrl, content);
     }
 
-    // ✅ MEMORIA: solo si todo salió bien (texto + tts si aplica)
-    const { memory, commit, signals } = await openMIAUserMemory({
-      userId,
-      contentType,
-      itemKey: contentType,
+    // ✅ MEMORIA: registrar sesión + uso, y persistir
+    memory.addSession({
+      content_type: contentType,
+      item_key: contentType,
       meta: {
         input_length: input.length,
         output_length: content.length,
@@ -266,11 +320,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // ✅ Marcamos mecanismo/ocurrencia (v1 simple: usar contentType como key estable)
+    // v1 simple: contentType como key estable
     memory.markMechanismUsed(contentType);
     memory.markOccurrenceUsed(contentType);
 
-    await commit();
+    await memory.save();
 
     return NextResponse.json({
       content,
@@ -283,7 +337,10 @@ export async function POST(req: NextRequest) {
               item_files: itemFilesAbs.map((f) =>
                 path.relative(rootAbs, f).replaceAll("\\", "/")
               ),
-              memorySignals: signals, // ✅ solo en debug (no rompe front)
+              memorySignals: {
+                recentMechanismHits30,
+                recentOccurrenceHits30,
+              },
             },
           }
         : {}),
