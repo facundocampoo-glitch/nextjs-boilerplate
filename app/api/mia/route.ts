@@ -64,9 +64,7 @@ async function findAllManifests(
           const parsed = JSON.parse(raw) as Manifest;
           if (!parsed?.content_type || !Array.isArray(parsed?.base_system)) continue;
           results.push({ dirAbs: path.dirname(full), manifestAbs: full, manifest: parsed });
-        } catch {
-          // ignore invalid manifest
-        }
+        } catch {}
       }
     }
   }
@@ -89,6 +87,31 @@ function dedupByBasenameKeepFirst(filesAbs: string[]): string[] {
 
 function buildSystemBundle(parts: Array<{ title: string; text: string }>): string {
   return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
+}
+
+function itemPriority(fileAbs: string): number {
+  const b = path.basename(fileAbs).toLowerCase();
+
+  if (b.includes("acuerdo_operativo")) return 10;
+  if (b.includes("manifiesto")) return 20;
+  if (b.includes("prompt_raiz")) return 30;
+  if (b.includes("checklist")) return 40;
+  if (b.includes("validacion")) return 50;
+  if (b.includes("ui_") || b.includes("pregunta")) return 60;
+  if (b.includes("estructura")) return 70;
+  if (b.includes("demo")) return 80;
+  if (b.includes("generador")) return 90;
+
+  return 75;
+}
+
+function sortItemFiles(filesAbs: string[]): string[] {
+  return [...filesAbs].sort((a, b) => {
+    const pa = itemPriority(a);
+    const pb = itemPriority(b);
+    if (pa !== pb) return pa - pb;
+    return sortStable(a, b);
+  });
 }
 
 async function openaiChat(systemText: string, userText: string): Promise<string> {
@@ -123,13 +146,10 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
   if (typeof content !== "string" || !content.trim()) {
     throw new Error("OpenAI returned empty content");
   }
+
   return content.trim();
 }
 
-/**
- * INTERNAL TTS CALL
- * In this repo the endpoint is /api/tts (NOT /api/generate-tts).
- */
 async function generateTtsBase64(baseUrl: string, text: string): Promise<string> {
   const res = await fetch(`${baseUrl}/api/tts`, {
     method: "POST",
@@ -146,44 +166,6 @@ async function generateTtsBase64(baseUrl: string, text: string): Promise<string>
   return buf.toString("base64");
 }
 
-/**
- * Order item prompt files so module "constitution" always wins.
- * This prevents the module from becoming generic.
- */
-function itemPriority(fileAbs: string): number {
-  const b = path.basename(fileAbs).toLowerCase();
-
-  // Highest priority: agreement + root + validation logic
-  if (b.includes("acuerdo_operativo")) return 10;
-  if (b.includes("manifiesto")) return 20;
-  if (b.includes("prompt_raiz") || (b.startsWith("prompt_raiz"))) return 30;
-
-  // Module-specific QA
-  if (b.includes("checklist")) return 40;
-  if (b.includes("validacion")) return 50;
-
-  // UI helpers/questions (still module-specific)
-  if (b.includes("ui_") || b.includes("_ui_") || b.includes("pregunta")) return 60;
-
-  // Structure/demo docs
-  if (b.includes("estructura")) return 70;
-  if (b.includes("demo")) return 80;
-
-  // Generator prompt should be last among item files
-  if (b.includes("generador") || b.startsWith("prompt_")) return 90;
-
-  return 75;
-}
-
-function sortItemFiles(filesAbs: string[]): string[] {
-  return [...filesAbs].sort((a, b) => {
-    const pa = itemPriority(a);
-    const pb = itemPriority(b);
-    if (pa !== pb) return pa - pb;
-    return sortStable(a, b);
-  });
-}
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -193,51 +175,47 @@ export async function POST(req: NextRequest) {
     const debug = Boolean(body?.debug);
     const tts = Boolean(body?.tts);
 
+    const userId =
+      typeof body?.userId === "string" && body.userId.trim()
+        ? body.userId.trim()
+        : "anonymous";
+
     const contentType = normalizeContentType(contentTypeRaw);
     if (!contentType) {
       return NextResponse.json({ error: "Missing contentType" }, { status: 400 });
     }
 
-    // Base paths
     const rootAbs = process.cwd();
     const promptsAbs = path.join(rootAbs, "prompts");
     const contentAbs = path.join(promptsAbs, "content");
 
-    // Find matching manifest by normalized content_type
     const manifests = await findAllManifests(contentAbs);
-    const available = Array.from(
-      new Set(manifests.map((m) => normalizeContentType(m.manifest.content_type)))
-    ).sort(sortStable);
 
     const match = manifests.find(
       (m) => normalizeContentType(m.manifest.content_type) === contentType
     );
 
     if (!match) {
-      return NextResponse.json(
-        { error: `Unknown contentType: ${contentType}`, available },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Unknown contentType: ${contentType}` }, { status: 400 });
     }
 
     const manifest = match.manifest;
 
-    // Load base_system (declared order)
-    const baseSystemDirsAbs = (manifest.base_system || []).map((rel) => path.join(promptsAbs, rel));
+    const baseSystemDirsAbs = (manifest.base_system || []).map((rel) =>
+      path.join(promptsAbs, rel)
+    );
+
     const baseSystemFilesAbsNested: string[] = [];
     for (const dirAbs of baseSystemDirsAbs) {
       const files = await listPromptFiles(dirAbs);
       baseSystemFilesAbsNested.push(...files);
     }
 
-    // Runtime dedup by filename (no manifest mutation)
     const baseSystemFilesAbs = dedupByBasenameKeepFirst(baseSystemFilesAbsNested);
 
-    // Load item prompts (now with priority ordering)
     const itemDirAbs = match.dirAbs;
     const itemFilesAbs = sortItemFiles(await listPromptFiles(itemDirAbs));
 
-    // Build system bundle
     const systemParts: Array<{ title: string; text: string }> = [];
 
     for (const f of baseSystemFilesAbs) {
@@ -255,30 +233,13 @@ export async function POST(req: NextRequest) {
     }
 
     const systemText = buildSystemBundle(systemParts);
-    const userText = input || "";
 
-    // Generate content
+    const userText = userId === "anonymous" ? input : `[USER:${userId}]\n${input}`;
+
     const content = await openaiChat(systemText, userText);
 
-    const debugPayload: DebugPayload = {
-      manifest: {
-        ...manifest,
-        content_type: normalizeContentType(manifest.content_type),
-      },
-      loaded: {
-        base_system_dirs: baseSystemDirsAbs.map((d) =>
-          path.relative(rootAbs, d).replaceAll("\\", "/")
-        ),
-        base_system_files: baseSystemFilesAbs.map((f) =>
-          path.relative(rootAbs, f).replaceAll("\\", "/")
-        ),
-        item_dir: path.relative(rootAbs, itemDirAbs).replaceAll("\\", "/"),
-        item_files: itemFilesAbs.map((f) => path.relative(rootAbs, f).replaceAll("\\", "/")),
-      },
-    };
-
-    // Optional: TTS (internal base URL)
     let audioBase64: string | undefined;
+
     if (tts) {
       const baseUrl = process.env.MIA_INTERNAL_BASE_URL || "http://localhost:3000";
       audioBase64 = await generateTtsBase64(baseUrl, content);
@@ -288,7 +249,16 @@ export async function POST(req: NextRequest) {
       content,
       contentType,
       ...(tts ? { audioBase64 } : {}),
-      ...(debug ? { debug: debugPayload } : {}),
+      ...(debug
+        ? {
+            debug: {
+              userId,
+              item_files: itemFilesAbs.map((f) =>
+                path.relative(rootAbs, f).replaceAll("\\", "/")
+              ),
+            },
+          }
+        : {}),
     });
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Unknown error" }, { status: 500 });
