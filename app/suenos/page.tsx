@@ -1,68 +1,94 @@
+// app/suenos/page.tsx
 "use client";
 
 import { useState } from "react";
-import { miaText } from "@/lib/mia/client";
-import { CONTENT_TYPES } from "@/lib/mia/content-types";
+import { generateMiaReading } from "@/lib/miaApi";
 
 export default function SuenosPage() {
-  const [dream, setDream] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = useState("");
+  const [reading, setReading] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleGenerate() {
+    const trimmed = input.trim();
+
+    if (!trimmed) {
+      setError("Escribe tu sueño antes de generar la lectura.");
+      setReading("");
+      return;
+    }
+
     setLoading(true);
-    setError(null);
-    setOutput("");
+    setError("");
+    setReading("");
 
     try {
-      const res = await miaText({
-        contentType: CONTENT_TYPES.SUENOS,
-        input: dream,
+      const response = await generateMiaReading({
+        contentType: "cuerpo_onirico",
+        input: trimmed,
+        locale: "es-AR",
       });
 
-      setOutput(res.output);
+      setReading(response.content || "");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Request failed");
+      const message =
+        err instanceof Error ? err.message : "Ocurrió un error al generar la lectura.";
+
+      setError(message);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Mirada Sueños</h1>
+    <main className="min-h-screen bg-black text-white px-6 py-10">
+      <div className="mx-auto w-full max-w-3xl">
+        <header className="mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight">Sueños</h1>
+          <p className="mt-3 text-sm text-white/70">
+            Cuéntale a MIA tu sueño y recibe una lectura desde el backend real.
+          </p>
+        </header>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <textarea
-          className="w-full min-h-[140px] rounded-xl border p-3"
-          placeholder="Escribí tu sueño..."
-          value={dream}
-          onChange={(e) => setDream(e.target.value)}
-          disabled={loading}
-        />
+        <section className="space-y-4">
+          <label htmlFor="sueno" className="block text-sm text-white/80">
+            Escribe tu sueño
+          </label>
 
-        <button
-          type="submit"
-          className="rounded-xl border px-4 py-2 disabled:opacity-50"
-          disabled={loading || dream.trim().length === 0}
-        >
-          {loading ? "Interpretando..." : "Interpretar"}
-        </button>
-      </form>
+          <textarea
+            id="sueno"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Soñé que caminaba por una casa enorme y no encontraba la salida..."
+            className="min-h-[180px] w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 outline-none transition focus:border-white/20 focus:bg-white/10"
+          />
 
-      {error && (
-        <div className="rounded-xl border p-3">
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={loading}
+            className="rounded-2xl bg-white px-5 py-3 text-sm font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Generando..." : "Generar lectura"}
+          </button>
+        </section>
 
-      {output && (
-        <div className="rounded-xl border p-3 whitespace-pre-wrap">
-          {output}
-        </div>
-      )}
+        {error ? (
+          <section className="mt-8 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+            <p className="text-sm text-red-200">{error}</p>
+          </section>
+        ) : null}
+
+        {reading ? (
+          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
+            <h2 className="mb-4 text-lg font-medium">Tu lectura</h2>
+            <div className="whitespace-pre-wrap text-[15px] leading-7 text-white/90">
+              {reading}
+            </div>
+          </section>
+        ) : null}
+      </div>
     </main>
   );
 }
