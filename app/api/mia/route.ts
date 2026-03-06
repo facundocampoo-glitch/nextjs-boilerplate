@@ -13,92 +13,45 @@ type Manifest = {
   features?: Record<string, unknown>;
 };
 
-type ProfileTraits = {
-  updated_at: string;
-  traits: Record<string, any>;
-};
-
 function normalizeContentType(ct: string): string {
   return (ct || "").trim().toLowerCase().replace(/-/g, "_");
 }
 
-function isPromptFile(fileName: string): boolean {
-  const lower = fileName.toLowerCase();
-  if (lower === "manifest.json") return false;
-  if (lower === ".keep") return false;
-  return lower.endsWith(".txt") || lower.endsWith(".md");
-}
-
-function sortStable(a: string, b: string) {
-  return a.localeCompare(b, "en");
-}
-
-async function listPromptFiles(dirAbs: string): Promise<string[]> {
-  const entries = await fs.readdir(dirAbs, { withFileTypes: true });
-  return entries
-    .filter((e) => e.isFile() && isPromptFile(e.name))
-    .map((e) => path.join(dirAbs, e.name))
-    .sort(sortStable);
-}
-
-async function readTextFile(fileAbs: string): Promise<string> {
-  return fs.readFile(fileAbs, "utf8");
-}
-
-async function findAllManifests(
-  contentRootAbs: string
-): Promise<Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }>> {
-  const results: Array<{ dirAbs: string; manifestAbs: string; manifest: Manifest }> = [];
-
-  async function walk(dirAbs: string) {
-    const entries = await fs.readdir(dirAbs, { withFileTypes: true });
-    for (const e of entries) {
-      const full = path.join(dirAbs, e.name);
-      if (e.isDirectory()) {
-        await walk(full);
-      } else if (e.isFile() && e.name === "manifest.json") {
-        try {
-          const raw = await fs.readFile(full, "utf8");
-          const parsed = JSON.parse(raw) as Manifest;
-          if (!parsed?.content_type || !Array.isArray(parsed?.base_system)) continue;
-          results.push({ dirAbs: path.dirname(full), manifestAbs: full, manifest: parsed });
-        } catch {}
-      }
-    }
-  }
-
-  await walk(contentRootAbs);
-  return results;
-}
-
-function dedupByBasenameKeepFirst(filesAbs: string[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const f of filesAbs) {
-    const base = path.basename(f);
-    if (seen.has(base)) continue;
-    seen.add(base);
-    out.push(f);
-  }
-  return out;
-}
-
-function buildSystemBundle(parts: Array<{ title: string; text: string }>): string {
-  return parts.map((p) => `\n\n---\n# ${p.title}\n---\n${p.text}\n`).join("\n");
-}
-
 function buildLengthBlock(contentType: string) {
+  const map: Record<string, { min: number; max: number }> = {
+    cuerpo_onirico: { min: 5000, max: 8000 },
+    cuerpo_psicomagico: { min: 3500, max: 5500 },
+    tarot_marselles: { min: 9500, max: 12500 },
+    cuerpo_astral: { min: 4200, max: 6000 },
+    horoscopo_diario: { min: 900, max: 1400 },
+    horoscopo_semanal: { min: 2800, max: 3500 },
+  };
+
+  const range = map[contentType];
+
+  if (!range) {
+    return `[MIA_LENGTH]
+Produce a full narrative reading. Avoid short answers.
+[/MIA_LENGTH]`;
+  }
+
   return `[MIA_LENGTH]
 
-Respect production length ranges defined in ACUERDO_OPERATIVO.txt.
+Target length: ${range.min}–${range.max} characters.
 
-Do not shorten the reading.
 Do not summarize.
-Aim for the full production range unless explicitly impossible.
+Do not stop early.
 
-If the system runs out of space, prioritize clarity but continue until the range is reached.
+Expansion rule:
+Before closing the reading explore:
 
-Current content type: ${contentType}
+• situation
+• tension
+• hidden pattern
+• consequence
+• closing insight
+
+Stay inside the target range.
 
 [/MIA_LENGTH]`;
 }
@@ -128,15 +81,13 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(`OpenAI error: ${res.status} ${res.statusText} ${txt}`.trim());
+    throw new Error(`OpenAI error: ${res.status} ${res.statusText} ${txt}`);
   }
 
-  const data = (await res.json()) as any;
+  const data = await res.json();
   const content = data?.choices?.[0]?.message?.content;
 
-  if (typeof content !== "string" || !content.trim()) {
-    throw new Error("OpenAI returned empty content");
-  }
+  if (!content) throw new Error("OpenAI returned empty content");
 
   return content.trim();
 }
@@ -147,16 +98,9 @@ export async function POST(req: NextRequest) {
 
     const input = typeof body?.input === "string" ? body.input : "";
     const contentTypeRaw = typeof body?.contentType === "string" ? body.contentType : "";
-
-    const userId =
-      typeof body?.userId === "string" && body.userId.trim()
-        ? body.userId.trim()
-        : "anonymous";
+    const userId = body?.userId || "anonymous";
 
     const contentType = normalizeContentType(contentTypeRaw);
-    if (!contentType) {
-      return NextResponse.json({ error: "Missing contentType" }, { status: 400 });
-    }
 
     const readingId = crypto.randomUUID();
 
@@ -164,65 +108,62 @@ export async function POST(req: NextRequest) {
     const promptsAbs = path.join(rootAbs, "prompts");
     const contentAbs = path.join(promptsAbs, "content");
 
-    const manifests = await findAllManifests(contentAbs);
+    const entries = await fs.readdir(contentAbs);
 
-    const match = manifests.find(
-      (m) => normalizeContentType(m.manifest.content_type) === contentType
-    );
+    let manifestDir: string | null = null;
 
-    if (!match) {
+    for (const dir of entries) {
+      const manifestPath = path.join(contentAbs, dir, "manifest.json");
+      try {
+        const raw = await fs.readFile(manifestPath, "utf8");
+        const parsed = JSON.parse(raw) as Manifest;
+
+        if (normalizeContentType(parsed.content_type) === contentType) {
+          manifestDir = path.join(contentAbs, dir);
+          break;
+        }
+      } catch {}
+    }
+
+    if (!manifestDir) {
       return NextResponse.json(
         { error: `Unknown contentType: ${contentType}` },
         { status: 400 }
       );
     }
 
-    const manifest = match.manifest;
+    const systemFiles = await fs.readdir(manifestDir);
 
-    const baseSystemDirsAbs = (manifest.base_system || []).map((rel) =>
-      path.join(promptsAbs, rel)
-    );
+    let systemText = "";
 
-    const baseSystemFilesAbsNested: string[] = [];
-    for (const dirAbs of baseSystemDirsAbs) {
-      const files = await listPromptFiles(dirAbs);
-      baseSystemFilesAbsNested.push(...files);
+    for (const file of systemFiles) {
+      if (file.endsWith(".txt") || file.endsWith(".md")) {
+        const txt = await fs.readFile(path.join(manifestDir, file), "utf8");
+        systemText += `\n\n${txt}`;
+      }
     }
 
-    const baseSystemFilesAbs = dedupByBasenameKeepFirst(baseSystemFilesAbsNested);
-
-    const itemDirAbs = match.dirAbs;
-    const itemFilesAbs = await listPromptFiles(itemDirAbs);
-
-    const systemParts: Array<{ title: string; text: string }> = [];
-
-    for (const f of baseSystemFilesAbs) {
-      systemParts.push({
-        title: path.relative(promptsAbs, f),
-        text: await readTextFile(f),
-      });
-    }
-
-    for (const f of itemFilesAbs) {
-      systemParts.push({
-        title: path.relative(promptsAbs, f),
-        text: await readTextFile(f),
-      });
-    }
-
-    const systemText = buildSystemBundle(systemParts);
-
-    const memory = new MemoryEngine(userId, { window_days: 30 });
+    const memory = new MemoryEngine(userId);
     await memory.load();
 
     const mechanisms = await pickMechanisms({ userId, count: 3 });
-    const occurrences = await pickOccurrences({ userId, count: 5, minLen: 6 });
+    const occurrences = await pickOccurrences({ userId, count: 5 });
 
     const lengthBlock = buildLengthBlock(contentType);
 
-    const userText =
-      `${lengthBlock}\n\n` +
-      `[USER:${userId}]\n${input}`;
+    const userText = `
+${lengthBlock}
+
+[MIA_MECHANISMS]
+${mechanisms.join("\n")}
+[/MIA_MECHANISMS]
+
+[MIA_OCCURRENCES]
+${occurrences.join("\n")}
+[/MIA_OCCURRENCES]
+
+${input}
+`;
 
     const content = await openaiChat(systemText, userText);
 
