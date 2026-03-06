@@ -1,80 +1,80 @@
 "use client";
 
 import { useState } from "react";
-import { callMiaApi } from "../../lib/miaApi";
-
-function formatText(text: string) {
-  if (!text) return [];
-
-  // Si ya trae párrafos, los respeta
-  if (text.includes("\n")) {
-    return text
-      .split(/\n+/)
-      .map((p) => p.trim())
-      .filter(Boolean);
-  }
-
-  // Si viene “chorizo”, lo corta por oraciones
-  return text
-    .split(/(?<=[.!?])\s+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-}
+import { callMiaApi } from "@/lib/miaApi";
 
 export default function MiradaAstralPage() {
-  const [input, setInput] = useState("");
-  const [result, setResult] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [reading, setReading] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleGenerate() {
-    setStatus("loading");
-    setResult("Generando...");
+    setLoading(true);
+    setError("");
+    setReading("");
 
     try {
       const response = await callMiaApi({
         contentType: "cuerpo_astral",
-        input: input,
+        input: "",
         locale: "es-AR",
       });
 
-      setResult(response.content || "(sin contenido)");
-      setStatus("done");
-    } catch (e: any) {
-      setResult("ERROR: " + (e?.message || "error desconocido"));
-      setStatus("error");
+      setReading(response.content || "");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Ocurrió un error al generar la lectura.";
+
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   }
 
-  const paragraphs = formatText(result);
-
   return (
-    <div style={{ padding: 40, maxWidth: 900 }}>
-      <h1>Mirada Astral</h1>
+    <main className="min-h-screen bg-black text-white px-6 py-10">
+      <div className="mx-auto w-full max-w-3xl">
+        <header className="mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Mirada Astral
+          </h1>
 
-      <textarea
-        placeholder="Escribí tu consulta..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        style={{ width: "100%", height: 120 }}
-      />
-
-      <br />
-      <br />
-
-      <button onClick={handleGenerate}>
-        {status === "loading" ? "Generando..." : "Generar"}
-      </button>
-
-      <br />
-      <br />
-
-      <div>
-        {paragraphs.map((p, i) => (
-          <p key={i} style={{ marginBottom: 16, lineHeight: 1.6 }}>
-            {p}
+          <p className="mt-3 text-sm text-white/70">
+            Tu lectura base: carta astral, horóscopo solar y horóscopo chino.
           </p>
-        ))}
+        </header>
+
+        <section className="space-y-4">
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={loading}
+            className="rounded-2xl bg-white px-5 py-3 text-sm font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Generando lectura..." : "Generar lectura base"}
+          </button>
+        </section>
+
+        {error ? (
+          <section className="mt-8 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+            <p className="text-sm text-red-200">{error}</p>
+          </section>
+        ) : null}
+
+        {reading ? (
+          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
+            <h2 className="mb-4 text-lg font-medium">
+              Tu lectura astral
+            </h2>
+
+            <div className="whitespace-pre-wrap text-[15px] leading-7 text-white/90">
+              {reading}
+            </div>
+          </section>
+        ) : null}
       </div>
-    </div>
+    </main>
   );
 }
