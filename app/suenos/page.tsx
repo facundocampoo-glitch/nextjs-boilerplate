@@ -1,8 +1,7 @@
-// app/suenos/page.tsx
 "use client";
 
 import { useState } from "react";
-import { generateMiaReading } from "@/lib/miaApi";
+import { callMiaApi } from "@/lib/miaApi";
 
 export default function SuenosPage() {
   const [input, setInput] = useState("");
@@ -24,7 +23,7 @@ export default function SuenosPage() {
     setReading("");
 
     try {
-      const response = await generateMiaReading({
+      const response = await callMiaApi({
         contentType: "cuerpo_onirico",
         input: trimmed,
         locale: "es-AR",
@@ -33,7 +32,9 @@ export default function SuenosPage() {
       setReading(response.content || "");
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Ocurrió un error al generar la lectura.";
+        err instanceof Error
+          ? err.message
+          : "Ocurrió un error al generar la lectura.";
 
       setError(message);
     } finally {
