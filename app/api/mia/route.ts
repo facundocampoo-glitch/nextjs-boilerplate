@@ -10,7 +10,6 @@ import { pickMechanisms } from "../../../mia-memory/mechanism-selector";
 type Manifest = {
   content_type: string;
   base_system: string[];
-  features?: Record<string, unknown>;
 };
 
 function normalizeContentType(ct: string): string {
@@ -31,7 +30,8 @@ function buildLengthBlock(contentType: string) {
 
   if (!range) {
     return `[MIA_LENGTH]
-Produce a full narrative reading. Avoid short answers.
+Produce a full narrative reading.
+Avoid short answers.
 [/MIA_LENGTH]`;
   }
 
@@ -42,9 +42,7 @@ Target length: ${range.min}–${range.max} characters.
 Do not summarize.
 Do not stop early.
 
-Expansion rule:
-Before closing the reading explore:
-
+Explore layers before closing:
 • situation
 • tension
 • hidden pattern
@@ -76,12 +74,15 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
       ],
       temperature: 0.9,
       top_p: 0.9,
+
+      // ESTO ESTABILIZA LAS RESPUESTAS LARGAS
+      max_tokens: 2000
     }),
   });
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(`OpenAI error: ${res.status} ${res.statusText} ${txt}`);
+    throw new Error(`OpenAI error: ${res.status} ${txt}`);
   }
 
   const data = await res.json();
@@ -108,11 +109,11 @@ export async function POST(req: NextRequest) {
     const promptsAbs = path.join(rootAbs, "prompts");
     const contentAbs = path.join(promptsAbs, "content");
 
-    const entries = await fs.readdir(contentAbs);
+    const dirs = await fs.readdir(contentAbs);
 
     let manifestDir: string | null = null;
 
-    for (const dir of entries) {
+    for (const dir of dirs) {
       const manifestPath = path.join(contentAbs, dir, "manifest.json");
       try {
         const raw = await fs.readFile(manifestPath, "utf8");
@@ -132,11 +133,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const systemFiles = await fs.readdir(manifestDir);
+    const files = await fs.readdir(manifestDir);
 
     let systemText = "";
 
-    for (const file of systemFiles) {
+    for (const file of files) {
       if (file.endsWith(".txt") || file.endsWith(".md")) {
         const txt = await fs.readFile(path.join(manifestDir, file), "utf8");
         systemText += `\n\n${txt}`;
