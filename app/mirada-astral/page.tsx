@@ -4,24 +4,31 @@ import { useState } from "react";
 import { callMiaApi } from "../../lib/miaApi";
 
 export default function MiradaAstralPage() {
-
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   async function handleGenerate() {
+    setStatus("loading");
+    setResult("Generando...");
 
-    const response = await callMiaApi({
-      contentType: "mirada_astral",
-      input: input,
-      locale: "es-AR"
-    });
+    try {
+      const response = await callMiaApi({
+        contentType: "cuerpo_astral",
+        input: input,
+        locale: "es-AR"
+      });
 
-    setResult(response.content);
+      setResult(response.content || "(sin contenido)");
+      setStatus("done");
+    } catch (e: any) {
+      setResult("ERROR: " + (e?.message || "error desconocido"));
+      setStatus("error");
+    }
   }
 
   return (
-    <div style={{ padding: 40 }}>
-
+    <div style={{ padding: 40, maxWidth: 900 }}>
       <h1>Mirada Astral</h1>
 
       <textarea
@@ -31,20 +38,17 @@ export default function MiradaAstralPage() {
         style={{ width: "100%", height: 120 }}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
       <button onClick={handleGenerate}>
-        Generar
+        {status === "loading" ? "Generando..." : "Generar"}
       </button>
 
-      <br />
-      <br />
+      <br /><br />
 
-      <div>
+      <div style={{ whiteSpace: "pre-wrap" }}>
         {result}
       </div>
-
     </div>
   );
 }
