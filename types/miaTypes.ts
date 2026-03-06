@@ -1,11 +1,10 @@
 export type MiaContentType =
-  | "mirada_astral"
-  | "horoscopo_solar_diario"
-  | "horoscopo_chino_diario"
-  | "tarot_semanal"
-  | "tarot_mensual_5mas5"
-  | "suenos"
-  | "psicomagia";
+  | "cuerpo_astral"
+  | "cuerpo_onirico"
+  | "cuerpo_psicomagico"
+  | "tarot_marselles"
+  | "horoscopo_diario"
+  | "horoscopo_semanal";
 
 export type MiaLocale =
   | "es-AR"
