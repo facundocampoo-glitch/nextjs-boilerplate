@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     }
 
     const root = process.cwd();
+
     const userDir = path.join(
       root,
       "mia-memory",
@@ -37,15 +38,17 @@ export async function GET(req: NextRequest) {
       sessions = [];
     }
 
-    const latest = sessions
-      .slice(-20)
-      .reverse();
+    const latest = sessions.slice(-10).reverse();
+
+    const latestSession = latest[0] || null;
 
     return NextResponse.json({
       userId,
       total: sessions.length,
       latest,
+      lastReading: latestSession,
     });
+
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message || "History error" },
