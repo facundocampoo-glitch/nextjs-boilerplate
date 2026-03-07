@@ -3,6 +3,33 @@
 import { useState } from "react";
 import { callMiaApi } from "@/lib/miaApi";
 
+function isLowQualityInput(value: string) {
+  const text = value.trim();
+  const normalized = text.toLowerCase();
+
+  if (text.length < 15) return true;
+
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length < 3) return true;
+
+  const uniqueWords = new Set(words);
+  if (uniqueWords.size <= 1) return true;
+
+  const junkPatterns = [
+    /^a+$/i,
+    /^j+a+$/i,
+    /^h+o+l+a+$/i,
+    /^t+e+s+t+$/i,
+    /^o+k+$/i,
+    /^asdf+$/i,
+    /^qwe+$/i,
+  ];
+
+  if (junkPatterns.some((pattern) => pattern.test(normalized))) return true;
+
+  return false;
+}
+
 export default function PsicomagiaPage() {
   const [input, setInput] = useState("");
   const [reading, setReading] = useState("");
@@ -16,8 +43,13 @@ export default function PsicomagiaPage() {
 
     if (!trimmed) {
       setError("¿Qué te gustaría fortalecer con un acto psicomágico?");
-      setReading("");
-      setAudioSrc("");
+      return;
+    }
+
+    if (isLowQualityInput(trimmed)) {
+      setError(
+        "Describe un poco más la situación que quieres transformar o fortalecer."
+      );
       return;
     }
 
@@ -37,37 +69,39 @@ export default function PsicomagiaPage() {
       const content = response.content || "";
       setReading(content);
 
-      if (content.trim()) {
-        setAudioLoading(true);
+      if (!content) return;
 
-        const ttsRes = await fetch("/api/generate-tts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            text: content,
-            locale: "es-AR",
-          }),
-        });
+      setAudioLoading(true);
 
-        const ttsData = await ttsRes.json();
+      const ttsRes = await fetch("/api/generate-tts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: content,
+          locale: "es-AR",
+        }),
+      });
 
-        if (!ttsRes.ok) {
-          throw new Error(ttsData?.error || "No se pudo generar el audio.");
-        }
+      const ttsData = await ttsRes.json();
 
-        if (!ttsData?.audioBase64) {
-          throw new Error("El audio no llegó correctamente.");
-        }
-
-        setAudioSrc(`data:audio/mpeg;base64,${ttsData.audioBase64}`);
+      if (!ttsRes.ok) {
+        setError(ttsData?.error || "Error generando audio");
+        return;
       }
+
+      if (!ttsData?.audioBase64) {
+        setError("El audio no llegó desde el servidor");
+        return;
+      }
+
+      setAudioSrc(`data:audio/mpeg;base64,${ttsData.audioBase64}`);
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
-          : "Ocurrió un error al generar la lectura.";
+          : "Error generando lectura.";
 
       setError(message);
     } finally {
@@ -83,64 +117,44 @@ export default function PsicomagiaPage() {
           <h1 className="text-3xl font-semibold tracking-tight">
             Psicomagia
           </h1>
-
-          <p className="mt-3 text-sm text-white/70">
-            Describe qué te gustaría transformar o fortalecer y MIA propondrá
-            un acto psicomágico.
-          </p>
         </header>
 
-        <section className="space-y-4">
-          <label htmlFor="tema" className="block text-sm text-white/80">
-            Tema o situación
-          </label>
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Quiero fortalecer mi autoestima..."
+          className="w-full min-h-[160px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+        />
 
-          <textarea
-            id="tema"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Quiero fortalecer mi autoestima..."
-            className="min-h-[160px] w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/35 outline-none transition focus:border-white/20 focus:bg-white/10"
-          />
+        <button
+          onClick={handleGenerate}
+          disabled={loading || audioLoading}
+          className="mt-4 rounded-2xl bg-white px-5 py-3 text-black"
+        >
+          {loading
+            ? "Generando acto..."
+            : audioLoading
+            ? "Generando audio..."
+            : "Generar acto"}
+        </button>
 
-          <button
-            type="button"
-            onClick={handleGenerate}
-            disabled={loading || audioLoading}
-            className="rounded-2xl bg-white px-5 py-3 text-sm font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading
-              ? "Generando acto..."
-              : audioLoading
-              ? "Generando audio..."
-              : "Generar acto"}
-          </button>
-        </section>
+        {error && (
+          <div className="mt-6 text-red-400">
+            {error}
+          </div>
+        )}
 
-        {error ? (
-          <section className="mt-8 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
-            <p className="text-sm text-red-200">{error}</p>
-          </section>
-        ) : null}
-
-        {audioSrc ? (
-          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-lg font-medium">Voz de MIA</h2>
+        {audioSrc && (
+          <div className="mt-8">
             <audio controls src={audioSrc} className="w-full" />
-          </section>
-        ) : null}
+          </div>
+        )}
 
-        {reading ? (
-          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-lg font-medium">
-              Acto psicomágico
-            </h2>
-
-            <div className="whitespace-pre-wrap text-[15px] leading-7 text-white/90">
-              {reading}
-            </div>
-          </section>
-        ) : null}
+        {reading && (
+          <div className="mt-8 whitespace-pre-wrap">
+            {reading}
+          </div>
+        )}
       </div>
     </main>
   );
