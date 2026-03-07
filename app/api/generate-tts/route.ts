@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { elevenTtsToBase64 } from "@/lib/tts/eleven";
+import { cleanTextForTts } from "@/lib/tts/clean-text";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
 
-    const text =
-      typeof body?.text === "string" ? body.text.trim() : "";
+    const rawText =
+      typeof body?.text === "string" ? body.text : "";
 
     const locale =
       typeof body?.locale === "string" ? body.locale : "es-AR";
 
-    if (!text) {
+    if (!rawText.trim()) {
       return NextResponse.json(
         { error: "Missing text" },
         { status: 400 }
@@ -26,6 +27,8 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    const text = cleanTextForTts(rawText);
 
     const result = await elevenTtsToBase64({
       text,
