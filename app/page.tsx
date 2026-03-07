@@ -12,18 +12,18 @@ type Session = {
 
 export default function HomePage() {
   const [history, setHistory] = useState<Session[]>([]);
-  const [userId, setUserId] = useState("");
+  const [lastReading, setLastReading] = useState<Session | null>(null);
 
   useEffect(() => {
-    const id = localStorage.getItem("mia_user_id") || "";
-    setUserId(id);
+    const userId = localStorage.getItem("mia_user_id");
 
-    if (!id) return;
+    if (!userId) return;
 
-    fetch(`/api/history?userId=${id}`)
+    fetch(`/api/history?userId=${userId}`)
       .then((r) => r.json())
       .then((data) => {
         if (data?.latest) setHistory(data.latest);
+        if (data?.lastReading) setLastReading(data.lastReading);
       })
       .catch(() => {});
   }, []);
@@ -43,7 +43,9 @@ export default function HomePage() {
         </header>
 
         <section className="mb-10">
-          <h2 className="mb-4 text-xl font-medium">Tu Mirada Astral</h2>
+          <h2 className="mb-4 text-xl font-medium">
+            Tu Mirada Astral
+          </h2>
 
           <Link
             href="/mirada-astral"
@@ -54,7 +56,9 @@ export default function HomePage() {
         </section>
 
         <section className="mb-10">
-          <h2 className="mb-4 text-xl font-medium">Explorar</h2>
+          <h2 className="mb-4 text-xl font-medium">
+            Explorar
+          </h2>
 
           <div className="grid gap-4 sm:grid-cols-3">
 
@@ -82,18 +86,36 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="mb-10">
+          <h2 className="mb-4 text-xl font-medium">
+            Última lectura
+          </h2>
+
+          {!lastReading && (
+            <div className="text-sm text-white/50">
+              Aún no hay lecturas registradas.
+            </div>
+          )}
+
+          {lastReading && (
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <div className="text-sm text-white/70 mb-2">
+                Tipo
+              </div>
+
+              <div className="text-lg font-medium">
+                {lastReading.content_type}
+              </div>
+            </div>
+          )}
+        </section>
+
         <section>
           <h2 className="mb-4 text-xl font-medium">
-            Últimas lecturas
+            Historial reciente
           </h2>
 
           <div className="space-y-3">
-
-            {history.length === 0 && (
-              <div className="text-white/50 text-sm">
-                Aún no hay lecturas registradas.
-              </div>
-            )}
 
             {history.map((s, i) => (
               <div
