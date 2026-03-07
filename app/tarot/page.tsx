@@ -3,6 +3,36 @@
 import { useState } from "react";
 import { callMiaApi } from "@/lib/miaApi";
 
+function isLowQualityTarotInput(value: string) {
+  const text = value.trim();
+  if (!text) return false;
+
+  const normalized = text.toLowerCase();
+
+  if (text.length < 8) return true;
+
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length < 2) return true;
+
+  const uniqueWords = new Set(words);
+  if (uniqueWords.size <= 1) return true;
+
+  const junkPatterns = [
+    /^a+$/i,
+    /^j+a+$/i,
+    /^h+o+l+a+$/i,
+    /^t+e+s+t+$/i,
+    /^o+k+$/i,
+    /^asdf+$/i,
+    /^qwe+$/i,
+    /^e+s+t+e+.*$/i,
+  ];
+
+  if (junkPatterns.some((pattern) => pattern.test(normalized))) return true;
+
+  return false;
+}
+
 export default function TarotPage() {
   const [input, setInput] = useState("");
   const [reading, setReading] = useState("");
@@ -13,6 +43,13 @@ export default function TarotPage() {
 
   async function handleGenerate() {
     const trimmed = input.trim();
+
+    if (isLowQualityTarotInput(trimmed)) {
+      setError("Si vas a escribir una pregunta o tema, cuéntamelo un poco mejor.");
+      setReading("");
+      setAudioSrc("");
+      return;
+    }
 
     setLoading(true);
     setAudioLoading(false);
