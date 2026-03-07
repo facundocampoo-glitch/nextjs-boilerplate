@@ -6,7 +6,9 @@ import { callMiaApi } from "@/lib/miaApi";
 export default function SuenosPage() {
   const [input, setInput] = useState("");
   const [reading, setReading] = useState("");
+  const [audioSrc, setAudioSrc] = useState("");
   const [loading, setLoading] = useState(false);
+  const [audioLoading, setAudioLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleGenerate() {
@@ -15,12 +17,15 @@ export default function SuenosPage() {
     if (!trimmed) {
       setError("Escribe tu sueño antes de generar la lectura.");
       setReading("");
+      setAudioSrc("");
       return;
     }
 
     setLoading(true);
+    setAudioLoading(false);
     setError("");
     setReading("");
+    setAudioSrc("");
 
     try {
       const response = await callMiaApi({
@@ -29,7 +34,35 @@ export default function SuenosPage() {
         locale: "es-AR",
       });
 
-      setReading(response.content || "");
+      const content = response.content || "";
+      setReading(content);
+
+      if (content.trim()) {
+        setAudioLoading(true);
+
+        const ttsRes = await fetch("/api/generate-tts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: content,
+            locale: "es-AR",
+          }),
+        });
+
+        const ttsData = await ttsRes.json();
+
+        if (!ttsRes.ok) {
+          throw new Error(ttsData?.error || "No se pudo generar el audio.");
+        }
+
+        if (!ttsData?.audioBase64) {
+          throw new Error("El audio no llegó correctamente.");
+        }
+
+        setAudioSrc(`data:audio/mpeg;base64,${ttsData.audioBase64}`);
+      }
     } catch (err) {
       const message =
         err instanceof Error
@@ -39,6 +72,7 @@ export default function SuenosPage() {
       setError(message);
     } finally {
       setLoading(false);
+      setAudioLoading(false);
     }
   }
 
@@ -68,16 +102,27 @@ export default function SuenosPage() {
           <button
             type="button"
             onClick={handleGenerate}
-            disabled={loading}
+            disabled={loading || audioLoading}
             className="rounded-2xl bg-white px-5 py-3 text-sm font-medium text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Generando..." : "Generar lectura"}
+            {loading
+              ? "Generando lectura..."
+              : audioLoading
+              ? "Generando audio..."
+              : "Generar lectura"}
           </button>
         </section>
 
         {error ? (
           <section className="mt-8 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
             <p className="text-sm text-red-200">{error}</p>
+          </section>
+        ) : null}
+
+        {audioSrc ? (
+          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
+            <h2 className="mb-4 text-lg font-medium">Voz de MIA</h2>
+            <audio controls src={audioSrc} className="w-full" />
           </section>
         ) : null}
 
