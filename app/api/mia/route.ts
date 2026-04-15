@@ -1,3 +1,6 @@
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -74,8 +77,6 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
       ],
       temperature: 0.9,
       top_p: 0.9,
-
-      // ESTO ESTABILIZA LAS RESPUESTAS LARGAS
       max_tokens: 2000
     }),
   });
