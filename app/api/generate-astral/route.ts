@@ -3,8 +3,8 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 
-const SUPABASE_URL = process.env.SUPABASE_URL!;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const SUPABASE_URL = process.env.mia_SUPABASE_URL || process.env.SUPABASE_URL!;
+const SUPABASE_KEY = process.env.mia_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const BOILERPLATE_URL = "https://nextjs-boilerplate-psi-orpin-34.vercel.app";
 
 async function supabaseInsert(table: string, data: Record<string, any>) {
