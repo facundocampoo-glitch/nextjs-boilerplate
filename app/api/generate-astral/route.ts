@@ -2,16 +2,23 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const SUPABASE_URL = process.env.SUPABASE_URL!;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const BOILERPLATE_URL = "https://nextjs-boilerplate-psi-orpin-34.vercel.app";
 
-const BOILERPLATE_URL = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "https://nextjs-boilerplate-psi-orpin-34.vercel.app";
+async function supabaseInsert(table: string, data: Record<string, any>) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Prefer": "return=minimal",
+    },
+    body: JSON.stringify(data),
+  });
+}
 
 function calcularSignoSolar(fecha: string): string {
   if (!fecha) return "desconocido";
@@ -59,7 +66,6 @@ Signo solar: ${signo}
 Animal chino: ${animalChino}
 `.trim();
 
-    // Generar texto
     const resMia = await fetch(`${BOILERPLATE_URL}/api/mia`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,7 +77,6 @@ Animal chino: ${animalChino}
     const contenido = dataMia?.content;
     if (!contenido) throw new Error("Sin contenido");
 
-    // Generar audio
     let audioBase64: string | null = null;
     try {
       const resTts = await fetch(`${BOILERPLATE_URL}/api/generate-tts`, {
@@ -85,8 +90,7 @@ Animal chino: ${animalChino}
       }
     } catch {}
 
-    // Guardar en Supabase
-    await supabase.from("lecturas").insert({
+    await supabaseInsert("lecturas", {
       user_id: userId,
       tipo: "mirada_astral",
       titulo: "Mirada Astral",
