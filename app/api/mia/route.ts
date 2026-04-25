@@ -15,6 +15,17 @@ type Manifest = {
   base_system: string[];
 };
 
+const LOCALE_TO_LANGUAGE: Record<string, string> = {
+  "es-AR": "Spanish (Argentine)",
+  "ru-RU": "Russian",
+  "en-US": "English (American)",
+  "it-IT": "Italian",
+  "pt-BR": "Portuguese (Brazilian)",
+  "pt-PT": "Portuguese (European)",
+  "de-DE": "German",
+  "fr-FR": "French",
+};
+
 function normalizeContentType(ct: string): string {
   return (ct || "").trim().toLowerCase().replace(/-/g, "_");
 }
@@ -46,11 +57,11 @@ Do not summarize.
 Do not stop early.
 
 Explore layers before closing:
-• situation
-• tension
-• hidden pattern
-• consequence
-• closing insight
+- situation
+- tension
+- hidden pattern
+- consequence
+- closing insight
 
 Stay inside the target range.
 
@@ -101,8 +112,10 @@ export async function POST(req: NextRequest) {
     const input = typeof body?.input === "string" ? body.input : "";
     const contentTypeRaw = typeof body?.contentType === "string" ? body.contentType : "";
     const userId = body?.userId || "anonymous";
+    const locale = typeof body?.locale === "string" ? body.locale : "es-AR";
 
     const contentType = normalizeContentType(contentTypeRaw);
+    const language = LOCALE_TO_LANGUAGE[locale] || "Spanish (Argentine)";
 
     const readingId = crypto.randomUUID();
 
@@ -144,6 +157,9 @@ export async function POST(req: NextRequest) {
         systemText += `\n\n${txt}`;
       }
     }
+
+    // Instrucción de idioma — siempre al final del system prompt
+    systemText += `\n\n[MIA_LANGUAGE]\nYou MUST write your entire response in ${language}. Do not use any other language. The user's interface is in ${language} and they expect the reading in ${language}.\n[/MIA_LANGUAGE]`;
 
     const memory = new MemoryEngine(userId);
     await memory.load();
