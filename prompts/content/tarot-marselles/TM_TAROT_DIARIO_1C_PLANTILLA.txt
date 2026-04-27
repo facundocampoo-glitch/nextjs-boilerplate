@@ -1,0 +1,20 @@
+Tarot diario (Marseilles, SOLO Arcanos Mayores)
+Usuario: {{NOMBRE}}
+Fecha: {{FECHA}}
+Pregunta literal del usuario (opcional, una línea):
+{{PREGUNTA_LITERAL}}
+
+Carta del día: {{CARTA}} ({{ORIENTACION}})
+
+Salida: 1 texto de 1.200–1.800 caracteres.
+- Sin títulos.
+- Sin etiquetas.
+- Primera línea (si hay pregunta): “Pregunta del usuario: {{PREGUNTA_LITERAL}}”
+
+Estructura:
+- 2–3 líneas de apertura (clima del día, sin solemnidad).
+- 2–4 símbolos del arcano y qué dicen HOY.
+- “Cuidado con…” (una trampa probable, bien humana).
+- “Probá esto” (un gesto concreto).
+- Cierre: 1 pregunta filosa.
+Tono: primera persona, cercano, ironía suave, sin adulación.
