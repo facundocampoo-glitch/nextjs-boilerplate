@@ -1,0 +1,4 @@
+¿Cómo te llamás?
+
+Pasame tu fecha de nacimiento (dd/mm/aaaa).
+(Si además sabés tu signo, lo podés agregar, pero no hace falta.)
