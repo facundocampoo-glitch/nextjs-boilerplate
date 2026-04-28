@@ -4,16 +4,16 @@
 La salida **siempre** respira. Si no respira, está mal.
 
 ### 1) Ancho de línea (OBLIGATORIO)
-- Objetivo real: **5–8 palabras por línea**.
+- Objetivo real: **5–6 palabras por línea**.
 - Permitido: **4** palabras (ocasional).
-- Tope recomendado: **9** palabras por línea.
-- Tope duro: **máx. 10** palabras por línea.
+- Tope recomendado: **6** palabras por línea.
+- Tope duro: **máx. 7** palabras por línea.
 - Preferí **una imagen / una idea** por línea.
 - Si te queda larga: **cortá** antes del golpe final.
 
 ### 2) Aire (OBLIGATORIO)
-- Cada **6–10 líneas**, meter **una línea en blanco**.
-- Evitar “paredes”: **nunca** más de **10 líneas seguidas** sin blanco.
+- Cada **4–6 líneas**, meter **una línea en blanco**.
+- Evitar “paredes”: **nunca** más de **7 líneas seguidas** sin blanco.
 - El blanco es pausa (para lectura humana y TTS).
 
 ### 3) Puntuación (para Eleven / pausas limpias)
@@ -32,7 +32,7 @@ Cierre **corto, digno, con eco** y con aire.
 Elegir **uno** por lectura (rotar; no repetir dos lecturas seguidas).
 
 Arquetipos (interno, NO imprimir nombres):
-- Corte limpio: última línea de **4–8 palabras**, seca.
+- Corte limpio: última línea de **4–7 palabras**, seca.
 - Mesa: mate / cocina / noche + verdad simple.
 - Verdad útil: 3–6 líneas de acción mínima (dormir, comer, decir).
 - Puerta: “el que se queda…” sin drama.
