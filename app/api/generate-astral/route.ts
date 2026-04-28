@@ -1,5 +1,5 @@
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -90,35 +90,33 @@ Animal chino: ${animalChino}
     const contenido = dataMia?.content;
     if (!contenido) throw new Error("Sin contenido");
 
-    // Paso 2: guardar texto en Supabase sin audio
+    // Paso 2: generar audio
+    let audioBase64: string | null = null;
+    try {
+      const resTts = await fetch(`${BOILERPLATE_URL}/api/generate-tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: contenido, contentType: "cuerpo_astral", locale: locale || "es-AR" }),
+      });
+      if (resTts.ok) {
+        const dataTts = await resTts.json();
+        audioBase64 = dataTts?.audioBase64 ?? dataTts?.audio_base64 ?? null;
+      }
+    } catch {}
+
+    // Paso 3: guardar texto + audio
     const insertRes = await supabaseInsert("lecturas", {
       user_id: userId,
       tipo: "mirada_astral",
       titulo: "Mirada Astral",
       preview: contenido.slice(0, 200),
       contenido_completo: contenido,
-      audio_base64: null,
+      audio_base64: audioBase64,
       voz_activada: false,
     });
 
     const insertData = await insertRes.json();
     const lecturaId = insertData?.[0]?.id;
-
-    // Paso 3: generar audio en background sin esperar
-    if (lecturaId) {
-      fetch(`${BOILERPLATE_URL}/api/generate-tts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: contenido, contentType: "cuerpo_astral", locale: locale || "es-AR" }),
-      }).then(async (resTts) => {
-        if (!resTts.ok) return;
-        const dataTts = await resTts.json();
-        const audioBase64 = dataTts?.audioBase64 ?? dataTts?.audio_base64 ?? null;
-        if (audioBase64) {
-          await supabasePatch("lecturas", lecturaId, { audio_base64: audioBase64 });
-        }
-      }).catch(() => {});
-    }
 
     return NextResponse.json({ ok: true, lecturaId });
 
