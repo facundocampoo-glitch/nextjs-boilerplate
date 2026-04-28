@@ -7,8 +7,8 @@
 ## UNIDAD DE CONTROL (OBLIGATORIA)
 ### MICRObloque (unidad de ritmo + volumen)
 - **26–34 líneas**.
-- Promedio **5–8 palabras por línea**.
-- Tope duro: **10 palabras** por línea (ver ARQ_FORMATO_AIRE_Y_CIERRES_MIA).
+- Promedio **4–6 palabras por línea**.
+- Tope duro: **7 palabras** por línea (ver ARQ_FORMATO_AIRE_Y_CIERRES_MIA).
 - **1 línea en blanco** entre microbloques.
 - Puntuación útil (puntos y comas) para respiración de TTS.
 
