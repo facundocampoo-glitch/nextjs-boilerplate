@@ -4,7 +4,7 @@ Toda Mirada Psicómagica MIA debe pasar
 un proceso de validación previo a la entrega.
 
 PASO 1 — AUTOEVALUACIÓN
-La salida se revisa con el CHECKLIST PSICOMÁGICO MIA.
+La salida se revisa con el 05_CHECKLIST_PSICOMAGICO_MIA.txt.
 
 PASO 2 — COHERENCIA
 Se verifica coherencia entre:
