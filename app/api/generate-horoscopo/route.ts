@@ -20,18 +20,6 @@ async function supabaseInsert(table: string, data: Record<string, any>) {
   });
 }
 
-async function supabasePatch(table: string, id: string, data: Record<string, any>) {
-  return fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-    },
-    body: JSON.stringify(data),
-  });
-}
-
 function calcularSignoSolar(fecha: string): string {
   if (!fecha) return "desconocido";
   const [, mes, dia] = fecha.split("-").map(Number);
@@ -75,7 +63,8 @@ async function generarYGuardar(
   const contenido = dataMia?.content;
   if (!contenido) throw new Error("Sin contenido");
 
-  const insertRes = await supabaseInsert("lecturas", {
+  // Solo texto — sin audio
+  await supabaseInsert("lecturas", {
     user_id: userId,
     tipo: tipoLectura,
     titulo,
@@ -84,26 +73,6 @@ async function generarYGuardar(
     audio_base64: null,
     voz_activada: false,
   });
-
-  const insertData = await insertRes.json();
-  const lecturaId = insertData?.[0]?.id;
-
-  if (lecturaId) {
-    fetch(`${BOILERPLATE_URL}/api/generate-tts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: contenido, contentType, locale }),
-    }).then(async (resTts) => {
-      if (!resTts.ok) return;
-      const dataTts = await resTts.json();
-      const audioBase64 = dataTts?.audioBase64 ?? dataTts?.audio_base64 ?? null;
-      if (audioBase64) {
-        await supabasePatch("lecturas", lecturaId, { audio_base64: audioBase64 });
-      }
-    }).catch(() => {});
-  }
-
-  return lecturaId;
 }
 
 export async function POST(req: NextRequest) {
@@ -131,7 +100,6 @@ Frecuencia: ${frecuencia}
     const inputSolar = `${inputBase}\nSigno solar: ${signo}`;
     const inputChino = `${inputBase}\nAnimal chino: ${animalChino}`;
 
-    // Generar solar y chino en paralelo
     await Promise.allSettled([
       generarYGuardar(userId, "horoscopo_diario", "horoscopo_solar_diario", "Horóscopo Solar Diario", inputSolar, locale || "es-AR"),
       generarYGuardar(userId, "horoscopo_diario", "horoscopo_chino_diario", "Horóscopo Chino Diario", inputChino, locale || "es-AR"),
