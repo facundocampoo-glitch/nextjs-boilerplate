@@ -1,0 +1,1056 @@
+BANCO_OCURRENCIAS_MIA_1000 — Banco de ocurrencias (v2)
+Fecha: 2026-01-25
+
+== Qué es ==
+Banco masivo de 'ocurrencias' (remates, preguntas-bisturí, microdramas y puentes) para que Mia suene
+viva, filosa y distinta, sin caer en frases hechas ni repetir fórmulas.
+
+== Reglas (anti-pose) ==
+- No explicar el chiste.
+- Nada de consignas/panfleto: escena humana, no editorial.
+- Máximo 1 ocurrencia cada 1–2 bloques (si saturás, pierde filo).
+- Anti-repetición: no repetir un mismo ID dentro de la lectura; y no repetirlo por ventana (30/90 días).
+- Si suena a frase de cartel, se corta.
+
+== Cómo usarlo (en cada lectura) ==
+1) Elegí 6–10 IDs (mezclá mínimo 3 categorías).
+2) Usalos como especias: aparecen, pegan, y se van.
+3) Compensá filo con una línea humana (sin mística, sin moraleja).
+
+== Categorías ==
+- A) Aperturas con golpe
+- B) Puentes y transiciones
+- C) Pregunta-acusación
+- D) Microdrama doméstico
+- E) Algoritmo y época
+- F) Vínculos
+- G) Trabajo y dinero
+- H) Cuerpo y energía
+- I) Tarot
+- J) Astral
+- K) Sueños
+- L) Psicomagia
+
+### A) Aperturas con golpe
+O-0001 — Hoy venís con cara de un sí honesto y cuerpo de un mail sin asunto. Se entiende.
+O-0002 — Hoy venís con cara de menos ruido y cuerpo de un 'lo vemos mañana'. Con amor.
+O-0003 — Tu problema no es sentir. Es editarte para que te quieran. Respirá.
+O-0004 — Hoy venís con cara de un vínculo que no drene y cuerpo de una ducha a medias. Respirá.
+O-0005 — Hoy venís con cara de una vida que alcance y cuerpo de un follow up. Respirá.
+O-0006 — Tu calma hoy tiene la estabilidad de la cama deshecha. Basta.
+O-0007 — Decime la verdad: ¿querés calma o querés tener razón? Con amor.
+O-0008 — Hoy venís con cara de una decisión y cuerpo de un follow up. Nos vimos.
+O-0009 — Hoy venís con cara de calma y cuerpo de un 'asap' sin apellido. Basta.
+O-0010 — Decime la verdad: ¿querés cerrar un ciclo o querés tener razón? Se entiende.
+O-0011 — Hoy venís con cara de menos ruido y cuerpo de la silla que cruje. No te mientas.
+O-0012 — Decime la verdad: ¿querés descanso o querés tener razón? Respirá.
+O-0013 — Hoy venís con cara de una vida que alcance y cuerpo de la luz de la cocina. Se entiende.
+O-0014 — Hoy venís con cara de cerrar un ciclo y cuerpo de el piso frío. Listo.
+O-0015 — Hoy venís con cara de menos ruido y cuerpo de un 'quick call'. Basta.
+O-0016 — Decime la verdad: ¿querés un límite sano o querés tener razón? Basta.
+O-0017 — Hoy venís con cara de orden y cuerpo de un feedback tibio. Ahí está.
+O-0018 — Tu calma hoy tiene la estabilidad de un ticket eterno. Se entiende.
+O-0019 — Tu calma hoy tiene la estabilidad de la radio de fondo. Fin.
+O-0020 — Decime la verdad: ¿querés un vínculo que no drene o querés tener razón? Basta.
+O-0021 — Te noto haciendo equilibrio con una sonrisa. Fin.
+O-0022 — Hoy venís con cara de más verdad y cuerpo de un jabón que se termina. No te mientas.
+O-0023 — Tu calma hoy tiene la estabilidad de un Trello. Nos vimos.
+O-0024 — Hoy venís con cara de más verdad y cuerpo de una reunión que pudo ser mensaje. Respirá.
+O-0025 — Hoy venís con cara de calma y cuerpo de el piso frío. No te mientas.
+O-0026 — Hoy venís con cara de claridad y cuerpo de un Trello. Basta.
+O-0027 — No es el destino. Es tu costumbre. Respirá.
+O-0028 — Hoy venís con cara de más verdad y cuerpo de una toalla húmeda. Con amor.
+O-0029 — Tu calma hoy tiene la estabilidad de un reporte semanal. Fin.
+O-0030 — Hoy venís con cara de un vínculo que no drene y cuerpo de un Zoom. Listo.
+O-0031 — Tu calma hoy tiene la estabilidad de un cajón que no cierra. Basta.
+O-0032 — Hoy venís con cara de una decisión y cuerpo de un login que caduca. Se entiende.
+O-0033 — Sos brillante… y te escondés como si eso fuera humildad. Fin.
+O-0034 — Tu calma hoy tiene la estabilidad de un tupper sin tapa. Con amor.
+O-0035 — Sos brillante… y te escondés como si eso fuera humildad. Ahí está.
+O-0036 — Decime la verdad: ¿querés calma o querés tener razón? No te mientas.
+O-0037 — Tu calma hoy tiene la estabilidad de un documento compartido. No te mientas.
+O-0038 — Hoy venís con cara de reciprocidad y cuerpo de un envío fallido. Basta.
+O-0039 — Tu problema no es sentir. Es editarte para que te quieran. Nos vimos.
+O-0040 — Hoy venís con cara de volver a vos y cuerpo de un 'quick call'. Fin.
+O-0041 — Sos brillante… y te escondés como si eso fuera humildad. Listo.
+O-0042 — Tu calma hoy tiene la estabilidad de un KPI inventado. Fin.
+O-0043 — Tu calma hoy tiene la estabilidad de un imán en la heladera. Respirá.
+O-0044 — Te noto haciendo equilibrio con una sonrisa. Nos vimos.
+O-0045 — Tu calma hoy tiene la estabilidad de un plato sin lavar. No te mientas.
+O-0046 — Tu calma hoy tiene la estabilidad de una tapa perdida. Ahí está.
+O-0047 — Decime la verdad: ¿querés claridad o querés tener razón? Basta.
+O-0048 — Tu problema no es sentir. Es editarte para que te quieran. Basta.
+O-0049 — Hoy venís con cara de un vínculo que no drene y cuerpo de un documento compartido. Respirá.
+O-0050 — Sos brillante… y te escondés como si eso fuera humildad. Con amor.
+O-0051 — Te noto haciendo equilibrio con una sonrisa. Con amor.
+O-0052 — Decime la verdad: ¿querés volver a vos o querés tener razón? Se entiende.
+O-0053 — Hoy venís con cara de reciprocidad y cuerpo de una notificación que vibra. Nos vimos.
+O-0054 — Hoy venís con cara de reciprocidad y cuerpo de un 'ping' a las 23:17. No te mientas.
+O-0055 — Hoy venís con cara de reciprocidad y cuerpo de un Excel con fórmulas rotas. No te mientas.
+O-0056 — Tu calma hoy tiene la estabilidad de una bolsa de compras. Basta.
+O-0057 — Hoy venís con cara de calma y cuerpo de un imán en la heladera. Nos vimos.
+O-0058 — Tu calma hoy tiene la estabilidad de un ticket eterno. Respirá.
+O-0059 — Tu calma hoy tiene la estabilidad de una pila de ropa. Fin.
+O-0060 — Sos brillante… y te escondés como si eso fuera humildad. No te mientas.
+O-0061 — No es el destino. Es tu costumbre. No te mientas.
+O-0062 — Tu calma hoy tiene la estabilidad de un KPI inventado. Se entiende.
+O-0063 — Decime la verdad: ¿querés un sí honesto o querés tener razón? Respirá.
+O-0064 — Tu calma hoy tiene la estabilidad de un mail sin asunto. Con amor.
+O-0065 — No es el destino. Es tu costumbre. Listo.
+O-0066 — No es el destino. Es tu costumbre. Con amor.
+O-0067 — Te noto haciendo equilibrio con una sonrisa. Ahí está.
+O-0068 — Tu calma hoy tiene la estabilidad de el mate lavado. Se entiende.
+O-0069 — Tu calma hoy tiene la estabilidad de la radio de fondo. No te mientas.
+O-0070 — Tu calma hoy tiene la estabilidad de un envío fallido. No te mientas.
+O-0071 — Tu calma hoy tiene la estabilidad de un drive lleno. Se entiende.
+O-0072 — Tu problema no es sentir. Es editarte para que te quieran. Se entiende.
+O-0073 — Decime la verdad: ¿querés un vínculo que no drene o querés tener razón? Con amor.
+O-0074 — Hoy venís con cara de claridad y cuerpo de el mantel manchado. Ahí está.
+O-0075 — Tu calma hoy tiene la estabilidad de un jabón que se termina. Fin.
+O-0076 — Te noto haciendo equilibrio con una sonrisa. Respirá.
+O-0077 — Tu calma hoy tiene la estabilidad de un reporte semanal. No te mientas.
+O-0078 — No es el destino. Es tu costumbre. Fin.
+O-0079 — Hoy venís con cara de menos ruido y cuerpo de un Asana. Fin.
+O-0080 — Tu problema no es sentir. Es editarte para que te quieran. Ahí está.
+O-0081 — Decime la verdad: ¿querés un vínculo que no drene o querés tener razón? Se entiende.
+O-0082 — Hoy venís con cara de un límite sano y cuerpo de un 'ping' a las 23:17. Respirá.
+O-0083 — Te noto haciendo equilibrio con una sonrisa. Listo.
+O-0084 — Hoy venís con cara de más verdad y cuerpo de el mantel manchado. Respirá.
+O-0085 — Hoy venís con cara de amor simple y cuerpo de un 'ping' a las 23:17. Respirá.
+O-0086 — Tu problema no es sentir. Es editarte para que te quieran. No te mientas.
+O-0087 — Tu calma hoy tiene la estabilidad de un vaso olvidado. Basta.
+O-0088 — Hoy venís con cara de calma y cuerpo de la olla que no tapa. Fin.
+O-0089 — Tu problema no es sentir. Es editarte para que te quieran. Con amor.
+O-0090 — Hoy venís con cara de más verdad y cuerpo de un documento compartido. Ahí está.
+O-0091 — Decime la verdad: ¿querés calma o querés tener razón? Fin.
+O-0092 — Hoy venís con cara de un vínculo que no drene y cuerpo de la cama deshecha. Con amor.
+O-0093 — Hoy venís con cara de un sí honesto y cuerpo de un 'quick call'. Se entiende.
+O-0094 — Te noto haciendo equilibrio con una sonrisa. Se entiende.
+O-0095 — Hoy venís con cara de orden y cuerpo de el mate lavado. No te mientas.
+O-0096 — Tu calma hoy tiene la estabilidad de la ventana empañada. Ahí está.
+O-0097 — Te noto haciendo equilibrio con una sonrisa. Basta.
+O-0098 — Tu calma hoy tiene la estabilidad de un 'quick call'. No te mientas.
+O-0099 — No es el destino. Es tu costumbre. Ahí está.
+O-0100 — Sos brillante… y te escondés como si eso fuera humildad. Nos vimos.
+O-0101 — Hoy venís con cara de un límite sano y cuerpo de un login que caduca. Respirá.
+O-0102 — Tu problema no es sentir. Es editarte para que te quieran. Fin.
+O-0103 — Hoy venís con cara de un sí honesto y cuerpo de un audio de 3 minutos. Fin.
+O-0104 — Tu calma hoy tiene la estabilidad de un mensaje 'URGENTE'. Se entiende.
+O-0105 — Hoy venís con cara de amor simple y cuerpo de un 'te paso el link'. Basta.
+O-0106 — Decime la verdad: ¿querés amor simple o querés tener razón? Basta.
+O-0107 — Hoy venís con cara de una decisión y cuerpo de un jabón que se termina. Fin.
+O-0108 — Tu calma hoy tiene la estabilidad de un Trello. Respirá.
+O-0109 — Sos brillante… y te escondés como si eso fuera humildad. Respirá.
+O-0110 — No es el destino. Es tu costumbre. Se entiende.
+O-0111 — Tu calma hoy tiene la estabilidad de un recordatorio que ignorás. Fin.
+O-0112 — Decime la verdad: ¿querés orden o querés tener razón? Se entiende.
+O-0113 — Sos brillante… y te escondés como si eso fuera humildad. Basta.
+O-0114 — Decime la verdad: ¿querés reciprocidad o querés tener razón? Basta.
+O-0115 — Decime la verdad: ¿querés volver a vos o querés tener razón? Respirá.
+O-0116 — No es el destino. Es tu costumbre. Basta.
+O-0117 — Te noto haciendo equilibrio con una sonrisa. No te mientas.
+O-0118 — Decime la verdad: ¿querés dejar de sobrepensar o querés tener razón? Fin.
+O-0119 — Tu calma hoy tiene la estabilidad de un captcha humillante. Respirá.
+O-0120 — Tu calma hoy tiene la estabilidad de un recordatorio que ignorás. Listo.
+O-0121 — Decime la verdad: ¿querés claridad o querés tener razón? Con amor.
+O-0122 — Decime la verdad: ¿querés menos ruido o querés tener razón? Se entiende.
+O-0123 — Sos brillante… y te escondés como si eso fuera humildad. Se entiende.
+O-0124 — Tu calma hoy tiene la estabilidad de un pan duro. Fin.
+O-0125 — Tu calma hoy tiene la estabilidad de la olla que no tapa. Se entiende.
+O-0126 — Tu calma hoy tiene la estabilidad de la silla que cruje. Con amor.
+O-0127 — Hoy venís con cara de claridad y cuerpo de un login que caduca. Listo.
+O-0128 — Tu calma hoy tiene la estabilidad de un 'asap' sin apellido. Ahí está.
+O-0129 — Tu calma hoy tiene la estabilidad de un reloj que atrasa. Nos vimos.
+O-0130 — Hoy venís con cara de orden y cuerpo de un 'lo vemos mañana'. Nos vimos.
+O-0131 — Decime la verdad: ¿querés menos ruido o querés tener razón? Con amor.
+O-0132 — Tu problema no es sentir. Es editarte para que te quieran. Listo.
+O-0133 — Tu calma hoy tiene la estabilidad de el mate lavado. Fin.
+O-0134 — Decime la verdad: ¿querés un vínculo que no drene o querés tener razón? Listo.
+O-0135 — Hoy venís con cara de un sí honesto y cuerpo de un reloj que atrasa. Con amor.
+O-0136 — Tu calma hoy tiene la estabilidad de un reporte semanal. Ahí está.
+O-0137 — Hoy venís con cara de orden y cuerpo de un pan duro. Respirá.
+O-0138 — Decime la verdad: ¿querés más verdad o querés tener razón? Respirá.
+O-0139 — Decime la verdad: ¿querés orden o querés tener razón? Respirá.
+O-0140 — Decime la verdad: ¿querés una vida que alcance o querés tener razón? Basta.
+
+### B) Puentes y transiciones
+O-0141 — No hace falta entender todo: alcanza con dejar de hacer la cama deshecha. Se entiende.
+O-0142 — Anotá esto: cuando decís 'cuando baje la ansiedad', tu cuerpo escucha 'nunca'. No te mientas.
+O-0143 — Te estás cuidando… pero con el método equivocado. Con amor.
+O-0144 — Vos decís 'no pasa nada'. Y aparece un audio de 3 minutos. Con amor.
+O-0145 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Ahí está.
+O-0146 — Una parte tuya quiere una decisión. La otra abre X. Fin.
+O-0147 — Una parte tuya quiere claridad. La otra abre Instagram. Ahí está.
+O-0148 — No hace falta entender todo: alcanza con dejar de hacer un follow up. Basta.
+O-0149 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Listo.
+O-0150 — Vos decís 'no pasa nada'. Y aparece un 'te paso el link'. Basta.
+O-0151 — No hace falta entender todo: alcanza con dejar de hacer la silla que cruje. Con amor.
+O-0152 — Vos decís 'no pasa nada'. Y aparece un 'ping' a las 23:17. No te mientas.
+O-0153 — Anotá esto: cuando decís 'cuando me ordene', tu cuerpo escucha 'nunca'. Respirá.
+O-0154 — No hace falta entender todo: alcanza con dejar de hacer una reunión que pudo ser mensaje. Basta.
+O-0155 — Te estás cuidando… pero con el método equivocado. No te mientas.
+O-0156 — Vos decís 'no pasa nada'. Y aparece una planta que sobrevive. Se entiende.
+O-0157 — Vos decís 'no pasa nada'. Y aparece un captcha humillante. Nos vimos.
+O-0158 — No hace falta entender todo: alcanza con dejar de hacer un Zoom. Se entiende.
+O-0159 — Te estás cuidando… pero con el método equivocado. Respirá.
+O-0160 — Anotá esto: cuando decís 'cuando el mundo colabore', tu cuerpo escucha 'nunca'. Se entiende.
+O-0161 — Una parte tuya quiere más verdad. La otra abre Google Calendar. Fin.
+O-0162 — Anotá esto: cuando decís 'cuando se alineen las cosas', tu cuerpo escucha 'nunca'. Nos vimos.
+O-0163 — No hace falta entender todo: alcanza con dejar de hacer una ducha a medias. Respirá.
+O-0164 — Una parte tuya quiere amor simple. La otra abre LinkedIn. Respirá.
+O-0165 — Vos decís 'no pasa nada'. Y aparece la cama deshecha. Con amor.
+O-0166 — No hace falta entender todo: alcanza con dejar de hacer un audio de 3 minutos. Fin.
+O-0167 — Vos decís 'no pasa nada'. Y aparece un 'lo vemos mañana'. Fin.
+O-0168 — Una parte tuya quiere orden. La otra abre X. No te mientas.
+O-0169 — Vos decís 'no pasa nada'. Y aparece un drive lleno. Basta.
+O-0170 — Una parte tuya quiere menos ruido. La otra abre ChatGPT. Basta.
+O-0171 — Anotá esto: cuando decís 'cuando no me dé vergüenza', tu cuerpo escucha 'nunca'. Se entiende.
+O-0172 — No hace falta entender todo: alcanza con dejar de hacer un 'te paso el link'. Con amor.
+O-0173 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Nos vimos.
+O-0174 — Hagamos simple: orden no se negocia con un jabón que se termina. Se entiende.
+O-0175 — Vos decís 'no pasa nada'. Y aparece un feedback tibio. No te mientas.
+O-0176 — Una parte tuya quiere más verdad. La otra abre WhatsApp. Fin.
+O-0177 — No hace falta entender todo: alcanza con dejar de hacer un feedback tibio. Se entiende.
+O-0178 — Hagamos simple: orden no se negocia con una notificación que vibra. Se entiende.
+O-0179 — Te estás cuidando… pero con el método equivocado. Ahí está.
+O-0180 — Una parte tuya quiere menos ruido. La otra abre Spotify. Se entiende.
+O-0181 — No hace falta entender todo: alcanza con dejar de hacer un mail sin asunto. No te mientas.
+O-0182 — Anotá esto: cuando decís 'cuando tenga un rato', tu cuerpo escucha 'nunca'. Nos vimos.
+O-0183 — Hagamos simple: claridad no se negocia con un documento compartido. Se entiende.
+O-0184 — No hace falta entender todo: alcanza con dejar de hacer un tupper sin tapa. Respirá.
+O-0185 — Vos decís 'no pasa nada'. Y aparece una tapa perdida. Nos vimos.
+O-0186 — No hace falta entender todo: alcanza con dejar de hacer un feedback tibio. Basta.
+O-0187 — Hagamos simple: una vida que alcance no se negocia con una pila de ropa. No te mientas.
+O-0188 — Hagamos simple: dejar de sobrepensar no se negocia con un captcha humillante. Se entiende.
+O-0189 — Una parte tuya quiere soltar control. La otra abre Spotify. Con amor.
+O-0190 — Una parte tuya quiere cerrar un ciclo. La otra abre YouTube. Nos vimos.
+O-0191 — Anotá esto: cuando decís 'cuando tenga un rato', tu cuerpo escucha 'nunca'. No te mientas.
+O-0192 — Hagamos simple: un sí honesto no se negocia con un recordatorio que ignorás. Basta.
+O-0193 — Hagamos simple: una decisión no se negocia con un reloj que atrasa. Con amor.
+O-0194 — Anotá esto: cuando decís 'cuando me sienta listo/a', tu cuerpo escucha 'nunca'. No te mientas.
+O-0195 — Una parte tuya quiere soltar control. La otra abre Google Calendar. Se entiende.
+O-0196 — Vos decís 'no pasa nada'. Y aparece un captcha humillante. Respirá.
+O-0197 — Vos decís 'no pasa nada'. Y aparece un mail sin asunto. Respirá.
+O-0198 — Una parte tuya quiere un sí honesto. La otra abre LinkedIn. Respirá.
+O-0199 — Hagamos simple: un vínculo que no drene no se negocia con un tupper sin tapa. Listo.
+O-0200 — Anotá esto: cuando decís 'cuando pase el lunes', tu cuerpo escucha 'nunca'. Fin.
+O-0201 — No hace falta entender todo: alcanza con dejar de hacer una toalla húmeda. Ahí está.
+O-0202 — Te estás cuidando… pero con el método equivocado. Nos vimos.
+O-0203 — Anotá esto: cuando decís 'cuando me sienta listo/a', tu cuerpo escucha 'nunca'. Se entiende.
+O-0204 — Una parte tuya quiere orden. La otra abre YouTube. Listo.
+O-0205 — Vos decís 'no pasa nada'. Y aparece un Excel con fórmulas rotas. Listo.
+O-0206 — Vos decís 'no pasa nada'. Y aparece un envío fallido. Con amor.
+O-0207 — Anotá esto: cuando decís 'cuando me sienta listo/a', tu cuerpo escucha 'nunca'. Ahí está.
+O-0208 — No hace falta entender todo: alcanza con dejar de hacer un drive lleno. Ahí está.
+O-0209 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Basta.
+O-0210 — Una parte tuya quiere un sí honesto. La otra abre ChatGPT. Respirá.
+O-0211 — Una parte tuya quiere una vida que alcance. La otra abre Google Calendar. Fin.
+O-0212 — Una parte tuya quiere claridad. La otra abre Instagram. Listo.
+O-0213 — Anotá esto: cuando decís 'cuando no me dé vergüenza', tu cuerpo escucha 'nunca'. No te mientas.
+O-0214 — Una parte tuya quiere amor simple. La otra abre Instagram. Fin.
+O-0215 — Anotá esto: cuando decís 'cuando no me dé vergüenza', tu cuerpo escucha 'nunca'. Nos vimos.
+O-0216 — Vos decís 'no pasa nada'. Y aparece un plato sin lavar. Basta.
+O-0217 — Hagamos simple: calma no se negocia con un mensaje 'URGENTE'. Fin.
+O-0218 — No hace falta entender todo: alcanza con dejar de hacer una planta que sobrevive. Fin.
+O-0219 — Te estás cuidando… pero con el método equivocado. Listo.
+O-0220 — Hagamos simple: menos ruido no se negocia con un tupper sin tapa. No te mientas.
+O-0221 — Anotá esto: cuando decís 'cuando me ordene', tu cuerpo escucha 'nunca'. Nos vimos.
+O-0222 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Fin.
+O-0223 — Una parte tuya quiere reciprocidad. La otra abre Spotify. Se entiende.
+O-0224 — Hagamos simple: un límite sano no se negocia con un calendario lleno. Se entiende.
+O-0225 — No hace falta entender todo: alcanza con dejar de hacer una ducha a medias. Con amor.
+O-0226 — Anotá esto: cuando decís 'cuando baje la ansiedad', tu cuerpo escucha 'nunca'. Con amor.
+O-0227 — No hace falta entender todo: alcanza con dejar de hacer una bolsa de compras. Fin.
+O-0228 — Vos decís 'no pasa nada'. Y aparece un follow up. No te mientas.
+O-0229 — Anotá esto: cuando decís 'cuando no me dé vergüenza', tu cuerpo escucha 'nunca'. Ahí está.
+O-0230 — Anotá esto: cuando decís 'cuando deje de pensar tanto', tu cuerpo escucha 'nunca'. Fin.
+O-0231 — Una parte tuya quiere dejar de sobrepensar. La otra abre YouTube. Respirá.
+O-0232 — Te estás cuidando… pero con el método equivocado. Fin.
+O-0233 — Vos decís 'no pasa nada'. Y aparece un calendario lleno. No te mientas.
+O-0234 — Anotá esto: cuando decís 'cuando me ordene', tu cuerpo escucha 'nunca'. Se entiende.
+O-0235 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. No te mientas.
+O-0236 — No hace falta entender todo: alcanza con dejar de hacer un documento compartido. Con amor.
+O-0237 — Una parte tuya quiere calma. La otra abre YouTube. Ahí está.
+O-0238 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Se entiende.
+O-0239 — Te estás cuidando… pero con el método equivocado. Se entiende.
+O-0240 — Vos decís 'no pasa nada'. Y aparece un deadline. Listo.
+O-0241 — Una parte tuya quiere una decisión. La otra abre TikTok. Ahí está.
+O-0242 — Una parte tuya quiere calma. La otra abre Google Calendar. Listo.
+O-0243 — Anotá esto: cuando decís 'cuando pase el lunes', tu cuerpo escucha 'nunca'. Listo.
+O-0244 — Hagamos simple: un vínculo que no drene no se negocia con un mensaje 'URGENTE'. Nos vimos.
+O-0245 — Anotá esto: cuando decís 'cuando baje la ansiedad', tu cuerpo escucha 'nunca'. Listo.
+O-0246 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Respirá.
+O-0247 — Anotá esto: cuando decís 'cuando tenga un rato', tu cuerpo escucha 'nunca'. Ahí está.
+O-0248 — Anotá esto: cuando decís 'cuando tenga un rato', tu cuerpo escucha 'nunca'. Con amor.
+O-0249 — Una parte tuya quiere cerrar un ciclo. La otra abre X. Respirá.
+O-0250 — Te estás cuidando… pero con el método equivocado. Basta.
+O-0251 — Anotá esto: cuando decís 'cuando tenga energía de sobra', tu cuerpo escucha 'nunca'. Fin.
+O-0252 — Vos decís 'no pasa nada'. Y aparece un mail sin asunto. Nos vimos.
+O-0253 — Una parte tuya quiere una decisión. La otra abre ChatGPT. Ahí está.
+O-0254 — No hace falta entender todo: alcanza con dejar de hacer un imán en la heladera. Se entiende.
+O-0255 — Una parte tuya quiere soltar control. La otra abre X. Ahí está.
+O-0256 — Hagamos simple: claridad no se negocia con una bolsa de compras. Nos vimos.
+O-0257 — Vamos por lo mínimo: agua, comida, dormir. Sí, así de poco sexy. Con amor.
+O-0258 — Hagamos simple: descanso no se negocia con un cajón que no cierra. Con amor.
+O-0259 — Anotá esto: cuando decís 'cuando me ordene', tu cuerpo escucha 'nunca'. No te mientas.
+O-0260 — No hace falta entender todo: alcanza con dejar de hacer la silla que cruje. Listo.
+O-0261 — Una parte tuya quiere un vínculo que no drene. La otra abre ChatGPT. Con amor.
+O-0262 — Vos decís 'no pasa nada'. Y aparece un imán en la heladera. Fin.
+O-0263 — Una parte tuya quiere una vida que alcance. La otra abre ChatGPT. Ahí está.
+O-0264 — Vos decís 'no pasa nada'. Y aparece un Trello. Se entiende.
+O-0265 — Hagamos simple: una vida que alcance no se negocia con un plato sin lavar. Con amor.
+O-0266 — Anotá esto: cuando decís 'cuando tenga energía de sobra', tu cuerpo escucha 'nunca'. Listo.
+O-0267 — Hagamos simple: un límite sano no se negocia con un tupper sin tapa. Fin.
+O-0268 — Una parte tuya quiere claridad. La otra abre Instagram. Fin.
+O-0269 — Anotá esto: cuando decís 'cuando tenga un rato', tu cuerpo escucha 'nunca'. Listo.
+O-0270 — Hagamos simple: un límite sano no se negocia con una tapa perdida. Nos vimos.
+O-0271 — Hagamos simple: una vida que alcance no se negocia con un calendario lleno. Se entiende.
+O-0272 — Una parte tuya quiere un límite sano. La otra abre LinkedIn. Respirá.
+O-0273 — Vos decís 'no pasa nada'. Y aparece un 'ping' a las 23:17. Se entiende.
+O-0274 — No hace falta entender todo: alcanza con dejar de hacer un feedback tibio. Respirá.
+O-0275 — No hace falta entender todo: alcanza con dejar de hacer un audio de 3 minutos. Respirá.
+O-0276 — Vos decís 'no pasa nada'. Y aparece un Zoom. Con amor.
+O-0277 — Anotá esto: cuando decís 'cuando baje la ansiedad', tu cuerpo escucha 'nunca'. Nos vimos.
+O-0278 — Vos decís 'no pasa nada'. Y aparece la ventana empañada. Fin.
+O-0279 — No hace falta entender todo: alcanza con dejar de hacer un 'asap' sin apellido. Con amor.
+O-0280 — Una parte tuya quiere dejar de sobrepensar. La otra abre X. Nos vimos.
+O-0281 — Anotá esto: cuando decís 'cuando tenga energía de sobra', tu cuerpo escucha 'nunca'. No te mientas.
+O-0282 — Una parte tuya quiere reciprocidad. La otra abre Instagram. No te mientas.
+O-0283 — Vos decís 'no pasa nada'. Y aparece un mail sin asunto. No te mientas.
+O-0284 — Hagamos simple: volver a vos no se negocia con la silla que cruje. Listo.
+
+### C) Pregunta-acusación
+O-0285 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Se entiende.
+O-0286 — ¿Te das cuenta que pedís paz como si fuera un premio? Respirá.
+O-0287 — ¿Y si el problema no es la silla que cruje, sino que no descansás nunca? Se entiende.
+O-0288 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Fin.
+O-0289 — ¿Y si el problema no es un audio de 3 minutos, sino que no descansás nunca? No te mientas.
+O-0290 — ¿Y si el problema no es la ventana empañada, sino que no descansás nunca? Respirá.
+O-0291 — ¿No será que estás cansado/a y lo estás decorando con teoría? No te mientas.
+O-0292 — ¿Y si el problema no es un mail sin asunto, sino que no descansás nunca? No te mientas.
+O-0293 — ¿Y si el problema no es un mail sin asunto, sino que no descansás nunca? Fin.
+O-0294 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Fin.
+O-0295 — ¿No será que estás cansado/a y lo estás decorando con teoría? Se entiende.
+O-0296 — ¿Esto que te pasa te hace bien… o te hace conocido? Basta.
+O-0297 — ¿Esto que te pasa te hace bien… o te hace conocido? Con amor.
+O-0298 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? No te mientas.
+O-0299 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Ahí está.
+O-0300 — ¿No será que estás cansado/a y lo estás decorando con teoría? Basta.
+O-0301 — ¿Esto que te pasa te hace bien… o te hace conocido? No te mientas.
+O-0302 — ¿Y si el problema no es un Excel con fórmulas rotas, sino que no descansás nunca? Con amor.
+O-0303 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Nos vimos.
+O-0304 — ¿Te das cuenta que pedís paz como si fuera un premio? No te mientas.
+O-0305 — ¿Y si el problema no es un 'te paso el link', sino que no descansás nunca? Con amor.
+O-0306 — ¿Y si el problema no es un captcha humillante, sino que no descansás nunca? Listo.
+O-0307 — ¿No será que estás cansado/a y lo estás decorando con teoría? Respirá.
+O-0308 — ¿No será que estás cansado/a y lo estás decorando con teoría? Listo.
+O-0309 — ¿Y si el problema no es un imán en la heladera, sino que no descansás nunca? Fin.
+O-0310 — ¿Esto que te pasa te hace bien… o te hace conocido? Nos vimos.
+O-0311 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Basta.
+O-0312 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Se entiende.
+O-0313 — ¿Y si el problema no es un deadline, sino que no descansás nunca? Fin.
+O-0314 — ¿Vos querés amor… o querés alivio rápido? Respirá.
+O-0315 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Con amor.
+O-0316 — ¿Y si el problema no es un reloj que atrasa, sino que no descansás nunca? Fin.
+O-0317 — ¿Y si el problema no es la radio de fondo, sino que no descansás nunca? Se entiende.
+O-0318 — ¿Esto que te pasa te hace bien… o te hace conocido? Respirá.
+O-0319 — ¿Esto que te pasa te hace bien… o te hace conocido? Se entiende.
+O-0320 — ¿Y si el problema no es la luz de la cocina, sino que no descansás nunca? Fin.
+O-0321 — ¿Te das cuenta que pedís paz como si fuera un premio? Ahí está.
+O-0322 — ¿Y si el problema no es un cajón que no cierra, sino que no descansás nunca? Con amor.
+O-0323 — ¿Vos querés amor… o querés alivio rápido? Con amor.
+O-0324 — ¿Por qué te hablás como enemiga/o y después pedís ternura? Respirá.
+O-0325 — ¿Te das cuenta que pedís paz como si fuera un premio? Con amor.
+O-0326 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Basta.
+O-0327 — ¿Esto que te pasa te hace bien… o te hace conocido? Ahí está.
+O-0328 — ¿No será que estás cansado/a y lo estás decorando con teoría? Nos vimos.
+O-0329 — ¿Vos querés amor… o querés alivio rápido? Se entiende.
+O-0330 — ¿Y si el problema no es una planta que sobrevive, sino que no descansás nunca? Listo.
+O-0331 — ¿Y si el problema no es un hilo de Slack, sino que no descansás nunca? Con amor.
+O-0332 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Nos vimos.
+O-0333 — ¿Y si el problema no es un Trello, sino que no descansás nunca? Ahí está.
+O-0334 — ¿Esto que te pasa te hace bien… o te hace conocido? Listo.
+O-0335 — ¿Te das cuenta que pedís paz como si fuera un premio? Nos vimos.
+O-0336 — ¿Vos querés amor… o querés alivio rápido? Nos vimos.
+O-0337 — ¿Te das cuenta que pedís paz como si fuera un premio? Basta.
+O-0338 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Listo.
+O-0339 — ¿Vos querés amor… o querés alivio rápido? Fin.
+O-0340 — ¿Y si el problema no es el piso frío, sino que no descansás nunca? Fin.
+O-0341 — ¿Y si el problema no es una bolsa de compras, sino que no descansás nunca? Basta.
+O-0342 — ¿Vos querés amor… o querés alivio rápido? Basta.
+O-0343 — ¿Y si el problema no es una ducha a medias, sino que no descansás nunca? Nos vimos.
+O-0344 — ¿No será que estás cansado/a y lo estás decorando con teoría? Con amor.
+O-0345 — ¿Te das cuenta que pedís paz como si fuera un premio? Se entiende.
+O-0346 — ¿Y si el problema no es un jabón que se termina, sino que no descansás nunca? Listo.
+O-0347 — ¿No será que estás cansado/a y lo estás decorando con teoría? Ahí está.
+O-0348 — ¿Y si el problema no es un mensaje 'URGENTE', sino que no descansás nunca? Se entiende.
+O-0349 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Ahí está.
+O-0350 — ¿Vos querés amor… o querés alivio rápido? No te mientas.
+O-0351 — ¿Y si el problema no es un Asana, sino que no descansás nunca? Ahí está.
+O-0352 — ¿Esto que te pasa te hace bien… o te hace conocido? Fin.
+O-0353 — ¿Vos querés amor… o querés alivio rápido? Ahí está.
+O-0354 — ¿Vos querés amor… o querés alivio rápido? Listo.
+O-0355 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Respirá.
+O-0356 — ¿No será que estás cansado/a y lo estás decorando con teoría? Fin.
+O-0357 — ¿Te das cuenta que pedís paz como si fuera un premio? Listo.
+O-0358 — ¿Cuántas veces te traicionás por día y lo llamás 'ser buena persona'? Con amor.
+O-0359 — ¿Te das cuenta que pedís paz como si fuera un premio? Fin.
+O-0360 — ¿Y si el problema no es un hilo de Slack, sino que no descansás nunca? No te mientas.
+O-0361 — ¿Por qué te hablás como enemiga/o y después pedís ternura? No te mientas.
+O-0362 — ¿Y si el problema no es un Asana, sino que no descansás nunca? Respirá.
+O-0363 — ¿Y si el problema no es un deadline, sino que no descansás nunca? Basta.
+O-0364 — ¿Y si el problema no es un Zoom, sino que no descansás nunca? No te mientas.
+
+### D) Microdrama doméstico
+O-0365 — Hay una pila de cosas (y de pensamientos) que no estás guardando: la radio de fondo. Listo.
+O-0366 — Tu casa no te juzga. Vos sí. Y se siente. Fin.
+O-0367 — Tu casa no te juzga. Vos sí. Y se siente. No te mientas.
+O-0368 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un KPI inventado. Con amor.
+O-0369 — Querías dejar de sobrepensar. Te encontraste con una planta que sobrevive. Pequeña epopeya. Con amor.
+O-0370 — Querías un sí honesto. Te encontraste con un Trello. Pequeña epopeya. Con amor.
+O-0371 — Querías un sí honesto. Te encontraste con un reporte semanal. Pequeña epopeya. No te mientas.
+O-0372 — Querías orden. Te encontraste con una reunión que pudo ser mensaje. Pequeña epopeya. Respirá.
+O-0373 — El una planta que sobrevive no es el fin del mundo. Tu autoexigencia sí. No te mientas.
+O-0374 — El un mensaje 'URGENTE' te dice 'bajá un cambio' y vos respondés con velocidad. Basta.
+O-0375 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un pan duro. Nos vimos.
+O-0376 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un 'asap' sin apellido. Respirá.
+O-0377 — El una reunión que pudo ser mensaje te dice 'bajá un cambio' y vos respondés con velocidad. Fin.
+O-0378 — El la luz de la cocina te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0379 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un envío fallido. Ahí está.
+O-0380 — Querías un vínculo que no drene. Te encontraste con una ducha a medias. Pequeña epopeya. No te mientas.
+O-0381 — El un follow up no es el fin del mundo. Tu autoexigencia sí. Listo.
+O-0382 — El un reporte semanal no es el fin del mundo. Tu autoexigencia sí. Fin.
+O-0383 — Tu ritual nocturno: apagar luces, mirar techo, abrir ChatGPT. Ahí está.
+O-0384 — Querías un sí honesto. Te encontraste con un mensaje 'URGENTE'. Pequeña epopeya. Ahí está.
+O-0385 — El un Trello no es el fin del mundo. Tu autoexigencia sí. Ahí está.
+O-0386 — Tu ritual nocturno: apagar luces, mirar techo, abrir TikTok. Fin.
+O-0387 — Tu ritual nocturno: apagar luces, mirar techo, abrir X. Listo.
+O-0388 — El un drive lleno no es el fin del mundo. Tu autoexigencia sí. Basta.
+O-0389 — Hay una pila de cosas (y de pensamientos) que no estás guardando: el mate lavado. Respirá.
+O-0390 — El un Asana te dice 'bajá un cambio' y vos respondés con velocidad. Ahí está.
+O-0391 — El un tupper sin tapa te dice 'bajá un cambio' y vos respondés con velocidad. Con amor.
+O-0392 — Tu ritual nocturno: apagar luces, mirar techo, abrir WhatsApp. Ahí está.
+O-0393 — Hay una pila de cosas (y de pensamientos) que no estás guardando: una notificación que vibra. No te mientas.
+O-0394 — El un login que caduca no es el fin del mundo. Tu autoexigencia sí. Listo.
+O-0395 — Tu casa no te juzga. Vos sí. Y se siente. Se entiende.
+O-0396 — El una tapa perdida no es el fin del mundo. Tu autoexigencia sí. Nos vimos.
+O-0397 — Querías un límite sano. Te encontraste con una reunión que pudo ser mensaje. Pequeña epopeya. Fin.
+O-0398 — Querías más verdad. Te encontraste con un imán en la heladera. Pequeña epopeya. Basta.
+O-0399 — El la ventana empañada no es el fin del mundo. Tu autoexigencia sí. Listo.
+O-0400 — Hay una pila de cosas (y de pensamientos) que no estás guardando: una planta que sobrevive. Listo.
+O-0401 — Querías un vínculo que no drene. Te encontraste con la radio de fondo. Pequeña epopeya. No te mientas.
+O-0402 — Querías menos ruido. Te encontraste con un ticket eterno. Pequeña epopeya. Con amor.
+O-0403 — El la olla que no tapa no es el fin del mundo. Tu autoexigencia sí. Se entiende.
+O-0404 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un Zoom. Con amor.
+O-0405 — Querías menos ruido. Te encontraste con una notificación que vibra. Pequeña epopeya. Se entiende.
+O-0406 — Tu ritual nocturno: apagar luces, mirar techo, abrir Google Calendar. Con amor.
+O-0407 — El la luz de la cocina no es el fin del mundo. Tu autoexigencia sí. Nos vimos.
+O-0408 — Querías un vínculo que no drene. Te encontraste con la olla que no tapa. Pequeña epopeya. Con amor.
+O-0409 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un mail sin asunto. Basta.
+O-0410 — El un 'te paso el link' te dice 'bajá un cambio' y vos respondés con velocidad. No te mientas.
+O-0411 — Querías dejar de sobrepensar. Te encontraste con un recordatorio que ignorás. Pequeña epopeya. Se entiende.
+O-0412 — Tu casa no te juzga. Vos sí. Y se siente. Basta.
+O-0413 — Querías una vida que alcance. Te encontraste con la cama deshecha. Pequeña epopeya. Fin.
+O-0414 — El un ticket eterno no es el fin del mundo. Tu autoexigencia sí. Fin.
+O-0415 — El una pila de ropa no es el fin del mundo. Tu autoexigencia sí. Con amor.
+O-0416 — Querías amor simple. Te encontraste con un deadline. Pequeña epopeya. Con amor.
+O-0417 — Querías reciprocidad. Te encontraste con un mail sin asunto. Pequeña epopeya. Ahí está.
+O-0418 — Querías menos ruido. Te encontraste con la cama deshecha. Pequeña epopeya. Respirá.
+O-0419 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un ticket eterno. Fin.
+O-0420 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un KPI inventado. Respirá.
+O-0421 — Hay una pila de cosas (y de pensamientos) que no estás guardando: una bolsa de compras. Fin.
+O-0422 — Tu ritual nocturno: apagar luces, mirar techo, abrir ChatGPT. Basta.
+O-0423 — El un Zoom no es el fin del mundo. Tu autoexigencia sí. Con amor.
+O-0424 — El un envío fallido no es el fin del mundo. Tu autoexigencia sí. Nos vimos.
+O-0425 — El un mensaje 'URGENTE' te dice 'bajá un cambio' y vos respondés con velocidad. Fin.
+O-0426 — Tu ritual nocturno: apagar luces, mirar techo, abrir TikTok. Nos vimos.
+O-0427 — Tu casa no te juzga. Vos sí. Y se siente. Listo.
+O-0428 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un imán en la heladera. Basta.
+O-0429 — El la radio de fondo no es el fin del mundo. Tu autoexigencia sí. Fin.
+O-0430 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un follow up. Con amor.
+O-0431 — El un Trello no es el fin del mundo. Tu autoexigencia sí. Listo.
+O-0432 — Querías volver a vos. Te encontraste con un calendario lleno. Pequeña epopeya. Respirá.
+O-0433 — Querías amor simple. Te encontraste con un Excel con fórmulas rotas. Pequeña epopeya. Listo.
+O-0434 — Querías un vínculo que no drene. Te encontraste con un vaso olvidado. Pequeña epopeya. Se entiende.
+O-0435 — El la olla que no tapa te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0436 — El un vaso olvidado no es el fin del mundo. Tu autoexigencia sí. Fin.
+O-0437 — El un pan duro te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0438 — Querías reciprocidad. Te encontraste con un calendario lleno. Pequeña epopeya. Basta.
+O-0439 — El un deadline te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0440 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un tupper sin tapa. Basta.
+O-0441 — Hay una pila de cosas (y de pensamientos) que no estás guardando: la silla que cruje. Se entiende.
+O-0442 — Querías dejar de sobrepensar. Te encontraste con un recordatorio que ignorás. Pequeña epopeya. Listo.
+O-0443 — El un audio de 3 minutos no es el fin del mundo. Tu autoexigencia sí. Fin.
+O-0444 — Querías cerrar un ciclo. Te encontraste con un reporte semanal. Pequeña epopeya. Nos vimos.
+O-0445 — Querías más verdad. Te encontraste con un recordatorio que ignorás. Pequeña epopeya. Ahí está.
+O-0446 — Querías orden. Te encontraste con un cajón que no cierra. Pequeña epopeya. Listo.
+O-0447 — Tu ritual nocturno: apagar luces, mirar techo, abrir Spotify. Se entiende.
+O-0448 — Tu casa no te juzga. Vos sí. Y se siente. Nos vimos.
+O-0449 — Tu ritual nocturno: apagar luces, mirar techo, abrir X. Con amor.
+O-0450 — El un jabón que se termina te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0451 — El un Zoom te dice 'bajá un cambio' y vos respondés con velocidad. Fin.
+O-0452 — Querías reciprocidad. Te encontraste con un imán en la heladera. Pequeña epopeya. Con amor.
+O-0453 — El un 'quick call' no es el fin del mundo. Tu autoexigencia sí. Listo.
+O-0454 — Tu casa no te juzga. Vos sí. Y se siente. Ahí está.
+O-0455 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un feedback tibio. Listo.
+O-0456 — Querías menos ruido. Te encontraste con un documento compartido. Pequeña epopeya. Respirá.
+O-0457 — El el mantel manchado te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0458 — Querías calma. Te encontraste con un documento compartido. Pequeña epopeya. Se entiende.
+O-0459 — Querías dejar de sobrepensar. Te encontraste con un Excel con fórmulas rotas. Pequeña epopeya. Se entiende.
+O-0460 — El un audio de 3 minutos no es el fin del mundo. Tu autoexigencia sí. Listo.
+O-0461 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un 'ping' a las 23:17. Con amor.
+O-0462 — El un 'lo vemos mañana' te dice 'bajá un cambio' y vos respondés con velocidad. Con amor.
+O-0463 — El una planta que sobrevive no es el fin del mundo. Tu autoexigencia sí. Nos vimos.
+O-0464 — Querías orden. Te encontraste con el mantel manchado. Pequeña epopeya. Nos vimos.
+O-0465 — Tu ritual nocturno: apagar luces, mirar techo, abrir Spotify. Listo.
+O-0466 — El un audio de 3 minutos te dice 'bajá un cambio' y vos respondés con velocidad. Con amor.
+O-0467 — El el mantel manchado te dice 'bajá un cambio' y vos respondés con velocidad. Respirá.
+O-0468 — El el mate lavado no es el fin del mundo. Tu autoexigencia sí. Fin.
+O-0469 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un reporte semanal. Fin.
+O-0470 — El un mensaje 'URGENTE' no es el fin del mundo. Tu autoexigencia sí. Se entiende.
+O-0471 — Hay una pila de cosas (y de pensamientos) que no estás guardando: una pila de ropa. Basta.
+O-0472 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un tupper sin tapa. Nos vimos.
+O-0473 — Hay una pila de cosas (y de pensamientos) que no estás guardando: el mate lavado. Nos vimos.
+O-0474 — Tu casa no te juzga. Vos sí. Y se siente. Con amor.
+O-0475 — El un login que caduca no es el fin del mundo. Tu autoexigencia sí. Se entiende.
+O-0476 — Tu ritual nocturno: apagar luces, mirar techo, abrir Spotify. Basta.
+O-0477 — Querías un sí honesto. Te encontraste con un 'ping' a las 23:17. Pequeña epopeya. Con amor.
+O-0478 — Tu ritual nocturno: apagar luces, mirar techo, abrir WhatsApp. Nos vimos.
+O-0479 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un hilo de Slack. Basta.
+O-0480 — Hay una pila de cosas (y de pensamientos) que no estás guardando: el mantel manchado. Respirá.
+O-0481 — El un documento compartido te dice 'bajá un cambio' y vos respondés con velocidad. Basta.
+O-0482 — Tu ritual nocturno: apagar luces, mirar techo, abrir X. Respirá.
+O-0483 — Querías un vínculo que no drene. Te encontraste con un 'te paso el link'. Pequeña epopeya. Ahí está.
+O-0484 — El un drive lleno te dice 'bajá un cambio' y vos respondés con velocidad. No te mientas.
+O-0485 — El un mensaje 'URGENTE' te dice 'bajá un cambio' y vos respondés con velocidad. No te mientas.
+O-0486 — Querías reciprocidad. Te encontraste con una tapa perdida. Pequeña epopeya. Se entiende.
+O-0487 — Hay una pila de cosas (y de pensamientos) que no estás guardando: una pila de ropa. Ahí está.
+O-0488 — Querías soltar control. Te encontraste con un Excel con fórmulas rotas. Pequeña epopeya. No te mientas.
+O-0489 — Tu ritual nocturno: apagar luces, mirar techo, abrir Instagram. Basta.
+O-0490 — Tu ritual nocturno: apagar luces, mirar techo, abrir LinkedIn. Se entiende.
+O-0491 — El un mail sin asunto no es el fin del mundo. Tu autoexigencia sí. Ahí está.
+O-0492 — El la radio de fondo no es el fin del mundo. Tu autoexigencia sí. Basta.
+O-0493 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un Asana. No te mientas.
+O-0494 — El la cama deshecha te dice 'bajá un cambio' y vos respondés con velocidad. Respirá.
+O-0495 — El un feedback tibio no es el fin del mundo. Tu autoexigencia sí. Respirá.
+O-0496 — El un Asana no es el fin del mundo. Tu autoexigencia sí. Se entiende.
+O-0497 — Querías dejar de sobrepensar. Te encontraste con un drive lleno. Pequeña epopeya. Nos vimos.
+O-0498 — Querías amor simple. Te encontraste con un pan duro. Pequeña epopeya. Respirá.
+O-0499 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un captcha humillante. No te mientas.
+O-0500 — El la silla que cruje te dice 'bajá un cambio' y vos respondés con velocidad. Se entiende.
+O-0501 — Tu ritual nocturno: apagar luces, mirar techo, abrir X. Basta.
+O-0502 — El un ticket eterno no es el fin del mundo. Tu autoexigencia sí. Ahí está.
+O-0503 — El la ventana empañada te dice 'bajá un cambio' y vos respondés con velocidad. No te mientas.
+O-0504 — Querías cerrar un ciclo. Te encontraste con un ticket eterno. Pequeña epopeya. Basta.
+O-0505 — Hay una pila de cosas (y de pensamientos) que no estás guardando: un mensaje 'URGENTE'. Nos vimos.
+
+### E) Algoritmo y época
+O-0506 — Tu cabeza pide silencio. Tu dedo abre LinkedIn. Conflicto de versiones. Ahí está.
+O-0507 — Te comparás en LinkedIn y después te pedís paz. Raro trato. Ahí está.
+O-0508 — Te comparás en TikTok y después te pedís paz. Raro trato. Basta.
+O-0509 — La espiritualidad de pantalla: respirás, citás algo, y volvés al la radio de fondo. No te mientas.
+O-0510 — Tu cabeza pide silencio. Tu dedo abre X. Conflicto de versiones. Fin.
+O-0511 — El algoritmo no te conoce, pero te adivina. Eso debería darte miedo. Se entiende.
+O-0512 — La espiritualidad de pantalla: respirás, citás algo, y volvés al la luz de la cocina. No te mientas.
+O-0513 — Te comparás en Spotify y después te pedís paz. Raro trato. Fin.
+O-0514 — Tu cabeza pide silencio. Tu dedo abre Spotify. Conflicto de versiones. Nos vimos.
+O-0515 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un envío fallido. Nos vimos.
+O-0516 — Tu cabeza pide silencio. Tu dedo abre LinkedIn. Conflicto de versiones. Nos vimos.
+O-0517 — No es el universo. Es Google Calendar. Y vos igual le creés. Ahí está.
+O-0518 — No es el universo. Es TikTok. Y vos igual le creés. Listo.
+O-0519 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un Trello. Nos vimos.
+O-0520 — Te comparás en WhatsApp y después te pedís paz. Raro trato. Nos vimos.
+O-0521 — Scrolleás para calmarte y volvés con más ruido. Listo.
+O-0522 — No es el universo. Es ChatGPT. Y vos igual le creés. Se entiende.
+O-0523 — No es el universo. Es YouTube. Y vos igual le creés. Se entiende.
+O-0524 — Tu cabeza pide silencio. Tu dedo abre Spotify. Conflicto de versiones. Listo.
+O-0525 — El algoritmo no te conoce, pero te adivina. Eso debería darte miedo. Ahí está.
+O-0526 — Tu cabeza pide silencio. Tu dedo abre YouTube. Conflicto de versiones. No te mientas.
+O-0527 — Te comparás en Spotify y después te pedís paz. Raro trato. Basta.
+O-0528 — La espiritualidad de pantalla: respirás, citás algo, y volvés al una ducha a medias. Fin.
+O-0529 — No es el universo. Es TikTok. Y vos igual le creés. Basta.
+O-0530 — Te comparás en TikTok y después te pedís paz. Raro trato. No te mientas.
+O-0531 — Tu cabeza pide silencio. Tu dedo abre LinkedIn. Conflicto de versiones. No te mientas.
+O-0532 — Tu cabeza pide silencio. Tu dedo abre Spotify. Conflicto de versiones. Respirá.
+O-0533 — Te comparás en WhatsApp y después te pedís paz. Raro trato. Con amor.
+O-0534 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un drive lleno. Se entiende.
+O-0535 — Te comparás en Spotify y después te pedís paz. Raro trato. Listo.
+O-0536 — La espiritualidad de pantalla: respirás, citás algo, y volvés al la cama deshecha. Listo.
+O-0537 — El algoritmo no te conoce, pero te adivina. Eso debería darte miedo. Fin.
+O-0538 — Te comparás en X y después te pedís paz. Raro trato. Nos vimos.
+O-0539 — La espiritualidad de pantalla: respirás, citás algo, y volvés al una ducha a medias. Respirá.
+O-0540 — Tu cabeza pide silencio. Tu dedo abre LinkedIn. Conflicto de versiones. Se entiende.
+O-0541 — Tu cabeza pide silencio. Tu dedo abre ChatGPT. Conflicto de versiones. Fin.
+O-0542 — Te comparás en Spotify y después te pedís paz. Raro trato. Se entiende.
+O-0543 — No es el universo. Es TikTok. Y vos igual le creés. No te mientas.
+O-0544 — Te comparás en Instagram y después te pedís paz. Raro trato. Con amor.
+O-0545 — Tu cabeza pide silencio. Tu dedo abre TikTok. Conflicto de versiones. Ahí está.
+O-0546 — Te comparás en ChatGPT y después te pedís paz. Raro trato. No te mientas.
+O-0547 — No es el universo. Es YouTube. Y vos igual le creés. Listo.
+O-0548 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un hilo de Slack. Basta.
+O-0549 — Tu cabeza pide silencio. Tu dedo abre Instagram. Conflicto de versiones. Con amor.
+O-0550 — No es el universo. Es TikTok. Y vos igual le creés. Respirá.
+O-0551 — Te comparás en TikTok y después te pedís paz. Raro trato. Con amor.
+O-0552 — Te comparás en Spotify y después te pedís paz. Raro trato. Con amor.
+O-0553 — Te comparás en YouTube y después te pedís paz. Raro trato. Ahí está.
+O-0554 — Scrolleás para calmarte y volvés con más ruido. Fin.
+O-0555 — No es el universo. Es ChatGPT. Y vos igual le creés. Basta.
+O-0556 — Te comparás en LinkedIn y después te pedís paz. Raro trato. Con amor.
+O-0557 — No es el universo. Es X. Y vos igual le creés. Respirá.
+O-0558 — No es el universo. Es ChatGPT. Y vos igual le creés. No te mientas.
+O-0559 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un ticket eterno. Se entiende.
+O-0560 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un reporte semanal. Respirá.
+O-0561 — La espiritualidad de pantalla: respirás, citás algo, y volvés al una reunión que pudo ser mensaje. Respirá.
+O-0562 — No es el universo. Es YouTube. Y vos igual le creés. Nos vimos.
+O-0563 — Te comparás en YouTube y después te pedís paz. Raro trato. Listo.
+O-0564 — Tu cabeza pide silencio. Tu dedo abre Spotify. Conflicto de versiones. Con amor.
+O-0565 — El algoritmo no te conoce, pero te adivina. Eso debería darte miedo. Listo.
+O-0566 — No es el universo. Es TikTok. Y vos igual le creés. Nos vimos.
+O-0567 — No es el universo. Es X. Y vos igual le creés. No te mientas.
+O-0568 — No es el universo. Es YouTube. Y vos igual le creés. No te mientas.
+O-0569 — No es el universo. Es Google Calendar. Y vos igual le creés. Basta.
+O-0570 — Te comparás en ChatGPT y después te pedís paz. Raro trato. Listo.
+O-0571 — Te comparás en YouTube y después te pedís paz. Raro trato. Se entiende.
+O-0572 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un 'ping' a las 23:17. Con amor.
+O-0573 — No es el universo. Es X. Y vos igual le creés. Se entiende.
+O-0574 — Te comparás en X y después te pedís paz. Raro trato. Con amor.
+O-0575 — El algoritmo no te conoce, pero te adivina. Eso debería darte miedo. No te mientas.
+O-0576 — Tu cabeza pide silencio. Tu dedo abre Google Calendar. Conflicto de versiones. Listo.
+O-0577 — El algoritmo no te conoce, pero te adivina. Eso debería darte miedo. Respirá.
+O-0578 — No es el universo. Es TikTok. Y vos igual le creés. Fin.
+O-0579 — Tu cabeza pide silencio. Tu dedo abre YouTube. Conflicto de versiones. Ahí está.
+O-0580 — No es el universo. Es Spotify. Y vos igual le creés. Con amor.
+O-0581 — La espiritualidad de pantalla: respirás, citás algo, y volvés al un calendario lleno. Fin.
+O-0582 — Scrolleás para calmarte y volvés con más ruido. Con amor.
+O-0583 — Te comparás en TikTok y después te pedís paz. Raro trato. Respirá.
+O-0584 — Tu cabeza pide silencio. Tu dedo abre Spotify. Conflicto de versiones. Fin.
+O-0585 — Scrolleás para calmarte y volvés con más ruido. Basta.
+
+### F) Vínculos
+O-0586 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Basta.
+O-0587 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Con amor.
+O-0588 — El amor sano no se siente como examen. Con amor.
+O-0589 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Ahí está.
+O-0590 — El amor sano no se siente como examen. No te mientas.
+O-0591 — El amor sano no se siente como examen. Respirá.
+O-0592 — Tu cariño no es moneda para que te elijan. Listo.
+O-0593 — No estás pidiendo mucho: estás pidiendo claro. Fin.
+O-0594 — Querés una vida que alcance. Pero elegís migajas porque ya las conocés. Con amor.
+O-0595 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Basta.
+O-0596 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Con amor.
+O-0597 — Tu cariño no es moneda para que te elijan. Respirá.
+O-0598 — Querés un vínculo que no drene. Pero elegís migajas porque ya las conocés. Respirá.
+O-0599 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Listo.
+O-0600 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Se entiende.
+O-0601 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. No te mientas.
+O-0602 — Querés soltar control. Pero elegís migajas porque ya las conocés. Nos vimos.
+O-0603 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Listo.
+O-0604 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Respirá.
+O-0605 — Querés claridad. Pero elegís migajas porque ya las conocés. No te mientas.
+O-0606 — Querés reciprocidad. Pero elegís migajas porque ya las conocés. Fin.
+O-0607 — No estás pidiendo mucho: estás pidiendo claro. No te mientas.
+O-0608 — Querés orden. Pero elegís migajas porque ya las conocés. Se entiende.
+O-0609 — Querés dejar de sobrepensar. Pero elegís migajas porque ya las conocés. Nos vimos.
+O-0610 — Querés claridad. Pero elegís migajas porque ya las conocés. Fin.
+O-0611 — Querés un límite sano. Pero elegís migajas porque ya las conocés. Respirá.
+O-0612 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Basta.
+O-0613 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Ahí está.
+O-0614 — Querés volver a vos. Pero elegís migajas porque ya las conocés. Nos vimos.
+O-0615 — Querés un sí honesto. Pero elegís migajas porque ya las conocés. Respirá.
+O-0616 — Tu cariño no es moneda para que te elijan. Nos vimos.
+O-0617 — Querés orden. Pero elegís migajas porque ya las conocés. Respirá.
+O-0618 — Querés una vida que alcance. Pero elegís migajas porque ya las conocés. Basta.
+O-0619 — Querés soltar control. Pero elegís migajas porque ya las conocés. Respirá.
+O-0620 — No estás pidiendo mucho: estás pidiendo claro. Nos vimos.
+O-0621 — Querés un límite sano. Pero elegís migajas porque ya las conocés. Basta.
+O-0622 — Querés cerrar un ciclo. Pero elegís migajas porque ya las conocés. Respirá.
+O-0623 — Querés descanso. Pero elegís migajas porque ya las conocés. Ahí está.
+O-0624 — Querés reciprocidad. Pero elegís migajas porque ya las conocés. Nos vimos.
+O-0625 — No estás pidiendo mucho: estás pidiendo claro. Ahí está.
+O-0626 — El amor sano no se siente como examen. Basta.
+O-0627 — Querés reciprocidad. Pero elegís migajas porque ya las conocés. Se entiende.
+O-0628 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Listo.
+O-0629 — El amor sano no se siente como examen. Fin.
+O-0630 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. No te mientas.
+O-0631 — Querés un vínculo que no drene. Pero elegís migajas porque ya las conocés. No te mientas.
+O-0632 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Respirá.
+O-0633 — No estás pidiendo mucho: estás pidiendo claro. Basta.
+O-0634 — Tu cariño no es moneda para que te elijan. Con amor.
+O-0635 — No estás pidiendo mucho: estás pidiendo claro. Se entiende.
+O-0636 — El amor sano no se siente como examen. Listo.
+O-0637 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Respirá.
+O-0638 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Fin.
+O-0639 — No estás pidiendo mucho: estás pidiendo claro. Con amor.
+O-0640 — Querés dejar de sobrepensar. Pero elegís migajas porque ya las conocés. No te mientas.
+O-0641 — Te quedás donde no te eligen para no elegir vos. Duele, sí. No te mientas.
+O-0642 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Con amor.
+O-0643 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Nos vimos.
+O-0644 — Tu cariño no es moneda para que te elijan. No te mientas.
+O-0645 — Querés menos ruido. Pero elegís migajas porque ya las conocés. No te mientas.
+O-0646 — Querés dejar de sobrepensar. Pero elegís migajas porque ya las conocés. Fin.
+O-0647 — Tu cariño no es moneda para que te elijan. Se entiende.
+O-0648 — Tu cariño no es moneda para que te elijan. Fin.
+O-0649 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Nos vimos.
+O-0650 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Fin.
+O-0651 — El amor sano no se siente como examen. Ahí está.
+O-0652 — Querés cerrar un ciclo. Pero elegís migajas porque ya las conocés. No te mientas.
+O-0653 — No estás pidiendo mucho: estás pidiendo claro. Listo.
+O-0654 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Se entiende.
+O-0655 — Querés dejar de sobrepensar. Pero elegís migajas porque ya las conocés. Con amor.
+O-0656 — Tu cariño no es moneda para que te elijan. Ahí está.
+O-0657 — Querés dejar de sobrepensar. Pero elegís migajas porque ya las conocés. Ahí está.
+O-0658 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Ahí está.
+O-0659 — Perdonás antes de que te pidan perdón. Hermoso… y peligroso. Fin.
+O-0660 — Querés volver a vos. Pero elegís migajas porque ya las conocés. Ahí está.
+O-0661 — Querés reciprocidad. Pero elegís migajas porque ya las conocés. Ahí está.
+O-0662 — El amor sano no se siente como examen. Se entiende.
+O-0663 — Te quedás donde no te eligen para no elegir vos. Duele, sí. Nos vimos.
+O-0664 — Hay gente que te extraña. Y gente que te usa. Vos sabés cuál es cuál. Se entiende.
+O-0665 — Tu cariño no es moneda para que te elijan. Basta.
+O-0666 — Querés un vínculo que no drene. Pero elegís migajas porque ya las conocés. Listo.
+O-0667 — No estás pidiendo mucho: estás pidiendo claro. Respirá.
+
+### G) Trabajo y dinero
+O-0668 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. No te mientas.
+O-0669 — Decís 'me enfoco' y abrís Slack. Ahí está. Listo.
+O-0670 — Tu calendario está tan lleno que ya no cabe tu vida. Con amor.
+O-0671 — El KPI sube, tu paz baja. Y nadie lo mide. Fin.
+O-0672 — Tu productividad no reemplaza el descanso. Respirá.
+O-0673 — El KPI sube, tu paz baja. Y nadie lo mide. Se entiende.
+O-0674 — Tu calendario está tan lleno que ya no cabe tu vida. Fin.
+O-0675 — El ticket eterno no se resuelve con culpa. Con amor.
+O-0676 — Tu calendario está tan lleno que ya no cabe tu vida. Respirá.
+O-0677 — El ticket eterno no se resuelve con culpa. Listo.
+O-0678 — Decís 'me enfoco' y abrís Slack. Ahí está. Fin.
+O-0679 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Respirá.
+O-0680 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Ahí está.
+O-0681 — El KPI sube, tu paz baja. Y nadie lo mide. Listo.
+O-0682 — Decís 'me enfoco' y abrís Slack. Ahí está. Basta.
+O-0683 — Tu calendario está tan lleno que ya no cabe tu vida. Ahí está.
+O-0684 — Tu productividad no reemplaza el descanso. Nos vimos.
+O-0685 — Decís 'me enfoco' y abrís Slack. Ahí está. Respirá.
+O-0686 — El ticket eterno no se resuelve con culpa. Se entiende.
+O-0687 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Con amor.
+O-0688 — Te piden un 'quick call' y vos respondés con ansiedad premium. Nos vimos.
+O-0689 — Te piden un 'quick call' y vos respondés con ansiedad premium. Ahí está.
+O-0690 — El KPI sube, tu paz baja. Y nadie lo mide. No te mientas.
+O-0691 — Tu productividad no reemplaza el descanso. Listo.
+O-0692 — Decís 'me enfoco' y abrís Slack. Ahí está. Nos vimos.
+O-0693 — Tu productividad no reemplaza el descanso. Basta.
+O-0694 — El KPI sube, tu paz baja. Y nadie lo mide. Respirá.
+O-0695 — El KPI sube, tu paz baja. Y nadie lo mide. Ahí está.
+O-0696 — El KPI sube, tu paz baja. Y nadie lo mide. Basta.
+O-0697 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Fin.
+O-0698 — El ticket eterno no se resuelve con culpa. Fin.
+O-0699 — Decís 'me enfoco' y abrís Slack. Ahí está. No te mientas.
+O-0700 — Te piden un 'quick call' y vos respondés con ansiedad premium. Respirá.
+O-0701 — El ticket eterno no se resuelve con culpa. Ahí está.
+O-0702 — Decís 'me enfoco' y abrís Slack. Ahí está. Con amor.
+O-0703 — El KPI sube, tu paz baja. Y nadie lo mide. Con amor.
+O-0704 — Te piden un 'quick call' y vos respondés con ansiedad premium. Listo.
+O-0705 — El ticket eterno no se resuelve con culpa. Nos vimos.
+O-0706 — Tu productividad no reemplaza el descanso. Con amor.
+O-0707 — Te piden un 'quick call' y vos respondés con ansiedad premium. No te mientas.
+O-0708 — Te piden un 'quick call' y vos respondés con ansiedad premium. Fin.
+O-0709 — Decís 'me enfoco' y abrís Slack. Ahí está. Se entiende.
+O-0710 — Tu calendario está tan lleno que ya no cabe tu vida. No te mientas.
+O-0711 — Te piden un 'quick call' y vos respondés con ansiedad premium. Se entiende.
+O-0712 — El KPI sube, tu paz baja. Y nadie lo mide. Nos vimos.
+O-0713 — Decís 'me enfoco' y abrís Slack. Ahí está. Ahí está.
+O-0714 — El ticket eterno no se resuelve con culpa. Basta.
+O-0715 — Tu productividad no reemplaza el descanso. No te mientas.
+O-0716 — Te piden un 'quick call' y vos respondés con ansiedad premium. Con amor.
+O-0717 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Listo.
+O-0718 — Tu productividad no reemplaza el descanso. Se entiende.
+O-0719 — El ticket eterno no se resuelve con culpa. No te mientas.
+O-0720 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Nos vimos.
+O-0721 — Tu calendario está tan lleno que ya no cabe tu vida. Basta.
+O-0722 — Tu productividad no reemplaza el descanso. Ahí está.
+O-0723 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Basta.
+O-0724 — Tu calendario está tan lleno que ya no cabe tu vida. Listo.
+O-0725 — Tu calendario está tan lleno que ya no cabe tu vida. Nos vimos.
+O-0726 — El mail dice 'quedo a disposición'. Tu alma dice 'por favor no'. Se entiende.
+
+### H) Cuerpo y energía
+O-0727 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Fin.
+O-0728 — Tu energía no está baja: está tercerizada. No te mientas.
+O-0729 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Basta.
+O-0730 — No es confusión: es cansancio. Son idiomas distintos. Fin.
+O-0731 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Respirá.
+O-0732 — Tu energía no está baja: está tercerizada. Se entiende.
+O-0733 — Dormir no es perder tiempo: es volver a vos. Ahí está.
+O-0734 — Tu energía no está baja: está tercerizada. Fin.
+O-0735 — Tu energía no está baja: está tercerizada. Ahí está.
+O-0736 — No es confusión: es cansancio. Son idiomas distintos. No te mientas.
+O-0737 — Dormir no es perder tiempo: es volver a vos. Con amor.
+O-0738 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Se entiende.
+O-0739 — No es confusión: es cansancio. Son idiomas distintos. Nos vimos.
+O-0740 — Te comés el enojo y te indigestás tristeza. Con amor.
+O-0741 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Con amor.
+O-0742 — Te comés el enojo y te indigestás tristeza. Nos vimos.
+O-0743 — Dormir no es perder tiempo: es volver a vos. Se entiende.
+O-0744 — No es confusión: es cansancio. Son idiomas distintos. Se entiende.
+O-0745 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Fin.
+O-0746 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Listo.
+O-0747 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. No te mientas.
+O-0748 — Tu energía no está baja: está tercerizada. Con amor.
+O-0749 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Listo.
+O-0750 — Te comés el enojo y te indigestás tristeza. Se entiende.
+O-0751 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Ahí está.
+O-0752 — Tu energía no está baja: está tercerizada. Respirá.
+O-0753 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Respirá.
+O-0754 — No es confusión: es cansancio. Son idiomas distintos. Con amor.
+O-0755 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Nos vimos.
+O-0756 — Dormir no es perder tiempo: es volver a vos. Nos vimos.
+O-0757 — Dormir no es perder tiempo: es volver a vos. Respirá.
+O-0758 — No es confusión: es cansancio. Son idiomas distintos. Listo.
+O-0759 — No es confusión: es cansancio. Son idiomas distintos. Respirá.
+O-0760 — Tu energía no está baja: está tercerizada. Nos vimos.
+O-0761 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Ahí está.
+O-0762 — No es confusión: es cansancio. Son idiomas distintos. Ahí está.
+O-0763 — Dormir no es perder tiempo: es volver a vos. Fin.
+O-0764 — Te comés el enojo y te indigestás tristeza. Listo.
+O-0765 — Dormir no es perder tiempo: es volver a vos. No te mientas.
+O-0766 — Tu energía no está baja: está tercerizada. Basta.
+O-0767 — Te comés el enojo y te indigestás tristeza. Respirá.
+O-0768 — Tu energía no está baja: está tercerizada. Listo.
+O-0769 — Te comés el enojo y te indigestás tristeza. Ahí está.
+O-0770 — Te comés el enojo y te indigestás tristeza. Basta.
+O-0771 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Nos vimos.
+O-0772 — Dormir no es perder tiempo: es volver a vos. Listo.
+O-0773 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. No te mientas.
+O-0774 — Te comés el enojo y te indigestás tristeza. Fin.
+O-0775 — Tu espalda dice 'hasta acá' y vos decís 'una cosa más'. Basta.
+O-0776 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Con amor.
+O-0777 — Dormir no es perder tiempo: es volver a vos. Basta.
+O-0778 — No es confusión: es cansancio. Son idiomas distintos. Basta.
+O-0779 — Te comés el enojo y te indigestás tristeza. No te mientas.
+O-0780 — Tu cuerpo habló claro. Vos le respondiste con un emoji mental. Se entiende.
+
+### I) Tarot
+O-0781 — La Luna no vino a asustarte. Vino a decirte 'dejá de negociar tu paz'. Ahí está.
+O-0782 — Si El Emperador pudiera hablar, te diría: 'dejá de actuar normal'. Fin.
+O-0783 — No es magia: es espejo. Y La Fuerza te está mirando fijo. Con amor.
+O-0784 — En la tirada aparece La Justicia. Traducción: no te mientas con educación. Ahí está.
+O-0785 — Hoy el tarot hace algo raro: te muestra una tirada de tres cartas y te pide claridad. Listo.
+O-0786 — Si El Mundo pudiera hablar, te diría: 'dejá de actuar normal'. Ahí está.
+O-0787 — En la tirada aparece Los Enamorados. Traducción: no te mientas con educación. Respirá.
+O-0788 — El Mundo no vino a asustarte. Vino a decirte 'dejá de negociar tu paz'. Respirá.
+O-0789 — No es magia: es espejo. Y El Ermitaño te está mirando fijo. Respirá.
+O-0790 — En la tirada aparece La Estrella. Traducción: no te mientas con educación. Listo.
+O-0791 — En la tirada aparece El Diablo. Traducción: no te mientas con educación. No te mientas.
+O-0792 — Hoy el tarot hace algo raro: te muestra un naipe insistente y te pide más verdad. Respirá.
+O-0793 — No es magia: es espejo. Y La Torre te está mirando fijo. No te mientas.
+O-0794 — Si La Rueda pudiera hablar, te diría: 'dejá de actuar normal'. Con amor.
+O-0795 — En la tirada aparece La Justicia. Traducción: no te mientas con educación. Con amor.
+O-0796 — No es magia: es espejo. Y La Luna te está mirando fijo. Listo.
+O-0797 — Hoy el tarot hace algo raro: te muestra una respuesta que no querías oír y te pide volver a vos. Basta.
+O-0798 — En la tirada aparece El Ermitaño. Traducción: no te mientas con educación. Listo.
+O-0799 — Hoy el tarot hace algo raro: te muestra una lectura que te mira fijo y te pide descanso. Basta.
+O-0800 — Si La Muerte pudiera hablar, te diría: 'dejá de actuar normal'. Con amor.
+O-0801 — No es magia: es espejo. Y El Emperador te está mirando fijo. No te mientas.
+O-0802 — No es magia: es espejo. Y El Papa te está mirando fijo. Ahí está.
+O-0803 — No es magia: es espejo. Y La Estrella te está mirando fijo. Con amor.
+O-0804 — Si El Juicio pudiera hablar, te diría: 'dejá de actuar normal'. No te mientas.
+O-0805 — En la tirada aparece El Carro. Traducción: no te mientas con educación. Respirá.
+O-0806 — Hoy el tarot hace algo raro: te muestra una carta que cae de costado y te pide menos ruido. Con amor.
+O-0807 — No es magia: es espejo. Y El Emperador te está mirando fijo. Respirá.
+O-0808 — No es magia: es espejo. Y La Justicia te está mirando fijo. Fin.
+O-0809 — El Mundo no vino a asustarte. Vino a decirte 'dejá de negociar tu paz'. Fin.
+O-0810 — En la tirada aparece La Justicia. Traducción: no te mientas con educación. Respirá.
+O-0811 — Si La Rueda pudiera hablar, te diría: 'dejá de actuar normal'. Nos vimos.
+O-0812 — Hoy el tarot hace algo raro: te muestra una pregunta que no querías hacer y te pide claridad. Con amor.
+O-0813 — No es magia: es espejo. Y El Diablo te está mirando fijo. Respirá.
+O-0814 — Hoy el tarot hace algo raro: te muestra una tirada de tres cartas y te pide reciprocidad. No te mientas.
+O-0815 — Hoy el tarot hace algo raro: te muestra una respuesta que no querías oír y te pide un límite sano. Basta.
+O-0816 — Si El Carro pudiera hablar, te diría: 'dejá de actuar normal'. Con amor.
+O-0817 — Si El Papa pudiera hablar, te diría: 'dejá de actuar normal'. No te mientas.
+O-0818 — No es magia: es espejo. Y La Sacerdotisa te está mirando fijo. Fin.
+O-0819 — Hoy el tarot hace algo raro: te muestra una pregunta que no querías hacer y te pide un vínculo que no drene. No te mientas.
+O-0820 — Si El Sol pudiera hablar, te diría: 'dejá de actuar normal'. Se entiende.
+O-0821 — Hoy el tarot hace algo raro: te muestra una pregunta que no querías hacer y te pide orden. Listo.
+O-0822 — La Estrella no vino a asustarte. Vino a decirte 'dejá de negociar tu paz'. Fin.
+O-0823 — Hoy el tarot hace algo raro: te muestra una carta que cae de costado y te pide calma. No te mientas.
+O-0824 — Si Los Enamorados pudiera hablar, te diría: 'dejá de actuar normal'. Nos vimos.
+O-0825 — No es magia: es espejo. Y La Estrella te está mirando fijo. Respirá.
+O-0826 — Si Los Enamorados pudiera hablar, te diría: 'dejá de actuar normal'. Basta.
+O-0827 — Si El Loco pudiera hablar, te diría: 'dejá de actuar normal'. Se entiende.
+O-0828 — Si La Luna pudiera hablar, te diría: 'dejá de actuar normal'. Nos vimos.
+O-0829 — Hoy el tarot hace algo raro: te muestra una lectura que te mira fijo y te pide un sí honesto. Basta.
+O-0830 — En la tirada aparece Los Enamorados. Traducción: no te mientas con educación. Nos vimos.
+O-0831 — Hoy el tarot hace algo raro: te muestra una tirada de tres cartas y te pide un vínculo que no drene. No te mientas.
+O-0832 — En la tirada aparece El Carro. Traducción: no te mientas con educación. No te mientas.
+O-0833 — Si La Luna pudiera hablar, te diría: 'dejá de actuar normal'. Ahí está.
+O-0834 — En la tirada aparece La Luna. Traducción: no te mientas con educación. Nos vimos.
+O-0835 — No es magia: es espejo. Y La Justicia te está mirando fijo. Basta.
+O-0836 — Si La Sacerdotisa pudiera hablar, te diría: 'dejá de actuar normal'. No te mientas.
+O-0837 — No es magia: es espejo. Y La Emperatriz te está mirando fijo. Basta.
+O-0838 — Los Enamorados no vino a asustarte. Vino a decirte 'dejá de negociar tu paz'. Listo.
+O-0839 — En la tirada aparece La Torre. Traducción: no te mientas con educación. Listo.
+O-0840 — En la tirada aparece La Estrella. Traducción: no te mientas con educación. Nos vimos.
+
+### J) Astral
+O-0841 — Con tu ascendente pidiendo aire, el cielo te pide una cosa: menos teatro, más verdad. Ahí está.
+O-0842 — Con Marte queriendo cortar, el cielo te pide una cosa: menos teatro, más verdad. Ahí está.
+O-0843 — Con Saturno con su cara de 'a ver', el cielo te pide una cosa: menos teatro, más verdad. Basta.
+O-0844 — Tu carta no te condena. Te muestra el hábito. tu ascendente pidiendo aire. Ahí está.
+O-0845 — Tu carta no te condena. Te muestra el hábito. un eclipse (sí, otra vez). Fin.
+O-0846 — Con la Luna pidiéndote honestidad, el cielo te pide una cosa: menos teatro, más verdad. Ahí está.
+O-0847 — El cielo está claro: un tránsito que te apura. Y vos queriendo hacerte el/la distraído/a. Nos vimos.
+O-0848 — Con la Luna pidiéndote honestidad, el cielo te pide una cosa: menos teatro, más verdad. Basta.
+O-0849 — Hoy la astrología no te salva: te desnuda. tu ascendente pidiendo aire. Ahí está.
+O-0850 — Con Mercurio haciendo de Mercurio, el cielo te pide una cosa: menos teatro, más verdad. No te mientas.
+O-0851 — Con la Luna pidiéndote honestidad, el cielo te pide una cosa: menos teatro, más verdad. Se entiende.
+O-0852 — Hoy la astrología no te salva: te desnuda. Júpiter exagerando. No te mientas.
+O-0853 — El cielo está claro: Venus con ganas de cariño simple. Y vos queriendo hacerte el/la distraído/a. Ahí está.
+O-0854 — El cielo está claro: Mercurio haciendo de Mercurio. Y vos queriendo hacerte el/la distraído/a. Listo.
+O-0855 — Hoy la astrología no te salva: te desnuda. la Luna pidiéndote honestidad. Fin.
+O-0856 — Tu carta no te condena. Te muestra el hábito. un tránsito que te apura. Ahí está.
+O-0857 — Con la Luna pidiéndote honestidad, el cielo te pide una cosa: menos teatro, más verdad. No te mientas.
+O-0858 — Hoy la astrología no te salva: te desnuda. un eclipse (sí, otra vez). Listo.
+O-0859 — Tu carta no te condena. Te muestra el hábito. Mercurio haciendo de Mercurio. Ahí está.
+O-0860 — El cielo está claro: un eclipse (sí, otra vez). Y vos queriendo hacerte el/la distraído/a. Ahí está.
+O-0861 — Tu carta no te condena. Te muestra el hábito. un tránsito que te apura. Nos vimos.
+O-0862 — Tu carta no te condena. Te muestra el hábito. Saturno con su cara de 'a ver'. Listo.
+O-0863 — El cielo está claro: Júpiter exagerando. Y vos queriendo hacerte el/la distraído/a. Fin.
+O-0864 — Tu carta no te condena. Te muestra el hábito. Venus con ganas de cariño simple. Con amor.
+O-0865 — Con un tránsito que te apura, el cielo te pide una cosa: menos teatro, más verdad. Listo.
+O-0866 — El cielo está claro: Marte queriendo cortar. Y vos queriendo hacerte el/la distraído/a. Basta.
+O-0867 — Tu carta no te condena. Te muestra el hábito. la Luna pidiéndote honestidad. Nos vimos.
+O-0868 — El cielo está claro: Mercurio haciendo de Mercurio. Y vos queriendo hacerte el/la distraído/a. Se entiende.
+O-0869 — Con Mercurio haciendo de Mercurio, el cielo te pide una cosa: menos teatro, más verdad. Listo.
+O-0870 — El cielo está claro: Mercurio haciendo de Mercurio. Y vos queriendo hacerte el/la distraído/a. Nos vimos.
+O-0871 — Hoy la astrología no te salva: te desnuda. Venus con ganas de cariño simple. Nos vimos.
+O-0872 — Con Marte queriendo cortar, el cielo te pide una cosa: menos teatro, más verdad. Con amor.
+O-0873 — Hoy la astrología no te salva: te desnuda. un tránsito que te apura. Nos vimos.
+O-0874 — Hoy la astrología no te salva: te desnuda. Marte queriendo cortar. Respirá.
+O-0875 — Hoy la astrología no te salva: te desnuda. un tránsito que te apura. Respirá.
+O-0876 — El cielo está claro: tu ascendente pidiendo aire. Y vos queriendo hacerte el/la distraído/a. Listo.
+O-0877 — Con Saturno con su cara de 'a ver', el cielo te pide una cosa: menos teatro, más verdad. Listo.
+O-0878 — Tu carta no te condena. Te muestra el hábito. Venus con ganas de cariño simple. Basta.
+O-0879 — Con Saturno con su cara de 'a ver', el cielo te pide una cosa: menos teatro, más verdad. Ahí está.
+O-0880 — Hoy la astrología no te salva: te desnuda. Mercurio haciendo de Mercurio. Listo.
+O-0881 — El cielo está claro: un eclipse (sí, otra vez). Y vos queriendo hacerte el/la distraído/a. Fin.
+O-0882 — Hoy la astrología no te salva: te desnuda. un eclipse (sí, otra vez). Ahí está.
+O-0883 — Tu carta no te condena. Te muestra el hábito. un eclipse (sí, otra vez). Basta.
+O-0884 — Tu carta no te condena. Te muestra el hábito. tu ascendente pidiendo aire. Nos vimos.
+O-0885 — Tu carta no te condena. Te muestra el hábito. el cielo con su humor. Nos vimos.
+O-0886 — El cielo está claro: Venus con ganas de cariño simple. Y vos queriendo hacerte el/la distraído/a. Listo.
+O-0887 — Con tu ascendente pidiendo aire, el cielo te pide una cosa: menos teatro, más verdad. Basta.
+O-0888 — Hoy la astrología no te salva: te desnuda. el cielo con su humor. Respirá.
+O-0889 — Tu carta no te condena. Te muestra el hábito. Saturno con su cara de 'a ver'. No te mientas.
+O-0890 — El cielo está claro: un eclipse (sí, otra vez). Y vos queriendo hacerte el/la distraído/a. No te mientas.
+
+### K) Sueños
+O-0891 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un perro que aparece. No te mientas.
+O-0892 — Soñaste con un teléfono que no funciona. No es misterio: es tu mente pidiendo salida. Nos vimos.
+O-0893 — Soñaste con una puerta que no abre. No es misterio: es tu mente pidiendo salida. Se entiende.
+O-0894 — Los sueños no gritan: ponen símbolos. Hoy te pusieron una puerta que no abre. Con amor.
+O-0895 — Tu sueño te mostró una voz que no se entiende. Traducción: hay algo que evitás de día. Listo.
+O-0896 — Si tu sueño fuera sincero (lo es), un teléfono que no funciona es un 'basta' con imágenes. Ahí está.
+O-0897 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un pasillo largo. Basta.
+O-0898 — Tu sueño te mostró un pasillo largo. Traducción: hay algo que evitás de día. No te mientas.
+O-0899 — Soñaste con una habitación sin ventanas. No es misterio: es tu mente pidiendo salida. No te mientas.
+O-0900 — Si tu sueño fuera sincero (lo es), una voz que no se entiende es un 'basta' con imágenes. Nos vimos.
+O-0901 — Si tu sueño fuera sincero (lo es), un pasillo largo es un 'basta' con imágenes. No te mientas.
+O-0902 — Tu sueño te mostró un tren que se va. Traducción: hay algo que evitás de día. Con amor.
+O-0903 — Soñaste con una voz que no se entiende. No es misterio: es tu mente pidiendo salida. Nos vimos.
+O-0904 — Si tu sueño fuera sincero (lo es), un teléfono que no funciona es un 'basta' con imágenes. Respirá.
+O-0905 — Soñaste con un perro que aparece. No es misterio: es tu mente pidiendo salida. Fin.
+O-0906 — Soñaste con un ascensor que no llega. No es misterio: es tu mente pidiendo salida. Basta.
+O-0907 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un teléfono que no funciona. Se entiende.
+O-0908 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un tren que se va. Ahí está.
+O-0909 — Soñaste con una casa extraña. No es misterio: es tu mente pidiendo salida. Respirá.
+O-0910 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un ascensor que no llega. Ahí está.
+O-0911 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un ascensor que no llega. Con amor.
+O-0912 — Soñaste con una puerta que no abre. No es misterio: es tu mente pidiendo salida. No te mientas.
+O-0913 — Si tu sueño fuera sincero (lo es), un perro que aparece es un 'basta' con imágenes. Listo.
+O-0914 — Si tu sueño fuera sincero (lo es), una puerta que no abre es un 'basta' con imágenes. No te mientas.
+O-0915 — Tu sueño te mostró una voz que no se entiende. Traducción: hay algo que evitás de día. Fin.
+O-0916 — Si tu sueño fuera sincero (lo es), un agua que sube es un 'basta' con imágenes. Nos vimos.
+O-0917 — Tu sueño te mostró un teléfono que no funciona. Traducción: hay algo que evitás de día. Listo.
+O-0918 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un teléfono que no funciona. No te mientas.
+O-0919 — Tu sueño te mostró un ascensor que no llega. Traducción: hay algo que evitás de día. Se entiende.
+O-0920 — Tu sueño te mostró una habitación sin ventanas. Traducción: hay algo que evitás de día. Basta.
+O-0921 — Soñaste con un tren que se va. No es misterio: es tu mente pidiendo salida. No te mientas.
+O-0922 — Soñaste con una habitación sin ventanas. No es misterio: es tu mente pidiendo salida. Fin.
+O-0923 — Si tu sueño fuera sincero (lo es), una puerta que no abre es un 'basta' con imágenes. Listo.
+O-0924 — Soñaste con una casa extraña. No es misterio: es tu mente pidiendo salida. Nos vimos.
+O-0925 — Si tu sueño fuera sincero (lo es), un agua que sube es un 'basta' con imágenes. Ahí está.
+O-0926 — Soñaste con una casa extraña. No es misterio: es tu mente pidiendo salida. No te mientas.
+O-0927 — Soñaste con un tren que se va. No es misterio: es tu mente pidiendo salida. Fin.
+O-0928 — Tu sueño te mostró un ascensor que no llega. Traducción: hay algo que evitás de día. Fin.
+O-0929 — Los sueños no gritan: ponen símbolos. Hoy te pusieron una casa extraña. Ahí está.
+O-0930 — Soñaste con un agua que sube. No es misterio: es tu mente pidiendo salida. Basta.
+O-0931 — Soñaste con una voz que no se entiende. No es misterio: es tu mente pidiendo salida. Se entiende.
+O-0932 — Los sueños no gritan: ponen símbolos. Hoy te pusieron una voz que no se entiende. No te mientas.
+O-0933 — Si tu sueño fuera sincero (lo es), un ascensor que no llega es un 'basta' con imágenes. Ahí está.
+O-0934 — Soñaste con un agua que sube. No es misterio: es tu mente pidiendo salida. Nos vimos.
+O-0935 — Si tu sueño fuera sincero (lo es), un perro que aparece es un 'basta' con imágenes. No te mientas.
+O-0936 — Si tu sueño fuera sincero (lo es), un tren que se va es un 'basta' con imágenes. Respirá.
+O-0937 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un perro que aparece. Respirá.
+O-0938 — Los sueños no gritan: ponen símbolos. Hoy te pusieron un tren que se va. Basta.
+O-0939 — Los sueños no gritan: ponen símbolos. Hoy te pusieron una puerta que no abre. No te mientas.
+O-0940 — Soñaste con un teléfono que no funciona. No es misterio: es tu mente pidiendo salida. Con amor.
+
+### L) Psicomagia
+O-0941 — Te propongo un acto psicomágico mínimo: no para 'curarte', sino para devolverte el cuerpo. Respirá.
+O-0942 — La psicomagia no es cuento: es gesto. Hoy: una escena simbólica. Ahí está.
+O-0943 — Te propongo una ofrenda que no es para nadie más que vos: no para 'curarte', sino para devolverte el cuerpo. Respirá.
+O-0944 — Si te cuesta decirlo, hacelo: una carta a tu yo de antes. Con amor.
+O-0945 — Si te cuesta decirlo, hacelo: una carta a tu yo de antes. Ahí está.
+O-0946 — Un acto mínimo vale más que mil promesas. un acto psicomágico mínimo. Ahí está.
+O-0947 — Un acto mínimo vale más que mil promesas. un gesto simple que te devuelve el cuerpo. Nos vimos.
+O-0948 — Un acto mínimo vale más que mil promesas. un acto psicomágico mínimo. Con amor.
+O-0949 — La psicomagia no es cuento: es gesto. Hoy: una escena simbólica. Basta.
+O-0950 — La psicomagia no es cuento: es gesto. Hoy: una carta a tu yo de antes. No te mientas.
+O-0951 — Te propongo un gesto simple que te devuelve el cuerpo: no para 'curarte', sino para devolverte el cuerpo. Listo.
+O-0952 — Si te cuesta decirlo, hacelo: un ritual ridículo pero exacto. Listo.
+O-0953 — Te propongo un gesto simple que te devuelve el cuerpo: no para 'curarte', sino para devolverte el cuerpo. Con amor.
+O-0954 — Un acto mínimo vale más que mil promesas. un gesto simple que te devuelve el cuerpo. Ahí está.
+O-0955 — La psicomagia no es cuento: es gesto. Hoy: un acto psicomágico mínimo. Nos vimos.
+O-0956 — Te propongo un ritual ridículo pero exacto: no para 'curarte', sino para devolverte el cuerpo. Ahí está.
+O-0957 — Te propongo una escena simbólica: no para 'curarte', sino para devolverte el cuerpo. Fin.
+O-0958 — Si te cuesta decirlo, hacelo: un ritual ridículo pero exacto. Se entiende.
+O-0959 — La psicomagia no es cuento: es gesto. Hoy: una ofrenda que no es para nadie más que vos. Nos vimos.
+O-0960 — Si te cuesta decirlo, hacelo: una ofrenda que no es para nadie más que vos. Respirá.
+O-0961 — La psicomagia no es cuento: es gesto. Hoy: un acto psicomágico mínimo. Listo.
+O-0962 — Si te cuesta decirlo, hacelo: una ofrenda que no es para nadie más que vos. Ahí está.
+O-0963 — Un acto mínimo vale más que mil promesas. una ofrenda que no es para nadie más que vos. Respirá.
+O-0964 — Un acto mínimo vale más que mil promesas. un acto psicomágico mínimo. Respirá.
+O-0965 — Un acto mínimo vale más que mil promesas. una ofrenda que no es para nadie más que vos. Listo.
+O-0966 — Un acto mínimo vale más que mil promesas. una ofrenda que no es para nadie más que vos. Ahí está.
+O-0967 — Un acto mínimo vale más que mil promesas. un ritual ridículo pero exacto. Respirá.
+O-0968 — Si te cuesta decirlo, hacelo: un ritual ridículo pero exacto. Respirá.
+O-0969 — Te propongo una escena simbólica: no para 'curarte', sino para devolverte el cuerpo. Con amor.
+O-0970 — La psicomagia no es cuento: es gesto. Hoy: una carta a tu yo de antes. Se entiende.
+O-0971 — La psicomagia no es cuento: es gesto. Hoy: un gesto simple que te devuelve el cuerpo. Nos vimos.
+O-0972 — Un acto mínimo vale más que mil promesas. un ritual ridículo pero exacto. Se entiende.
+O-0973 — Te propongo una carta a tu yo de antes: no para 'curarte', sino para devolverte el cuerpo. Se entiende.
+O-0974 — Un acto mínimo vale más que mil promesas. un gesto simple que te devuelve el cuerpo. Basta.
+O-0975 — Un acto mínimo vale más que mil promesas. un gesto simple que te devuelve el cuerpo. Listo.
+O-0976 — La psicomagia no es cuento: es gesto. Hoy: una carta a tu yo de antes. Nos vimos.
+O-0977 — Un acto mínimo vale más que mil promesas. una ofrenda que no es para nadie más que vos. Con amor.
+O-0978 — Te propongo una ofrenda que no es para nadie más que vos: no para 'curarte', sino para devolverte el cuerpo. Fin.
+O-0979 — Si te cuesta decirlo, hacelo: un acto psicomágico mínimo. Respirá.
+O-0980 — La psicomagia no es cuento: es gesto. Hoy: un acto psicomágico mínimo. Basta.
+O-0981 — La psicomagia no es cuento: es gesto. Hoy: un gesto simple que te devuelve el cuerpo. Con amor.
+O-0982 — Si te cuesta decirlo, hacelo: una carta a tu yo de antes. Respirá.
+O-0983 — La psicomagia no es cuento: es gesto. Hoy: una carta a tu yo de antes. Basta.
+O-0984 — Te propongo una ofrenda que no es para nadie más que vos: no para 'curarte', sino para devolverte el cuerpo. Ahí está.
+O-0985 — Si te cuesta decirlo, hacelo: un gesto simple que te devuelve el cuerpo. Ahí está.
+O-0986 — Si te cuesta decirlo, hacelo: un gesto simple que te devuelve el cuerpo. Basta.
+O-0987 — Si te cuesta decirlo, hacelo: un gesto simple que te devuelve el cuerpo. Fin.
+O-0988 — Un acto mínimo vale más que mil promesas. una carta a tu yo de antes. Respirá.
+O-0989 — Un acto mínimo vale más que mil promesas. una ofrenda que no es para nadie más que vos. Fin.
+O-0990 — Un acto mínimo vale más que mil promesas. una carta a tu yo de antes. Listo.
+O-0991 — Si te cuesta decirlo, hacelo: un ritual ridículo pero exacto. Nos vimos.
+O-0992 — La psicomagia no es cuento: es gesto. Hoy: un ritual ridículo pero exacto. No te mientas.
+O-0993 — Un acto mínimo vale más que mil promesas. un ritual ridículo pero exacto. Basta.
+O-0994 — Si te cuesta decirlo, hacelo: una ofrenda que no es para nadie más que vos. Se entiende.
+O-0995 — Te propongo una escena simbólica: no para 'curarte', sino para devolverte el cuerpo. No te mientas.
+O-0996 — Si te cuesta decirlo, hacelo: un acto psicomágico mínimo. Se entiende.
+O-0997 — Si te cuesta decirlo, hacelo: una carta a tu yo de antes. Nos vimos.
+O-0998 — Te propongo un gesto simple que te devuelve el cuerpo: no para 'curarte', sino para devolverte el cuerpo. No te mientas.
+O-0999 — Te propongo un acto psicomágico mínimo: no para 'curarte', sino para devolverte el cuerpo. Fin.
+O-1000 — La psicomagia no es cuento: es gesto. Hoy: una ofrenda que no es para nadie más que vos. Basta.
