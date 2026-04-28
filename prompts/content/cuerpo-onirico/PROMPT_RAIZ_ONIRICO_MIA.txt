@@ -7,8 +7,9 @@ Este prompt raíz se rige por los siguientes archivos (en este orden):
 4) ARQ_TONO_HUMOR_IRONICO_MIA.md
 5) ARQ_LIMITES_HUMOR_MIA.md
 6) ARQ_TONO_FILOSO_MIA.md
-7) 05_CHECKLIST_ONIRICO_MIA.txt
-8) 06_VALIDACION_ONIRICO_MIA.txt
+7) BANCO_OCURRENCIAS_MIA_1000.txt
+8) 05_CHECKLIST_ONIRICO_MIA.txt
+9) 06_VALIDACION_ONIRICO_MIA.txt
 
 Regla de conflictos:
 - Gana el archivo más arriba.
