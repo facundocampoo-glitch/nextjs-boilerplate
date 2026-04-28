@@ -14,7 +14,19 @@ async function supabaseInsert(table: string, data: Record<string, any>) {
       "Content-Type": "application/json",
       "apikey": SUPABASE_KEY,
       "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Prefer": "return=minimal",
+      "Prefer": "return=representation",
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+async function supabasePatch(table: string, id: string, data: Record<string, any>) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
     },
     body: JSON.stringify(data),
   });
@@ -47,7 +59,7 @@ function calcularAnimalChino(fecha: string): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const { userId, nombre, fechaNacimiento, horaNacimiento, lugarNacimiento, pais } = body;
+    const { userId, nombre, fechaNacimiento, horaNacimiento, lugarNacimiento, pais, locale } = body;
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -66,10 +78,11 @@ Signo solar: ${signo}
 Animal chino: ${animalChino}
 `.trim();
 
+    // Paso 1: generar texto
     const resMia = await fetch(`${BOILERPLATE_URL}/api/mia`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contentType: "cuerpo_astral", input, userId }),
+      body: JSON.stringify({ contentType: "cuerpo_astral", input, userId, locale: locale || "es-AR" }),
     });
 
     if (!resMia.ok) throw new Error("Error en /api/mia");
@@ -77,30 +90,37 @@ Animal chino: ${animalChino}
     const contenido = dataMia?.content;
     if (!contenido) throw new Error("Sin contenido");
 
-    let audioBase64: string | null = null;
-    try {
-      const resTts = await fetch(`${BOILERPLATE_URL}/api/generate-tts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: contenido, locale: "es-AR" }),
-      });
-      if (resTts.ok) {
-        const dataTts = await resTts.json();
-        audioBase64 = dataTts?.audioBase64 ?? dataTts?.audio_base64 ?? null;
-      }
-    } catch {}
-
-    await supabaseInsert("lecturas", {
+    // Paso 2: guardar texto en Supabase sin audio
+    const insertRes = await supabaseInsert("lecturas", {
       user_id: userId,
       tipo: "mirada_astral",
       titulo: "Mirada Astral",
       preview: contenido.slice(0, 200),
       contenido_completo: contenido,
-      audio_base64: audioBase64,
+      audio_base64: null,
       voz_activada: false,
     });
 
-    return NextResponse.json({ ok: true });
+    const insertData = await insertRes.json();
+    const lecturaId = insertData?.[0]?.id;
+
+    // Paso 3: generar audio en background sin esperar
+    if (lecturaId) {
+      fetch(`${BOILERPLATE_URL}/api/generate-tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: contenido, contentType: "cuerpo_astral", locale: locale || "es-AR" }),
+      }).then(async (resTts) => {
+        if (!resTts.ok) return;
+        const dataTts = await resTts.json();
+        const audioBase64 = dataTts?.audioBase64 ?? dataTts?.audio_base64 ?? null;
+        if (audioBase64) {
+          await supabasePatch("lecturas", lecturaId, { audio_base64: audioBase64 });
+        }
+      }).catch(() => {});
+    }
+
+    return NextResponse.json({ ok: true, lecturaId });
 
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Error" }, { status: 500 });
