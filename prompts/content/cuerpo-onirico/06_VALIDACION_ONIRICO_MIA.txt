@@ -1,7 +1,7 @@
 VALIDACIÓN — ONÍRICO (OBLIGATORIA)
 
 1) Generar la salida completa con la estructura del PROMPT RAÍZ.
-2) Aplicar reglas de ACUERDO + MANIFIESTO + ARQs.
+2) Aplicar reglas de ACUERDO_OPERATIVO_ONIRICO_MIA.txt + MANIFIESTO_DE_VOZ_MIA.md + ARQs.
 3) Pasar el texto por 05_CHECKLIST_ONIRICO_MIA.txt.
 4) Si falla algo → reescribir y volver al punto 3.
 5) Repetir hasta OK total.
