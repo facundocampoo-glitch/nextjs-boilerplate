@@ -1,7 +1,7 @@
 VALIDACIÓN — CUERPO ASTRAL (OBLIGATORIA)
 
 1) Generar salida completa con la estructura del PROMPT RAÍZ.
-2) Aplicar ACUERDO + MANIFIESTO + ARQs.
+2) Aplicar ACUERDO_OPERATIVO_CUERPO_ASTRAL_MIA.txt + MANIFIESTO_DE_VOZ_MIA.md + ARQs.
 3) Pasar 05_CHECKLIST_CUERPO_ASTRAL_MIA.txt.
 4) Si falla algo → reescribir y volver al punto 3.
 5) Repetir hasta OK total.
