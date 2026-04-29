@@ -105,6 +105,53 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
   return content.trim();
 }
 
+async function loadConcienciaMadre(): Promise<string> {
+  try {
+    const rootAbs = process.cwd();
+    const concienciaDir = path.join(rootAbs, "prompts", "mia-core", "conciencia-madre");
+    const files = await fs.readdir(concienciaDir);
+
+    // Orden de prioridad según PROMPT_RAIZ
+    const priority = [
+      "ACUERDO_OPERATIVO",
+      "MANIFIESTO_DE_VOZ_MIA",
+      "ARQ_FORMATO_AIRE_Y_CIERRES_MIA",
+      "ARQ_TONO_HUMOR_IRONICO_MIA",
+      "ARQ_LIMITES_HUMOR_MIA",
+      "ARQ_TONO_FILOSO_MIA",
+      "ARQ_MOTOR_CARACTER_MIA",
+      "BANCO_MECANISMOS_MIA_300",
+      "05_CHECKLIST_VALIDACION_MIA",
+      "06_VALIDACION_MIA_LOGICA",
+    ];
+
+    let text = "";
+
+    // Primero cargar en orden de prioridad
+    for (const name of priority) {
+      const match = files.find(f => f.startsWith(name));
+      if (match && (match.endsWith(".txt") || match.endsWith(".md"))) {
+        const content = await fs.readFile(path.join(concienciaDir, match), "utf8");
+        text += `\n\n${content}`;
+      }
+    }
+
+    // Luego cargar el resto que no estaba en la lista
+    for (const file of files) {
+      if (!file.endsWith(".txt") && !file.endsWith(".md")) continue;
+      const alreadyLoaded = priority.some(name => file.startsWith(name));
+      if (!alreadyLoaded) {
+        const content = await fs.readFile(path.join(concienciaDir, file), "utf8");
+        text += `\n\n${content}`;
+      }
+    }
+
+    return text;
+  } catch {
+    return "";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -147,18 +194,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 1) Cargar conciencia madre primero (voz, carácter, reglas)
+    const concienciaMadre = await loadConcienciaMadre();
+
+    // 2) Cargar archivos específicos del contentType
     const files = await fs.readdir(manifestDir);
-
-    let systemText = "";
-
+    let contentTypeText = "";
     for (const file of files) {
       if (file.endsWith(".txt") || file.endsWith(".md")) {
         const txt = await fs.readFile(path.join(manifestDir, file), "utf8");
-        systemText += `\n\n${txt}`;
+        contentTypeText += `\n\n${txt}`;
       }
     }
 
-    // Instrucción de idioma — siempre al final del system prompt
+    // 3) Combinar: conciencia madre primero, luego específico del tipo
+    let systemText = concienciaMadre + contentTypeText;
+
+    // 4) Instrucción de idioma al final
     systemText += `\n\n[MIA_LANGUAGE]\nYou MUST write your entire response in ${language}. Do not use any other language. The user's interface is in ${language} and they expect the reading in ${language}.\n[/MIA_LANGUAGE]`;
 
     const memory = new MemoryEngine(userId);
