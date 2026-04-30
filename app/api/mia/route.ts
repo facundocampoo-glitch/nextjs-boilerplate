@@ -89,7 +89,7 @@ async function openaiChat(systemText: string, userText: string, maxTokens: numbe
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
 
-  const model = process.env.OPENAI_MODEL || "gpt-4o";
+  const model = process.env.OPENAI_MODEL || "gpt-5-mini";
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
