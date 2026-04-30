@@ -105,6 +105,32 @@ async function openaiChat(systemText: string, userText: string): Promise<string>
   return content.trim();
 }
 
+async function loadConcienciaMadre(): Promise<string> {
+  try {
+    const rootAbs = process.cwd();
+    const concienciaDir = path.join(rootAbs, "prompts", "mia-core", "conciencia-madre");
+
+    const esenciales = [
+      "ACUERDO_OPERATIVO.txt",
+      "MANIFIESTO_DE_VOZ_MIA.md",
+      "ARQ_FORMATO_AIRE_Y_CIERRES_MIA.md",
+      "ARQ_TONO_FILOSO_MIA.md",
+      "ARQ_MOTOR_CARACTER_MIA.md",
+    ];
+
+    let text = "";
+    for (const file of esenciales) {
+      try {
+        const content = await fs.readFile(path.join(concienciaDir, file), "utf8");
+        text += `\n\n${content}`;
+      } catch {}
+    }
+    return text;
+  } catch {
+    return "";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -147,10 +173,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Conciencia madre desactivada temporalmente para diagnosticar
-    const concienciaMadre = "";
+    const concienciaMadre = await loadConcienciaMadre();
 
-    // Cargar archivos específicos del contentType
     const files = await fs.readdir(manifestDir);
     let contentTypeText = "";
     for (const file of files) {
