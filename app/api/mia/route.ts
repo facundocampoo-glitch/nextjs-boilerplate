@@ -35,7 +35,6 @@ const LENGTH_MAP: Record<string, { min: number; max: number; maxTokens: number }
   horoscopo_semanal:  { min: 2800,  max: 3500,  maxTokens: 5000  },
 };
 
-// Archivos de voz — van PRIMERO para que el modelo los tome como base
 const VOZ_PRIMERO = [
   "MANIFIESTO_DE_VOZ_MIA.md",
   "ARQ_TONO_FILOSO_MIA.md",
@@ -45,7 +44,6 @@ const VOZ_PRIMERO = [
   "ANTI_REPETICION_MIA.md",
 ];
 
-// Archivos de motor y operativa — van después
 const MOTOR_DESPUES = [
   "ARQ_MOTOR_CARACTER_MIA.md",
   "ACUERDO_OPERATIVO.txt",
@@ -91,7 +89,7 @@ async function openaiChat(systemText: string, userText: string, maxTokens: numbe
 
   const model = process.env.OPENAI_MODEL || "gpt-5-mini";
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -99,13 +97,11 @@ async function openaiChat(systemText: string, userText: string, maxTokens: numbe
     },
     body: JSON.stringify({
       model,
-      messages: [
+      max_output_tokens: maxTokens,
+      input: [
         { role: "system", content: systemText },
         { role: "user", content: userText },
       ],
-      temperature: 0.9,
-      top_p: 0.9,
-      max_tokens: maxTokens,
     }),
   });
 
@@ -115,7 +111,7 @@ async function openaiChat(systemText: string, userText: string, maxTokens: numbe
   }
 
   const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content;
+  const content = data?.output?.[0]?.content?.[0]?.text;
 
   if (!content) throw new Error("OpenAI returned empty content");
 
@@ -129,7 +125,6 @@ async function loadConcienciaMadre(): Promise<string> {
 
     let text = "";
 
-    // 1. Voz primero
     for (const file of VOZ_PRIMERO) {
       try {
         const content = await fs.readFile(path.join(concienciaDir, file), "utf8");
@@ -137,7 +132,6 @@ async function loadConcienciaMadre(): Promise<string> {
       } catch {}
     }
 
-    // 2. Motor y operativa después
     for (const file of MOTOR_DESPUES) {
       try {
         const content = await fs.readFile(path.join(concienciaDir, file), "utf8");
