@@ -26,10 +26,6 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
   "fr-FR": "French",
 };
 
-function normalizeContentType(ct: string): string {
-  return (ct || "").trim().toLowerCase().replace(/-/g, "_");
-}
-
 const LENGTH_MAP: Record<string, { min: number; max: number; maxTokens: number }> = {
   cuerpo_onirico:     { min: 5000,  max: 8000,  maxTokens: 10000 },
   cuerpo_psicomagico: { min: 3500,  max: 5500,  maxTokens: 7000  },
@@ -38,6 +34,10 @@ const LENGTH_MAP: Record<string, { min: number; max: number; maxTokens: number }
   horoscopo_diario:   { min: 900,   max: 1400,  maxTokens: 2000  },
   horoscopo_semanal:  { min: 2800,  max: 3500,  maxTokens: 5000  },
 };
+
+function normalizeContentType(ct: string): string {
+  return (ct || "").trim().toLowerCase().replace(/-/g, "_");
+}
 
 function buildLengthBlock(contentType: string): string {
   const range = LENGTH_MAP[contentType];
@@ -66,10 +66,6 @@ Explore layers before closing:
 Stay inside the target range.
 
 [/MIA_LENGTH]`;
-}
-
-function getMaxTokens(contentType: string): number {
-  return LENGTH_MAP[contentType]?.maxTokens ?? 8000;
 }
 
 async function openaiChat(systemText: string, userText: string, maxTokens: number): Promise<string> {
@@ -146,6 +142,7 @@ export async function POST(req: NextRequest) {
 
     const contentType = normalizeContentType(contentTypeRaw);
     const language = LOCALE_TO_LANGUAGE[locale] || "Spanish (Argentine)";
+    const maxTokens = LENGTH_MAP[contentType]?.maxTokens ?? 8000;
 
     const readingId = crypto.randomUUID();
 
@@ -199,7 +196,6 @@ export async function POST(req: NextRequest) {
     const occurrences = await pickOccurrences({ userId, count: 5 });
 
     const lengthBlock = buildLengthBlock(contentType);
-    const maxTokens = getMaxTokens(contentType);
 
     const userText = `
 ${lengthBlock}
