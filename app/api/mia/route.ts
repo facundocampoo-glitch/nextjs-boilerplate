@@ -35,6 +35,23 @@ const LENGTH_MAP: Record<string, { min: number; max: number; maxTokens: number }
   horoscopo_semanal:  { min: 2800,  max: 3500,  maxTokens: 5000  },
 };
 
+// Archivos de voz — van PRIMERO para que el modelo los tome como base
+const VOZ_PRIMERO = [
+  "MANIFIESTO_DE_VOZ_MIA.md",
+  "ARQ_TONO_FILOSO_MIA.md",
+  "ARQ_TONO_HUMOR_IRONICO_MIA.md",
+  "ARQ_LIMITES_HUMOR_MIA.md",
+  "ARQ_FORMATO_AIRE_Y_CIERRES_MIA.md",
+  "ANTI_REPETICION_MIA.md",
+];
+
+// Archivos de motor y operativa — van después
+const MOTOR_DESPUES = [
+  "ARQ_MOTOR_CARACTER_MIA.md",
+  "ACUERDO_OPERATIVO.txt",
+  "PROMPT_RAIZ_CONCIENCIA_MADRE__MOTOR_MIA300.txt",
+];
+
 function normalizeContentType(ct: string): string {
   return (ct || "").trim().toLowerCase().replace(/-/g, "_");
 }
@@ -110,21 +127,24 @@ async function loadConcienciaMadre(): Promise<string> {
     const rootAbs = process.cwd();
     const concienciaDir = path.join(rootAbs, "prompts", "mia-core", "conciencia-madre");
 
-    const esenciales = [
-      "ACUERDO_OPERATIVO.txt",
-      "MANIFIESTO_DE_VOZ_MIA.md",
-      "ARQ_FORMATO_AIRE_Y_CIERRES_MIA.md",
-      "ARQ_TONO_FILOSO_MIA.md",
-      "ARQ_MOTOR_CARACTER_MIA.md",
-    ];
-
     let text = "";
-    for (const file of esenciales) {
+
+    // 1. Voz primero
+    for (const file of VOZ_PRIMERO) {
       try {
         const content = await fs.readFile(path.join(concienciaDir, file), "utf8");
         text += `\n\n${content}`;
       } catch {}
     }
+
+    // 2. Motor y operativa después
+    for (const file of MOTOR_DESPUES) {
+      try {
+        const content = await fs.readFile(path.join(concienciaDir, file), "utf8");
+        text += `\n\n${content}`;
+      } catch {}
+    }
+
     return text;
   } catch {
     return "";
