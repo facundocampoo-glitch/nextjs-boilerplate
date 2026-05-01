@@ -111,7 +111,11 @@ async function openaiChat(systemText: string, userText: string, maxTokens: numbe
   }
 
   const data = await res.json();
-  const content = data?.output?.[0]?.content?.[0]?.text;
+
+  // Buscar el bloque del assistant en output (puede venir con role "assistant" o type "message")
+  const outputBlock = data?.output?.find((b: any) => b.role === "assistant" || b.type === "message");
+  const content = outputBlock?.content?.find((c: any) => c.type === "output_text" || c.type === "text")?.text
+    ?? outputBlock?.content?.[0]?.text;
 
   if (!content) throw new Error("OpenAI returned empty content");
 
