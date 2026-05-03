@@ -1,5 +1,8 @@
-import { normalizeLocale, pickVoiceId } from "./voice-map";
+// Archivo: lib/tts/eleven.ts
+// Ruta completa: lib/tts/eleven.ts (en el boilerplate de Next.js)
+// Qué hacer: REEMPLAZAR el archivo completo en GitHub
 
+import { normalizeLocale, pickVoiceId } from "./voice-map";
 export async function elevenTtsToBase64(args: {
   text: string;
   locale?: string;
@@ -10,15 +13,11 @@ export async function elevenTtsToBase64(args: {
 }) {
   const text = (args.text || "").trim();
   if (!text) throw new Error("Falta text");
-
   const locale = (args.locale || "").trim();
   const voice_id = pickVoiceId(locale, args.voice_id);
-
   const stability = typeof args.stability === "number" ? args.stability : 0.55;
   const similarity = typeof args.similarity === "number" ? args.similarity : 0.85;
-
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${voice_id}`;
-
   const r = await fetch(url, {
     method: "POST",
     headers: {
@@ -28,23 +27,20 @@ export async function elevenTtsToBase64(args: {
     },
     body: JSON.stringify({
       text,
-      model_id: "eleven_multilingual_v2",
+      model_id: "eleven_v3",
       voice_settings: {
         stability,
         similarity_boost: similarity,
       },
     }),
   });
-
   if (!r.ok) {
     const details = await r.text().catch(() => "");
     const msg = `ElevenLabs error ${r.status}: ${details.slice(0, 400)}`;
     throw new Error(msg);
   }
-
   const arrayBuffer = await r.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
-
   return {
     audio_base64: base64,
     voice_id_used: voice_id,
