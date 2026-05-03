@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/horoscopos-diarios",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/horoscopos-semanales",
+      "schedule": "0 * * * 6"
+    }
+  ]
+}
