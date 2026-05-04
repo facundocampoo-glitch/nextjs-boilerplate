@@ -1,6 +1,6 @@
 // Archivo: app/api/cron/horoscopos-semanales/route.ts
 // Ruta completa: app/api/cron/horoscopos-semanales/route.ts (en el boilerplate)
-// Qué hacer: CREAR archivo nuevo en GitHub
+// Qué hacer: REEMPLAZAR el archivo completo en GitHub
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
