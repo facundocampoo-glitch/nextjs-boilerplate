@@ -1,3 +1,7 @@
+// Archivo: app/api/mia/route.ts
+// Ruta completa: app/api/mia/route.ts (en el boilerplate)
+// Qué hacer: REEMPLAZAR el archivo completo en GitHub
+
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
@@ -31,9 +35,11 @@ const LENGTH_MAP: Record<string, { min: number; max: number; maxTokens: number }
   cuerpo_psicomagico: { min: 3500,  max: 5500,  maxTokens: 7000  },
   tarot_marselles:    { min: 9500,  max: 12500, maxTokens: 16000 },
   cuerpo_astral:      { min: 4200,  max: 6000,  maxTokens: 8000  },
-  horoscopo_diario:   { min: 900,   max: 1400,  maxTokens: 2000  },
-  horoscopo_semanal:  { min: 2800,  max: 3500,  maxTokens: 5000  },
+  horoscopo_diario:   { min: 900,   max: 1400,  maxTokens: 3500  },
+  horoscopo_semanal:  { min: 2800,  max: 3500,  maxTokens: 5500  },
 };
+
+const HOROSCOPO_TYPES = new Set(["horoscopo_diario", "horoscopo_semanal"]);
 
 const VOZ_PRIMERO = [
   "MANIFIESTO_DE_VOZ_MIA.md",
@@ -83,6 +89,19 @@ Stay inside the target range.
 [/MIA_LENGTH]`;
 }
 
+function buildOpeningBlock(contentType: string): string {
+  if (!HOROSCOPO_TYPES.has(contentType)) return "";
+
+  return `\n[MIA_OPENING]
+The user's name is provided in the input below (line "Nombre:").
+Begin the reading by addressing the user by their first name directly.
+Do NOT begin with the zodiac sign in capital letters (e.g. "LIBRA — HOY").
+Do NOT begin with the sign followed by a date.
+The first line must contain the user's name (e.g. "Facu, hoy..." or "Hola Facu," or similar natural opening).
+The zodiac sign and animal can be referenced naturally inside the body of the reading, never as the opening.
+[/MIA_OPENING]`;
+}
+
 async function openaiChat(systemText: string, userText: string, maxTokens: number): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
@@ -112,7 +131,6 @@ async function openaiChat(systemText: string, userText: string, maxTokens: numbe
 
   const data = await res.json();
 
-  // Buscar el bloque del assistant en output (puede venir con role "assistant" o type "message")
   const outputBlock = data?.output?.find((b: any) => b.role === "assistant" || b.type === "message");
   const content = outputBlock?.content?.find((c: any) => c.type === "output_text" || c.type === "text")?.text
     ?? outputBlock?.content?.[0]?.text;
@@ -214,9 +232,11 @@ export async function POST(req: NextRequest) {
     const occurrences = await pickOccurrences({ userId, count: 5 });
 
     const lengthBlock = buildLengthBlock(contentType);
+    const openingBlock = buildOpeningBlock(contentType);
 
     const userText = `
 ${lengthBlock}
+${openingBlock}
 
 [MIA_MECHANISMS]
 ${mechanisms.join("\n")}
