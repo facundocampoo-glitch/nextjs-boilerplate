@@ -1,6 +1,6 @@
 // Archivo: app/api/cron/horoscopos-diarios/route.ts
 // Ruta completa: app/api/cron/horoscopos-diarios/route.ts (en el boilerplate)
-// Qué hacer: CREAR archivo nuevo en GitHub
+// Qué hacer: REEMPLAZAR el archivo completo en GitHub
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -54,9 +54,10 @@ export async function GET(req: NextRequest) {
       if (!perfil) { salteados++; continue; }
 
       const tz = tzPorPais(perfil.pais);
-      const { hora, fechaISO } = horaLocal(tz);
+      const { hora, diaSemana, fechaISO } = horaLocal(tz);
 
       if (hora !== HORA_OBJETIVO) { salteados++; continue; }
+      if (diaSemana < 1 || diaSemana > 5) { salteados++; continue; }
 
       const yaGenerados: any[] = await supabaseGet(
         `lecturas?user_id=eq.${userId}&tipo=eq.horoscopo_solar_diario&created_at=gte.${fechaISO}T00:00:00&select=id`
