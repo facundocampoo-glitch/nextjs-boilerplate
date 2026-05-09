@@ -1,17 +1,13 @@
-// Archivo: app/api/cron/horoscopos-diarios/route.ts
-// Ruta completa: app/api/cron/horoscopos-diarios/route.ts (en el boilerplate)
-// Qué hacer: REEMPLAZAR el archivo completo en GitHub
-
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 import { NextRequest, NextResponse } from "next/server";
-import { tzPorPais, horaLocal } from "@/lib/timezone";
+import { resolverTimezone, horaLocal } from "@/lib/timezone";
 
 const SUPABASE_URL = process.env.mia_SUPABASE_URL || process.env.SUPABASE_URL!;
 const SUPABASE_KEY = process.env.mia_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const BOILERPLATE_URL = "https://nextjs-boilerplate-psi-orpin-34.vercel.app";
-const HORA_OBJETIVO = 7;
+const HORA_OBJETIVO = 6;
 
 async function supabaseGet(path: string) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -43,17 +39,18 @@ export async function GET(req: NextRequest) {
     let procesados = 0;
     let salteados = 0;
     let errores = 0;
+    const detalles: any[] = [];
 
     for (const sus of suscripciones) {
       const userId = sus.user_id;
 
       const perfiles: any[] = await supabaseGet(
-        `profiles?id=eq.${userId}&select=nombre,fecha_nacimiento,hora_nacimiento,lugar_nacimiento,pais`
+        `profiles?id=eq.${userId}&select=nombre,fecha_nacimiento,hora_nacimiento,lugar_nacimiento,pais,timezone,idioma`
       );
       const perfil = perfiles?.[0];
       if (!perfil) { salteados++; continue; }
 
-      const tz = tzPorPais(perfil.pais);
+      const tz = resolverTimezone(perfil);
       const { hora, diaSemana, fechaISO } = horaLocal(tz);
 
       if (hora !== HORA_OBJETIVO) { salteados++; continue; }
@@ -63,6 +60,8 @@ export async function GET(req: NextRequest) {
         `lecturas?user_id=eq.${userId}&tipo=eq.horoscopo_solar_diario&created_at=gte.${fechaISO}T00:00:00&select=id`
       );
       if (yaGenerados.length > 0) { salteados++; continue; }
+
+      const idiomaUsuario = perfil.idioma || "es-AR";
 
       try {
         const resp = await fetch(`${BOILERPLATE_URL}/api/generate-horoscopo`, {
@@ -75,16 +74,23 @@ export async function GET(req: NextRequest) {
             horaNacimiento: perfil.hora_nacimiento,
             lugarNacimiento: perfil.lugar_nacimiento,
             pais: perfil.pais,
-            locale: "es-AR",
+            locale: idiomaUsuario,
           }),
         });
-        if (resp.ok) procesados++; else errores++;
-      } catch {
+        if (resp.ok) {
+          procesados++;
+          detalles.push({ userId, tz, idioma: idiomaUsuario, status: "ok" });
+        } else {
+          errores++;
+          detalles.push({ userId, tz, status: "http_error", code: resp.status });
+        }
+      } catch (e: any) {
         errores++;
+        detalles.push({ userId, tz, status: "exception", error: e?.message });
       }
     }
 
-    return NextResponse.json({ ok: true, procesados, salteados, errores });
+    return NextResponse.json({ ok: true, procesados, salteados, errores, detalles });
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Error" }, { status: 500 });
   }
