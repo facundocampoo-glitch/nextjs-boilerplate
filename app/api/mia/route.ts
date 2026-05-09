@@ -92,14 +92,30 @@ Stay inside the target range.
 function buildOpeningBlock(contentType: string): string {
   if (!HOROSCOPO_TYPES.has(contentType)) return "";
 
-  return `\n[MIA_OPENING]
-The user's name is provided in the input below (line "Nombre:").
-Begin the reading by addressing the user by their first name directly.
-Do NOT begin with the zodiac sign in capital letters (e.g. "LIBRA — HOY").
-Do NOT begin with the sign followed by a date.
-The first line must contain the user's name (e.g. "Facu, hoy..." or "Hola Facu," or similar natural opening).
-The zodiac sign and animal can be referenced naturally inside the body of the reading, never as the opening.
-[/MIA_OPENING]`;
+  return `\n[MIA_OPENING_HARD_RULE]
+
+ABSOLUTE OPENING RULE — VIOLATING THIS RULE INVALIDATES THE READING:
+
+The user's name is given in the input under "Nombre:".
+
+The very first line of the reading MUST start with the user's name. Examples of correct openings:
+- "Facu,"
+- "Florencia."
+- "Hola Facu,"
+- "Facu — hoy"
+
+FORBIDDEN OPENINGS (DO NOT WRITE THESE — UNDER ANY CIRCUMSTANCE):
+- Zodiac sign in capital letters at the beginning (e.g. "LIBRA — HOY", "ARIES.", "PISCIS —")
+- Chinese animal in capital letters at the beginning (e.g. "MONO — HOY", "DRAGÓN.")
+- Any uppercase astrological label as the first word
+- Date as the first line
+- Any header, title, or label before the user's name
+
+The zodiac sign and Chinese animal can be mentioned naturally inside the body, but NEVER as the opening line.
+
+If you find yourself writing a sign name in caps at the start, STOP and rewrite the opening using the user's name instead.
+
+[/MIA_OPENING_HARD_RULE]`;
 }
 
 async function openaiChat(systemText: string, userText: string, maxTokens: number): Promise<string> {
