@@ -8,7 +8,7 @@ const SUPABASE_URL = process.env.mia_SUPABASE_URL || process.env.SUPABASE_URL!;
 const SUPABASE_KEY = process.env.mia_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const BOILERPLATE_URL = "https://nextjs-boilerplate-psi-orpin-34.vercel.app";
 const HORA_OBJETIVO = 6;
-const DIA_OBJETIVO = 6; // Sabado
+const DIA_OBJETIVO = 6;
 
 function calcularSignoSolar(fecha: string): string {
   if (!fecha) return "desconocido";
@@ -37,3 +37,123 @@ function calcularAnimalChino(fecha: string): string {
 async function supabaseGet(path: string) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` },
+  });
+  if (!r.ok) return [];
+  return r.json();
+}
+
+async function supabaseInsert(table: string, data: Record<string, any>) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Prefer": "return=representation",
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+async function generarSemanal(
+  userId: string,
+  perfil: any,
+  tipoLectura: string,
+  titulo: string,
+  signoOAnimal: string,
+  signoLabel: string,
+  locale: string
+) {
+  const lugar = [perfil.lugar_nacimiento, perfil.pais].filter(Boolean).join(", ") || "no especificado";
+  const input = `
+Nombre: ${perfil.nombre || "Usuario"}
+Fecha de nacimiento: ${perfil.fecha_nacimiento || "no especificada"}
+Hora de nacimiento: ${perfil.hora_nacimiento || "no especificada"}
+Lugar de nacimiento: ${lugar}
+${signoLabel}: ${signoOAnimal}
+Frecuencia: semanal
+`.trim();
+
+  const resMia = await fetch(`${BOILERPLATE_URL}/api/mia`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contentType: "horoscopo_semanal", input, userId, locale }),
+  });
+  if (!resMia.ok) throw new Error("Error en /api/mia");
+  const dataMia = await resMia.json();
+  const contenido = dataMia?.content;
+  if (!contenido) throw new Error("Sin contenido");
+
+  await supabaseInsert("lecturas", {
+    user_id: userId,
+    tipo: tipoLectura,
+    titulo,
+    preview: contenido.slice(0, 200),
+    contenido_completo: contenido,
+    audio_base64: null,
+    voz_activada: false,
+  });
+}
+
+export async function GET(req: NextRequest) {
+  const authHeader = req.headers.get("authorization") || "";
+  const cronSecret = process.env.CRON_SECRET || "";
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const suscripciones: any[] = await supabaseGet(`suscripciones?estado=eq.active&select=user_id`);
+    if (!suscripciones.length) {
+      return NextResponse.json({ ok: true, procesados: 0, mensaje: "Sin suscriptores activos" });
+    }
+
+    let procesados = 0;
+    let salteados = 0;
+    let errores = 0;
+    const detalles: any[] = [];
+
+    for (const sus of suscripciones) {
+      const userId = sus.user_id;
+
+      const perfiles: any[] = await supabaseGet(
+        `profiles?id=eq.${userId}&select=nombre,fecha_nacimiento,hora_nacimiento,lugar_nacimiento,pais,timezone,idioma`
+      );
+      const perfil = perfiles?.[0];
+      if (!perfil) { salteados++; continue; }
+
+      const tz = resolverTimezone(perfil);
+      const { hora, diaSemana } = horaLocal(tz);
+
+      if (hora !== HORA_OBJETIVO || diaSemana !== DIA_OBJETIVO) { salteados++; continue; }
+
+      const haceSeisDias = new Date();
+      haceSeisDias.setDate(haceSeisDias.getDate() - 6);
+      const limite = haceSeisDias.toISOString();
+      const yaGenerados: any[] = await supabaseGet(
+        `lecturas?user_id=eq.${userId}&tipo=eq.horoscopo_solar_semanal&created_at=gte.${limite}&select=id`
+      );
+      if (yaGenerados.length > 0) { salteados++; continue; }
+
+      const idiomaUsuario = perfil.idioma || "es-AR";
+
+      try {
+        const signo = calcularSignoSolar(perfil.fecha_nacimiento || "");
+        const animal = calcularAnimalChino(perfil.fecha_nacimiento || "");
+        await Promise.allSettled([
+          generarSemanal(userId, perfil, "horoscopo_solar_semanal", "Horóscopo Solar Semanal", signo, "Signo solar", idiomaUsuario),
+          generarSemanal(userId, perfil, "horoscopo_chino_semanal", "Horóscopo Chino Semanal", animal, "Animal chino", idiomaUsuario),
+        ]);
+        procesados++;
+        detalles.push({ userId, tz, idioma: idiomaUsuario, status: "ok" });
+      } catch (e: any) {
+        errores++;
+        detalles.push({ userId, tz, status: "exception", error: e?.message });
+      }
+    }
+
+    return NextResponse.json({ ok: true, procesados, salteados, errores, detalles });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Error" }, { status: 500 });
+  }
+}
