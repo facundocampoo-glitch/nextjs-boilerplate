@@ -31,15 +31,26 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
 };
 
 const LENGTH_MAP: Record<string, { min: number; max: number; maxTokens: number }> = {
-  cuerpo_onirico:     { min: 5000,  max: 8000,  maxTokens: 10000 },
-  cuerpo_psicomagico: { min: 3500,  max: 5500,  maxTokens: 7000  },
-  tarot_marselles:    { min: 9500,  max: 12500, maxTokens: 16000 },
-  cuerpo_astral:      { min: 4200,  max: 6000,  maxTokens: 8000  },
-  horoscopo_diario:   { min: 900,   max: 1400,  maxTokens: 3500  },
-  horoscopo_semanal:  { min: 2800,  max: 3500,  maxTokens: 5500  },
+  cuerpo_onirico:           { min: 5000,  max: 8000,  maxTokens: 10000 },
+  cuerpo_psicomagico:       { min: 3500,  max: 5500,  maxTokens: 7000  },
+  tarot_marselles:          { min: 9500,  max: 12500, maxTokens: 16000 },
+  cuerpo_astral:            { min: 4200,  max: 6000,  maxTokens: 8000  },
+  horoscopo_diario:         { min: 900,   max: 1400,  maxTokens: 3500  },
+  horoscopo_semanal:        { min: 2800,  max: 3500,  maxTokens: 5500  },
+  horoscopo_chino_diario:   { min: 900,   max: 1400,  maxTokens: 3500  },
+  horoscopo_chino_semanal:  { min: 2800,  max: 3500,  maxTokens: 5500  },
+  horoscopo_solar_diario:   { min: 900,   max: 1400,  maxTokens: 3500  },
+  horoscopo_solar_semanal:  { min: 2800,  max: 3500,  maxTokens: 5500  },
 };
 
-const HOROSCOPO_TYPES = new Set(["horoscopo_diario", "horoscopo_semanal"]);
+const HOROSCOPO_TYPES = new Set([
+  "horoscopo_diario",
+  "horoscopo_semanal",
+  "horoscopo_chino_diario",
+  "horoscopo_chino_semanal",
+  "horoscopo_solar_diario",
+  "horoscopo_solar_semanal",
+]);
 
 const VOZ_PRIMERO = [
   "MANIFIESTO_DE_VOZ_MIA.md",
