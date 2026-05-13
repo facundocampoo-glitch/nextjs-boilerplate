@@ -31,7 +31,7 @@ Aire visual: bloques 1–3 líneas, sin párrafos largos.
 Sin “VIÑETA”.
 
 1) APERTURA DIRECTA
-“SIGNO — HOY.”
+"<NOMBRE>, hoy."
 Clima (1–2 líneas). Sin explicar.
 
 2) CORTE DE REALIDAD
